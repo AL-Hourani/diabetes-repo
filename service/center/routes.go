@@ -152,6 +152,11 @@ func (h *Handler) handleGetPatients(w http.ResponseWriter , r *http.Request) {
 	// 	return
 	// }
 
+
+
+
+	// nothing ...............
+	
 	// center , err := h.store.GetCenterByEmail(user.Email)
 	// if err != nil {
 	// 	http.Error(w, "error get center for patient", http.StatusUnauthorized)
