@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS centers (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `centerName` VARCHAR(255) NOT NULL,
+    `centerPassword` VARCHAR(255) NOT NULL,
+    `centerAddress`  VARCHAR(255) NOT NULL,
+    `createAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    PRIMARY KEY(id),
+    UNIQUE KEY(centerName)
+);
