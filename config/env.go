@@ -12,6 +12,9 @@ type Config struct {
 	Port       string
 
 	DBUser     string
+	Host       string
+	DBPort     string
+	DBHost     string
 	DBPassword string
 	DBAddress  string
 	DBName     string
@@ -28,8 +31,10 @@ func initConfig() Config {
 	}
 	return Config{
 		PublicHost: GetEnv("PUBLIC_HOST", ""),
-		Port:GetEnv("PORT", "8080"),
-
+		Port:GetEnv("PORT", ""),
+        Host:GetEnv("HOST",""),
+		DBPort:GetEnv("DB_PORT" ,""),
+		DBHost:GetEnv("DB_HOST" ,""),
 		DBUser: GetEnv("DB_USER",""),
 		DBPassword: GetEnv("DB_PASSWORD", ""),
 		DBAddress: fmt.Sprintf("%s:%s", GetEnv("DB_HOST","") , GetEnv("DB_PORT","")),

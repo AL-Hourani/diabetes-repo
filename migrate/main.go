@@ -6,7 +6,6 @@ import (
 
 	"github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/data"
-	 mysqlCfg "github.com/go-sql-driver/mysql"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -15,14 +14,13 @@ import (
 
 
 func main() {
-	db , err := data.NewMQLStorage(mysqlCfg.Config{
-		User: 			config.Envs.DBUser,
-		Passwd:         config.Envs.DBPassword,
-		Addr:           config.Envs.DBAddress,
-		DBName:         config.Envs.DBName,
-		Net: "tcp",
-		AllowNativePasswords: true,
-		ParseTime: true,
+	db , err := data.NewMQLStorage(data.PostgresConfig{
+		User: 			  config.Envs.DBUser,
+		Password:         config.Envs.DBPassword,
+		Port:             config.Envs.DBPort,
+		Host:    		  config.Envs.DBHost,
+		DBName:           config.Envs.DBName,
+		SSLMode: "require",
 	})
 
 	if err != nil {

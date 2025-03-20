@@ -2,6 +2,11 @@ package types
 
 import "time"
 
+
+
+//postgress strorge 
+
+
 // patients..............................
 
 type PatientStore interface {
@@ -92,3 +97,13 @@ type RegisterPatientHealthOverviewPayload struct {
 	CurrentBloodSugerLevel		  string 		`json:"current_blood_suger_level"`
 	BloodSugerTrends			  string	    `json:"blood_suger_trends"`
 }
+
+
+
+
+
+
+
+
+
+

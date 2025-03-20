@@ -6,21 +6,19 @@ import (
 	"github.com/AL-Hourani/care-center/api"
 	"github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/data"
-	"github.com/go-sql-driver/mysql"
 )
 
 
 func main(){
 	
 	
-	db , err := data.NewMQLStorage(mysql.Config{
-		User: 			config.Envs.DBUser,
-		Passwd:         config.Envs.DBPassword,
-		Addr:           config.Envs.DBAddress,
-		DBName:         config.Envs.DBName,
-		Net: "tcp",
-		AllowNativePasswords: true,
-		ParseTime: true,
+	db , err := data.NewMQLStorage(data.PostgresConfig{
+		User: 			  config.Envs.DBUser,
+		Password:         config.Envs.DBPassword,
+		Port:             config.Envs.DBPort,
+		Host:    		  config.Envs.DBHost,
+		DBName:           config.Envs.DBName,
+		SSLMode: "require",
 	})
 
 	if err != nil {
@@ -31,7 +29,7 @@ func main(){
 
 
 
-	server := api.CreateNewAPIServer(":8080", db)
+	server := api.CreateNewAPIServer(config.GetEnv("PORT" , ""), db)
 	if err := server.Run() ; err != nil {
 		log.Fatal(err)
 	}
