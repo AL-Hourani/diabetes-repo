@@ -29,7 +29,7 @@ func main(){
 
 
 
-	server := api.CreateNewAPIServer(":" + config.GetEnv("PORT" , ""), db)
+	server := api.CreateNewAPIServer(":" + config.GetEnv("PORT" , "8080"), db)
 	if err := server.Run() ; err != nil {
 		log.Fatal(err)
 	}
