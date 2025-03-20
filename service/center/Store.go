@@ -17,10 +17,12 @@ func NewStore(db *sql.DB) *Store {
 }
 
 func (s *Store) GetCenterByName(centerName string) (*types.Center , error) {
-	rows , err := s.db.Query("SELECT * FROM centers WHERE centerName=?",centerName)
+	rows , err := s.db.Query("SELECT * FROM centers WHERE centerName=$1",centerName)
 	if err != nil {
 		return nil , err
 	}
+    
+defer rows.Close()
 
 	c := new(types.Center)
 	for rows.Next() {
@@ -62,7 +64,7 @@ func scanRowIntoCenter(rows *sql.Rows) (*types.Center , error ){
 
 
 func (s *Store)	GreateCenter(center types.Center) error {
-	_ , err := s.db.Exec("INSERT INTO centers (centerName ,centerPassword , centerAddress) VALUES (?,?,?)" , center.CenterName , center.CenterPassword , center.CenterAddress)
+	_ , err := s.db.Exec("INSERT INTO centers (centerName ,centerPassword , centerAddress) VALUES ($1, $2, $3)" , center.CenterName , center.CenterPassword , center.CenterAddress)
 	if err  != nil {
 		return err
 	}

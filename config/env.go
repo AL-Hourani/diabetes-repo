@@ -27,13 +27,10 @@ type Config struct {
 var Envs = initConfig()
 
 func initConfig() Config {
-	// if value, ok := os.LookupEnv("GO_ENV");ok {
-       
-	// 	err := godotenv.Load()
-	// 	if err != nil {
-	// 		fmt.Println("error can load .env file so we use the loacl env")
-	// 	}
-	// }
+		// err := godotenv.Load()
+		// if err != nil {
+		// 	fmt.Println("error can load .env file so we use the loacl env")
+		// }
 	return Config{
 		// PublicHost: GetEnv("PUBLIC_HOST", ""),
 		DBPort:GetEnv("DB_PORT" ,""),

@@ -17,7 +17,7 @@ func NewStore(db *sql.DB) *Store {
 }
 
 func (s *Store) GetPatientByEmail(email string) (*types.Patient , error) {
-	rows , err := s.db.Query("SELECT * FROM patients WHERE email=?", email)
+	rows , err := s.db.Query("SELECT * FROM patients WHERE email=$1", email)
 	if err != nil {
 		return nil , err
 	}
@@ -66,7 +66,7 @@ func  (s *Store) GetPatientById(id int) (*types.Patient , error) {
 
 // 3
 func (s *Store)	GreatePatient(patient types.Patient) error {
-	_ , err := s.db.Exec("INSERT INTO patients (fullName , email , password , center_id) VALUES (?,?,?,?)" , patient.FullName , patient.Email , patient.Password , patient.CenterID)
+	_ , err := s.db.Exec("INSERT INTO patients (fullName , email , password , center_id) VALUES ($1,$2,$3,$4)" , patient.FullName , patient.Email , patient.Password , patient.CenterID)
 	if err  != nil {
 		return err
 	}
