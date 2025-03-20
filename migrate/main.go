@@ -7,7 +7,9 @@ import (
 	"github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/data"
 	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/mysql"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+
+	
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
@@ -27,14 +29,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-    driver , err := mysql.WithInstance(db , &mysql.Config{})
+    driver , err :=postgres.WithInstance(db, &postgres.Config{})
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	m , err := migrate.NewWithDatabaseInstance(
 		"file://migrate/migrations",
-		"mysql",
+		"postgres",
 		driver,
 	)
 	if err != nil {
