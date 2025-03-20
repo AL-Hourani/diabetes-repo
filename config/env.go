@@ -30,12 +30,12 @@ func initConfig() Config {
 		fmt.Println("error can load .env file so we use the loacl env")
 	}
 	return Config{
-		PublicHost: GetEnv("PUBLIC_HOST", ""),
+		// PublicHost: GetEnv("PUBLIC_HOST", ""),
 		DBPort:GetEnv("DB_PORT" ,""),
 		DBHost:GetEnv("DB_HOST" ,""),
 		DBUser: GetEnv("DB_USER",""),
 		DBPassword: GetEnv("DB_PASSWORD", ""),
-		DBAddress: fmt.Sprintf("%s:%s", GetEnv("DB_HOST","") , GetEnv("DB_PORT","")),
+		// DBAddress: fmt.Sprintf("%s:%s", GetEnv("DB_HOST","") , GetEnv("DB_PORT","")),
 		DBName: GetEnv("DB_NAME",""),
 		JWTSecret: GetEnv("JWT_SECRET",""),
 		JWTExpirationInSecond: getEnvAsInt("JWT_EXP", 3600 * 24 * 7),
