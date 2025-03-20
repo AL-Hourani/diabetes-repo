@@ -18,7 +18,7 @@ func main(){
 		Port:             config.Envs.DBPort,
 		Host:    		  config.Envs.DBHost,
 		DBName:           config.Envs.DBName,
-		SSLMode: "require",
+		SSLMode: 		  config.Envs.DBSSL,
 	})
 
 	if err != nil {

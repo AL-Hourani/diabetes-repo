@@ -8,8 +8,6 @@ import (
 	"github.com/AL-Hourani/care-center/data"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
-
-	
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
@@ -22,7 +20,7 @@ func main() {
 		Port:             config.Envs.DBPort,
 		Host:    		  config.Envs.DBHost,
 		DBName:           config.Envs.DBName,
-		SSLMode: "require",
+		SSLMode:          config.Envs.DBSSL,
 	})
 
 	if err != nil {
