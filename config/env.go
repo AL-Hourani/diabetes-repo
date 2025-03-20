@@ -31,8 +31,6 @@ func initConfig() Config {
 	}
 	return Config{
 		PublicHost: GetEnv("PUBLIC_HOST", ""),
-		Port:GetEnv("PORT", ""),
-        Host:GetEnv("HOST",""),
 		DBPort:GetEnv("DB_PORT" ,""),
 		DBHost:GetEnv("DB_HOST" ,""),
 		DBUser: GetEnv("DB_USER",""),
