@@ -22,7 +22,7 @@ type Patient struct {
 	Email			string		 `json:"email"`
 	Password		string       `json:"password"`
 	Age             string		 `json:"age"`
-	Phone			string          `json:"phone"`
+	Phone			string        `json:"phone"`
 	CenterID		int			 `json:"center_id"`
 	CreateAt        time.Time    `json:"createAt"`
 }

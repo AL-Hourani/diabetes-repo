@@ -8,6 +8,7 @@ import (
 	"github.com/AL-Hourani/care-center/service/center"
 	"github.com/AL-Hourani/care-center/service/patient"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/handlers"
 )
 
 type APIServer struct {
@@ -38,11 +39,17 @@ func (s *APIServer) Run() error {
 	patientStore := patient.NewStore(s.db)
 	patientHandler := patient.NewHandler(patientStore , centerStore)
 	patientHandler.RegisterPatientRoutes(subrouter)
-
+   
+		// إعدادات CORS
+		cors := handlers.CORS(
+			handlers.AllowedOrigins([]string{"*"}), // السماح بجميع النطاقات
+			handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
+			handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
+		)
 
 
 	
 	log.Println("Listing on " , s.addr)
-	return http.ListenAndServe(s.addr , router)
+	return http.ListenAndServe(s.addr , cors(router))
 }
 
