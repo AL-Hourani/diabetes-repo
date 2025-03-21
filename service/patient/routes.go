@@ -6,6 +6,7 @@ import (
 
 	"github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/service/auth"
+	// "github.com/AL-Hourani/care-center/service/patient"
 	"github.com/AL-Hourani/care-center/types"
 	"github.com/AL-Hourani/care-center/utils"
 	"github.com/go-playground/validator/v10"
