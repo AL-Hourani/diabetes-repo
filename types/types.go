@@ -31,7 +31,7 @@ type RegisterPatientPayload struct {
 	FullName		string		 `json:"fullname" validate:"required"`
 	Email			string		 `json:"email"    validate:"required,email"`
 	Age 			string       `json:"age"    validate:"required"`
-	Phone           int			 `json:"phone"    validate:"required,min=10,max=10"`
+	Phone           int			 `json:"phone"    validate:"required"`
 	Password		string		 `json:"password" validate:"required"`
 	CenterName		string		 `json:"center_name" validate:"required"`
 }
