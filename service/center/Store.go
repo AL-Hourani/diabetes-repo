@@ -47,7 +47,50 @@ func scanRowIntoCenter(rows *sql.Rows) (*types.Center , error ){
 		&center.ID,
 		&center.CenterName,
 		&center.CenterPassword,
-		&center.CenterAddress,
+		&center.CenterEmail,
+		&center.CreateAt,
+	)
+	
+	if err  != nil {
+		return nil , err
+	}
+
+	return center , nil
+}
+
+//get center by emial 
+func (s *Store) GetCenterByEmail(centerEmail string) (*types.Center , error) {
+	rows , err := s.db.Query("SELECT * FROM centers WHERE centerEmail=$1",centerEmail)
+	if err != nil {
+		return nil , err
+	}
+    
+defer rows.Close()
+
+	c := new(types.Center)
+	for rows.Next() {
+		c , err = scanRowIntoCenterByEmail(rows)
+		if err != nil {
+			return nil , err
+		}
+	}
+
+	if c.ID == 0 {
+		return nil , fmt.Errorf("center not found")
+	}
+
+	return c , nil
+}
+
+
+func scanRowIntoCenterByEmail(rows *sql.Rows) (*types.Center , error ){
+	center := new(types.Center)
+
+	err := rows.Scan(
+		&center.ID,
+		&center.CenterName,
+		&center.CenterPassword,
+		&center.CenterEmail,
 		&center.CreateAt,
 	)
 	
@@ -63,8 +106,9 @@ func scanRowIntoCenter(rows *sql.Rows) (*types.Center , error ){
 
 
 
+
 func (s *Store)	GreateCenter(center types.Center) error {
-	_ , err := s.db.Exec("INSERT INTO centers (centerName ,centerPassword , centerAddress) VALUES ($1, $2, $3)" , center.CenterName , center.CenterPassword , center.CenterAddress)
+	_ , err := s.db.Exec("INSERT INTO centers (centerName ,centerPassword , centerEmail) VALUES ($1, $2, $3)" , center.CenterName , center.CenterPassword , center.CenterEmail)
 	if err  != nil {
 		return err
 	}
@@ -144,7 +188,7 @@ func scanRowIntoCenters(rows *sql.Rows) (*types.Center , error ){
 		&center.ID,
 		&center.CenterName,
 		&center.CenterPassword,
-		&center.CenterAddress,
+		&center.CenterEmail,
 		&center.CreateAt,
 	)
 	

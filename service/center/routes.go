@@ -8,7 +8,7 @@ import (
 	"github.com/AL-Hourani/care-center/service/auth"
 	"github.com/AL-Hourani/care-center/types"
 	"github.com/AL-Hourani/care-center/utils"
-	"github.com/go-playground/validator/v10"
+	// "github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
     
 )
@@ -22,7 +22,7 @@ func NewHandler(store types.CenterStore) *Handler {
 }
 
 func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
-	router.HandleFunc("/centerLogin", h.handleCenterLogin).Methods("POST")
+	// router.HandleFunc("/centerLogin", h.handleCenterLogin).Methods("POST")
 	router.HandleFunc("/centerRegister", h.handleCenterRegister).Methods("POST")
 	router.HandleFunc("/getPatients", h.handleGetPatients).Methods(http.MethodGet)
 	router.HandleFunc("/getCenters", h.handleGetCenters).Methods(http.MethodGet)
@@ -30,43 +30,43 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 
 
 
-func (h *Handler) handleCenterLogin(w http.ResponseWriter , r *http.Request) {
-		//get json payload
-		var centerPayload types.LoginCenterPayload
-		if err := utils.ParseJSON(r , &centerPayload); err != nil {
-			utils.WriteError(w , http.StatusBadRequest , err)
-		}
+// func (h *Handler) handleCenterLogin(w http.ResponseWriter , r *http.Request) {
+// 		//get json payload
+// 		var centerPayload types.LoginCenterPayload
+// 		if err := utils.ParseJSON(r , &centerPayload); err != nil {
+// 			utils.WriteError(w , http.StatusBadRequest , err)
+// 		}
 
-		//validate the payoad .....................
-	if err := utils.Validate.Struct(centerPayload);err != nil {
-		error := err.(validator.ValidationErrors)
-		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("invalid payload %v", error) )
-		return
-	}
+// 		//validate the payoad .....................
+// 	if err := utils.Validate.Struct(centerPayload);err != nil {
+// 		error := err.(validator.ValidationErrors)
+// 		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("invalid payload %v", error) )
+// 		return
+// 	}
 
-	//find center
-	center , err := h.store.GetCenterByName(centerPayload.CenterName)
-	if err != nil {
-		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("not found invalid center name or center password"))
-		return 
-	}
+// 	//find center
+// 	center , err := h.store.GetCenterByEmail(centerPayload.CenterEmail)
+// 	if err != nil {
+// 		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("not found invalid center email or center password"))
+// 		return 
+// 	}
 
-	if !auth.ComparePasswords(center.CenterPassword , [] byte(centerPayload.CenterPassword)) {
-		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("not found invalid password"))
-		return
-	}
+// 	if !auth.ComparePasswords(center.CenterPassword , [] byte(centerPayload.CenterPassword)) {
+// 		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("not found invalid password"))
+// 		return
+// 	}
 
-	secret := []byte(config.Envs.JWTSecret)
-	token , err := auth.CreateJWT(secret , center.ID)
+// 	secret := []byte(config.Envs.JWTSecret)
+// 	token , err := auth.CreateJWT(secret , center.ID)
     
-	if err != nil {
-		utils.WriteError(w , http.StatusInternalServerError ,err)
-		return
-	}
+// 	if err != nil {
+// 		utils.WriteError(w , http.StatusInternalServerError ,err)
+// 		return
+// 	}
 
-	utils.WriteJSON(w , http.StatusOK ,map[string]string{"toke":token})
+// 	utils.WriteJSON(w , http.StatusOK ,map[string]string{"toke":token})
 
-}
+// }
 
 
 
@@ -86,11 +86,18 @@ func (h *Handler) handleCenterRegister(w http.ResponseWriter , r *http.Request) 
 
 		
 	// check if center exists
-        _ , err := h.store.GetCenterByName(centerPayload.CenterName)
-		if err == nil {
-			utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("center with name %s already exists" , centerPayload.CenterName))
-			return 
-		}
+        // _ , err := h.store.GetCenterByName(centerPayload.CenterName)
+		// if err == nil {
+		// 	utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("center with name %s already exists" , centerPayload.CenterName))
+		// 	return 
+		// }
+	
+	//check if the center email is uniqe 
+	 _ , err := h.store.GetCenterByEmail(centerPayload.CenterEmail)
+	if err == nil {
+		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("center with email %s already exists" , centerPayload.CenterEmail))
+		return 
+	}
 	
 
 		hashedPassword , err := auth.HashPassword(centerPayload.CenterPassword)
@@ -102,7 +109,7 @@ func (h *Handler) handleCenterRegister(w http.ResponseWriter , r *http.Request) 
 	err = h.store.GreateCenter(types.Center{
 		CenterName: centerPayload.CenterName,
 		CenterPassword:hashedPassword,
-		CenterAddress: centerPayload.CenterAddress,
+		CenterEmail:centerPayload.CenterEmail,
 
 	})
 

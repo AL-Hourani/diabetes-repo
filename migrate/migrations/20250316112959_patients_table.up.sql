@@ -3,6 +3,8 @@ CREATE TABLE IF NOT EXISTS patients (
     fullName VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    phone   INT NOT NULL,
+    date     VARCHAR(255) NOT NULL,
     center_id INT NOT NULL,
     createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     

@@ -21,6 +21,8 @@ type Patient struct {
 	FullName		string		 `json:"fullname"`
 	Email			string		 `json:"email"`
 	Password		string       `json:"password"`
+	Age             string		 `json:"age"`
+	Phone			int          `json:"phone"`
 	CenterID		int			 `json:"center_id"`
 	CreateAt        time.Time    `json:"createAt"`
 }
@@ -28,11 +30,13 @@ type Patient struct {
 type RegisterPatientPayload struct {
 	FullName		string		 `json:"fullname" validate:"required"`
 	Email			string		 `json:"email"    validate:"required,email"`
+	Age 			string       `json:"age"    validate:"required"`
+	Phone           int			 `json:"phone"    validate:"required,min=10,max=10"`
 	Password		string		 `json:"password" validate:"required"`
 	CenterName		string		 `json:"center_name" validate:"required"`
 }
 
-type LoginPatientPayload struct {
+type LoginPayload struct {
 	Email			string		 `json:"email"    validate:"required,email"`
 	Password		string		 `json:"password" validate:"required"`
 }
@@ -42,6 +46,7 @@ type LoginPatientPayload struct {
 
 type CenterStore interface {
 	GetCenterByName(centerName string) (*Center , error) 
+	GetCenterByEmail(centerEmail string) (*Center , error)
 	GreateCenter(Center) error
 	GetPatients(centerID int)([]Patient , error)
 	GetCenters()([]Center , error)
@@ -51,7 +56,7 @@ type Center struct {
 	ID				int          `json:"centerId"`
     CenterName		string		 `json:"centerName"`
 	CenterPassword  string       `json:"centerPassword"`
-	CenterAddress	string       `json:"centerAddress"`
+	CenterEmail	    string       `json:"centerEmail"`
 	CreateAt        time.Time    `json:"createAt"`
 }
 
@@ -60,15 +65,15 @@ type Center struct {
 type RegisterCenterPayload struct {
 	CenterName		string		 `json:"centerName"  validate:"required"`
 	CenterPassword  string       `json:"centerPassword"  validate:"required"`
-	CenterAddress	string       `json:"centerAddress"  validate:"required"`
+	CenterEmail	    string       `json:"centerEmail"    validate:"required,email"`
 	CenterKey		string		 `json:"centerKey" validate:"required"`
 
 }
 
-type LoginCenterPayload struct {
-	CenterName		string		 `json:"centerName"  validate:"required"`
-	CenterPassword  string       `json:"centerPassword"  validate:"required"`
-}
+// type LoginCenterPayload struct {
+// 	CenterEmail		string		 `json:"centerEmail"    validate:"required,email"`
+// 	CenterPassword  string       `json:"centerPassword"  validate:"required"`
+// }
 
 //end....................................................
 

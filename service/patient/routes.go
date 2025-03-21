@@ -22,50 +22,81 @@ func NewHandler(store types.PatientStore , centerStore types.CenterStore ) *Hand
 }
 
 func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
-	router.HandleFunc("/patientLogin", h.handlePatientLogin).Methods("POST")
+	router.HandleFunc("/Login", h.handleLogin).Methods("POST")
 	router.HandleFunc("/patientRegister", h.handlePatientRegister).Methods("POST")
 }
 
-func (h *Handler) handlePatientLogin(w http.ResponseWriter , r *http.Request) {
+
+
+
+// handle login for both centres or patients
+//----------------------------------------------------------------------------
+
+
+
+func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 	//get json payload
-	var patientPayload types.LoginPatientPayload
-	if err := utils.ParseJSON(r , &patientPayload); err != nil {
+	var LoginPayload types.LoginPayload
+	if err := utils.ParseJSON(r , &LoginPayload); err != nil {
 		utils.WriteError(w , http.StatusBadRequest , err)
 		return
 	}
 
 	//validate the payoad .....................
-	if err := utils.Validate.Struct(patientPayload);err != nil {
+	if err := utils.Validate.Struct(LoginPayload);err != nil {
 		error := err.(validator.ValidationErrors)
 		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("invalid payload %v", error) )
 		return
 	}
 
-	//find patinet
-	patient , err := h.store.GetPatientByEmail(patientPayload.Email)
-	if err != nil {
-		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("not found invalid email or password"))
-		return 
-	}
 
-	if !auth.ComparePasswords(patient.Password , [] byte(patientPayload.Password)) {
-		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("not found invalid password"))
-		return
-	}
-    
-	secret := []byte(config.Envs.JWTSecret)
-	token , err := auth.CreateJWT(secret , patient.ID)
-    
-	if err != nil {
-		utils.WriteError(w , http.StatusInternalServerError ,err)
-		return
-	}
 
-	utils.WriteJSON(w , http.StatusOK ,map[string]string{"toke":token})
+
+	// find patient .............................................................
+
+
+
+    patient , errLogin := h.store.GetPatientByEmail(LoginPayload.Email)
+	if errLogin == nil {
+	    if !auth.ComparePasswords(patient.Password , [] byte(LoginPayload.Password)) {
+				utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("not found invalid password"))
+			return
+	    }
+
+		secret := []byte(config.Envs.JWTSecret)
+		token , err := auth.CreateJWT(secret , patient.ID)
+		
+		if err != nil {
+			utils.WriteError(w , http.StatusInternalServerError ,err)
+			return
+		}
+	
+		utils.WriteJSON(w , http.StatusOK ,map[string]string{"toke":token})
+		
+	} else  {
+		center , err2 := h.storeCenter.GetCenterByEmail(LoginPayload.Email)
+		if err2 != nil {
+			utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("not found invalid  email or password"))
+			return 
+		}
+		if !auth.ComparePasswords(center.CenterPassword , [] byte(LoginPayload.Password)) {
+			utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("not found invalid password"))
+			return
+		}
+	
+		secret := []byte(config.Envs.JWTSecret)
+		token , err := auth.CreateJWT(secret , center.ID)
+		
+		if err != nil {
+			utils.WriteError(w , http.StatusInternalServerError ,err)
+			return
+		}
+	
+		utils.WriteJSON(w , http.StatusOK ,map[string]string{"toke":token})
+	}
+	
 
 }
-
-
 
 
 
@@ -111,6 +142,8 @@ func (h *Handler) handlePatientRegister(w http.ResponseWriter , r *http.Request)
 		FullName: patientPayload.FullName,
 		Email: patientPayload.Email,
 		Password: hashedPassword,
+		Age: patientPayload.Age,
+		Phone:patientPayload.Phone,
 		CenterID: cenetr.ID,
 		
 	})

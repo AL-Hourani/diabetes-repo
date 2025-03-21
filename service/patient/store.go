@@ -21,6 +21,7 @@ func (s *Store) GetPatientByEmail(email string) (*types.Patient , error) {
 	if err != nil {
 		return nil , err
 	}
+	defer rows.Close()
 
 	p := new(types.Patient)
 	for rows.Next() {
@@ -66,7 +67,7 @@ func  (s *Store) GetPatientById(id int) (*types.Patient , error) {
 
 // 3
 func (s *Store)	GreatePatient(patient types.Patient) error {
-	_ , err := s.db.Exec("INSERT INTO patients (fullName , email , password , center_id) VALUES ($1,$2,$3,$4)" , patient.FullName , patient.Email , patient.Password , patient.CenterID)
+	_ , err := s.db.Exec("INSERT INTO patients (fullName , email , password ,phone , date , center_id) VALUES ($1,$2,$3,$4,$5,$6)" , patient.FullName , patient.Email , patient.Password,patient.Phone, patient.Age , patient.CenterID)
 	if err  != nil {
 		return err
 	}
