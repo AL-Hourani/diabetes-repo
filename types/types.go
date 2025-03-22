@@ -13,6 +13,7 @@ type PatientStore interface {
 	GetPatientByEmail(email string) (*Patient , error)
 	GetPatientById(id int) (*Patient , error)
 	GreatePatient(Patient) error
+	SetPersonlPatientBasicInfo(BasicPatientInfo) error
 
 }
 
@@ -34,11 +35,42 @@ type RegisterPatientPayload struct {
 	Phone           string	     `json:"phone"    validate:"required"`
 	Password		string		 `json:"password" validate:"required"`
 	CenterName		string		 `json:"center_name" validate:"required"`
+      
 }
+
+
+
+type BasicPatientInfo struct {
+	ID				int			   `json:"id"`
+	PatientID		int            `json:"patientID" validate:"required"`
+	Weight			string         `json:"weight" validate:"required"`
+	Length          string		   `json:"lenght" validate:"required"`
+	Address			string         `json:"address" validate:"required"`
+	Gender          string         `json:"gender" validate:"required"`
+	IDNumber        string         `json:"idNumber" validate:"required"`
+    CreateAt        time.Time      `json:"createAt"`
+} 
+
+type BasicPatientInfoPalyoad struct {
+	PatientID		int            `json:"patientID" validate:"required"`
+	Weight			string         `json:"weight" validate:"required"`
+	Length          string		   `json:"lenght" validate:"required"`
+	Address			string         `json:"address" validate:"required"`
+	Gender          string         `json:"gender" validate:"required"`
+	IDNumber        string         `json:"idNumber" validate:"required"`
+} 
 
 type LoginPayload struct {
 	Email			string		 `json:"email"    validate:"required,email"`
 	Password		string		 `json:"password" validate:"required"`
+}
+
+type ReturnLoggingData struct {
+	Name		    string		 `json:"name"`
+	Email			string		 `json:"email"`
+	Role 			string       `json:"role"`
+	IsCompletes     bool         `json:"isCompleted"`
+	Token            string      `json:"token"`
 }
 
 //end.......................................
@@ -77,31 +109,12 @@ type RegisterCenterPayload struct {
 
 //end....................................................
 
-type HealthOverviewStore interface {
-	SetPatientHealthOverview(PatientHealthOverview) error
-}
 
 
-type PatientHealthOverview struct {
-	ID 							  int          `json:"id" validate:"required"`
-	PatientID		              int          `json:"patient_id"  validate:"required"` 
-	Age							  int			 `json:"age"  validate:"required"`
-	Gender						  string       `json:"gender"  validate:"required"`
-	DiabetesType				  string 		 `json:"diabetes_type"  validate:"required"`
-	DiagnosisData				  string       `json:"diagnosis_data"  validate:"required"`
-	CurrentBloodSugerLevel		  string 		`json:"current_blood_suger_level"`
-	BloodSugerTrends			  string	    `json:"blood_suger_trends"`
-}
 
-type RegisterPatientHealthOverviewPayload struct {
-	PatientName		              string       `json:"patientName"  validate:"required"` 
-	Age							  int		   `json:"age"  validate:"required"`
-	Gender						  string       `json:"gender"  validate:"required"`
-	DiabetesType				  string 		`json:"diabetes_type"  validate:"required"`
-	DiagnosisData				  string       `json:"diagnosis_data"  validate:"required"`
-	CurrentBloodSugerLevel		  string 		`json:"current_blood_suger_level"`
-	BloodSugerTrends			  string	    `json:"blood_suger_trends"`
-}
+
+
+
 
 
 

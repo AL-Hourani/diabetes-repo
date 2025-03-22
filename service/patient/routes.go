@@ -25,6 +25,7 @@ func NewHandler(store types.PatientStore , centerStore types.CenterStore ) *Hand
 func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/Login", h.handleLogin).Methods("POST")
 	router.HandleFunc("/patientRegister", h.handlePatientRegister).Methods("POST")
+	router.HandleFunc("/setPatientPersonalInfo",h.handleSetPatientPersonalInfo).Methods("POST")
 }
 
 
@@ -56,7 +57,7 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 	// find patient .............................................................
 
 
-
+    
     patient , errLogin := h.store.GetPatientByEmail(LoginPayload.Email)
 	if errLogin == nil {
 	    if !auth.ComparePasswords(patient.Password , [] byte(LoginPayload.Password)) {
@@ -71,8 +72,18 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 			utils.WriteError(w , http.StatusInternalServerError ,err)
 			return
 		}
-	
-		utils.WriteJSON(w , http.StatusOK ,map[string]string{"toke":token})
+
+		returnLoggingData := types.ReturnLoggingData {
+			Name: patient.FullName,
+			Email: patient.Email,
+			Role: "patient",
+			IsCompletes: false,
+			Token: token,
+		}
+		
+
+	    
+		utils.WriteJSON(w , http.StatusOK ,returnLoggingData)
 		
 	} else  {
 		center , err2 := h.storeCenter.GetCenterByEmail(LoginPayload.Email)
@@ -92,8 +103,16 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 			utils.WriteError(w , http.StatusInternalServerError ,err)
 			return
 		}
+
+		returnLoggingData := types.ReturnLoggingData {
+			Name: center.CenterName,
+			Email: center.CenterEmail,
+			Role: "center",
+			IsCompletes: true,
+			Token: token,
+		}
 	
-		utils.WriteJSON(w , http.StatusOK ,map[string]string{"toke":token})
+		utils.WriteJSON(w , http.StatusOK ,returnLoggingData)
 	}
 	
 
@@ -157,3 +176,54 @@ func (h *Handler) handlePatientRegister(w http.ResponseWriter , r *http.Request)
 	utils.WriteJSON(w , http.StatusCreated , map[string]string{"message":"successfully Created"})
 }
 
+
+
+
+
+//
+
+
+func (h *Handler) handleSetPatientPersonalInfo(w http.ResponseWriter , r *http.Request) {
+	var personalPatientInfo types.BasicPatientInfoPalyoad
+		//get json payload
+		if err := utils.ParseJSON(r , &personalPatientInfo); err != nil {
+			utils.WriteError(w , http.StatusBadRequest , err)
+			return
+		}
+
+	//validate the payoad .....................
+	if err := utils.Validate.Struct(personalPatientInfo);err != nil {
+		error := err.(validator.ValidationErrors)
+		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("invalid payload %v", error) )
+		return
+	}
+
+
+
+	_ , err := h.store.GetPatientById(personalPatientInfo.PatientID)
+	if err != nil {
+		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("patient with id %d is not exists" ,personalPatientInfo.PatientID ))
+		return 
+	}
+
+
+	err = h.store.SetPersonlPatientBasicInfo(types.BasicPatientInfo{
+        PatientID: personalPatientInfo.PatientID,
+		Weight: personalPatientInfo.Weight,
+		Length: personalPatientInfo.Length,
+		Address: personalPatientInfo.Address,
+		Gender: personalPatientInfo.Gender,
+		IDNumber: personalPatientInfo.IDNumber,
+		
+	})
+
+	if err != nil {
+		utils.WriteError(w , http.StatusBadRequest ,err)
+		return 
+	}
+
+
+    utils.WriteJSON(w , http.StatusCreated , map[string]string{"message":"successfully add basic info"})
+
+
+}
