@@ -46,6 +46,8 @@ func scanRowIntoPatientBy(rows *sql.Rows) (*types.Patient , error ){
 		&patient.FullName,
 		&patient.Email,
 		&patient.Password,
+		&patient.Age,
+		&patient.Phone,
 		&patient.CenterID,
 		&patient.CreateAt,
 	)
@@ -88,6 +90,8 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 		&patient.FullName,
 		&patient.Email,
 		&patient.Password,
+		&patient.Age,
+		&patient.Phone,
 		&patient.CenterID,
 		&patient.CreateAt,
 	)
