@@ -25,7 +25,7 @@ func (s *Store) GetPatientByEmail(email string) (*types.Patient , error) {
 
 	p := new(types.Patient)
 	for rows.Next() {
-		p , err = scanRowIntoPatient(rows)
+		p , err = scanRowIntoPatientBy(rows)
 		if err != nil {
 			return nil , err
 		}
@@ -36,6 +36,25 @@ func (s *Store) GetPatientByEmail(email string) (*types.Patient , error) {
 	}
 
 	return p , nil
+}
+
+func scanRowIntoPatientBy(rows *sql.Rows) (*types.Patient , error ){
+	patient := new(types.Patient)
+
+	err := rows.Scan(
+		&patient.ID,
+		&patient.FullName,
+		&patient.Email,
+		&patient.Password,
+		&patient.CenterID,
+		&patient.CreateAt,
+	)
+	
+	if err  != nil {
+		return nil , err
+	}
+
+	return patient , nil
 }
 
 func  (s *Store) GetPatientById(id int) (*types.Patient , error) {
