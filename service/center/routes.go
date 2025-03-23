@@ -112,6 +112,8 @@ func (h *Handler) handleCenterRegister(w http.ResponseWriter , r *http.Request) 
 		CenterEmail:centerPayload.CenterEmail,
 
 	})
+  
+	
 
 	if err != nil {
 		utils.WriteError(w , http.StatusBadRequest ,err)

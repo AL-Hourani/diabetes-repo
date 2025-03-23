@@ -14,6 +14,7 @@ type PatientStore interface {
 	GetPatientById(id int) (*Patient , error)
 	GreatePatient(Patient) error
 	SetPersonlPatientBasicInfo(BasicPatientInfo) error
+	GetPatientsForCenter(CenterID int) ([]int , error) 
 
 }
 
@@ -71,6 +72,14 @@ type ReturnLoggingData struct {
 	Role 			string       `json:"role"`
 	IsCompletes     bool         `json:"isCompleted"`
 	Token            string      `json:"token"`
+}
+type ReturnLoggingCenterData struct {
+	Name		    string		 `json:"name"`
+	Email			string		 `json:"email"`
+	Role 			string       `json:"role"`
+	IsCompletes     bool         `json:"isCompleted"`
+	Patient			[]int        `json:"patient"`
+	Token           string      `json:"token"`
 }
 
 //end.......................................

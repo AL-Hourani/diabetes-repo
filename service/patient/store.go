@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
+
 	"github.com/AL-Hourani/care-center/types"
 )
 
@@ -106,6 +107,50 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 
 
 // 2
+
+func  (s *Store) GetPatientsForCenter(CenterID int) ([]int , error) {
+	rows , err := s.db.Query("SELECT * FROM patients WHERE center_id=$1",CenterID)
+	if err != nil {
+		return nil , err
+	}
+	defer rows.Close()
+
+	patients_id := make([]int , 0)
+	for rows.Next() {
+		p , err := scanRowIntoPatients(rows)
+		if err != nil {
+			return nil , err
+		}
+
+		patients_id = append(patients_id , p.ID)
+	}
+
+	return patients_id , nil
+}
+
+
+func scanRowIntoPatients(rows *sql.Rows) (*types.Patient , error ){
+	patient := new(types.Patient)
+
+	err := rows.Scan(
+		&patient.ID,
+		&patient.FullName,
+		&patient.Email,
+		&patient.Password,
+		&patient.Age,
+		&patient.Phone,
+		&patient.CenterID,
+		&patient.CreateAt,
+	)
+	
+	if err  != nil {
+		return nil , err
+	}
+
+	return patient , nil
+}
+
+
 
 
 // 3

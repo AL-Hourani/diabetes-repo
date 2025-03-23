@@ -3,9 +3,11 @@ package patient
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/service/auth"
+
 	// "github.com/AL-Hourani/care-center/service/patient"
 	"github.com/AL-Hourani/care-center/types"
 	"github.com/AL-Hourani/care-center/utils"
@@ -26,6 +28,7 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/Login", h.handleLogin).Methods("POST")
 	router.HandleFunc("/patientRegister", h.handlePatientRegister).Methods("POST")
 	router.HandleFunc("/setPatientPersonalInfo",h.handleSetPatientPersonalInfo).Methods("POST")
+	router.HandleFunc("/getPatient/{id}" , h.handleGetPatient).Methods("GET")
 }
 
 
@@ -104,11 +107,18 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 			return
 		}
 
-		returnLoggingData := types.ReturnLoggingData {
+		patients_id , err := h.store.GetPatientsForCenter(center.ID)
+		if err != nil {
+			
+		}
+
+
+		returnLoggingData := types.ReturnLoggingCenterData {
 			Name: center.CenterName,
 			Email: center.CenterEmail,
 			Role: "center",
 			IsCompletes: true,
+			Patient: patients_id,
 			Token: token,
 		}
 	
@@ -224,6 +234,32 @@ func (h *Handler) handleSetPatientPersonalInfo(w http.ResponseWriter , r *http.R
 
 
     utils.WriteJSON(w , http.StatusCreated , map[string]string{"message":"successfully add basic info"})
+
+
+}
+
+
+
+func (h *Handler) handleGetPatient (w http.ResponseWriter , r *http.Request) {
+	
+	vars := mux.Vars(r)
+	id , err := strconv.Atoi(vars["id"])
+	if err != nil  {
+       utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid ID"))
+       return
+	}
+
+
+	patient , err := h.store.GetPatientById(id)
+	if err != nil {
+		utils.WriteError(w , http.StatusBadRequest ,err)
+		return 
+	}
+
+
+
+	utils.WriteJSON(w , http.StatusOK , patient)
+
 
 
 }
