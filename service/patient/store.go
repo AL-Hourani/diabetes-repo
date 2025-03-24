@@ -187,7 +187,8 @@ func (s *Store) SetPatientHealthInfo(healthInfo types.HealthPatientData) error {
 func (s *Store) GetAllPatientInfo(id int) (*types.ReaturnAllPatientInfo , error) {
 	rows , err := s.db.Query(`SELECT fullName,email,phone,date,wight,length_patient,address_patient,gender,id_number,bloodSugar,hemoglobin,bloodPressure,
 	sugarType,diseaseDetection,otherDisease,typeOfMedicine,urineAcid,cholesterol,grease,historyOfFamilyDisease
-	FROM patients INNER JOIN basic_patient_info,patient_health_info ON id=patient_id  WHERE id=$1`,id)
+	FROM patients p INNER JOIN  basic_patient_info b ON p.id = b.patient_id  INNER JOIN 
+	patient_health_info h ON p.id = h.patient_id  WHERE id=$1`,id)
 	if err != nil {
 		return nil , err
 	}
