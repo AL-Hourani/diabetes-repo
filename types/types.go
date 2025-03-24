@@ -14,7 +14,9 @@ type PatientStore interface {
 	GetPatientById(id int) (*Patient , error)
 	GreatePatient(Patient) error
 	SetPersonlPatientBasicInfo(BasicPatientInfo) error
+	SetPatientHealthInfo(HealthPatientData) error
 	GetPatientsForCenter(CenterID int) ([]int , error) 
+	GetAllPatientInfo(id int) (*ReaturnAllPatientInfo , error)
 
 }
 
@@ -82,6 +84,64 @@ type ReturnLoggingCenterData struct {
 	Token           string      `json:"token"`
 }
 
+type HealthPatientData struct {
+	ID              int            `json:"id" validate:"required"`
+	PatientID		int            `json:"patientID" validate:"required"`
+	BloodSugar      string		   `json:"booldSugar" validate:"required"`	
+	Hemoglobin      string         `json:"hemoglobin" validate:"required"`
+	BloodPressure   string         `json:"bloodPressure" validate:"required"`
+	SugarType		string         `json:"sugarType" validate:"required"`	
+	DiseaseDetection string        `json:"diseaseDetection" validate:"required"`
+	OtherDisease     string        `json:"OtherDisease" validate:"required"`
+	TypeOfMedicine   string        `json:"typeOfMedicine" validate:"required"`
+	UrineAcid        string        `json:"urineAcid" validate:"required"`
+	Cholesterol      string        `json:"cholesterol" validate:"required"`
+	Grease			 string        `json:"grease" validate:"required"`
+	HistoryOfFamilyDisease string  `json:"historyOfFamilyDisease" validate:"required"`
+	CreateAt        time.Time      `json:"createAt"`
+}
+
+
+type RegisterHealthPatientData struct {
+	PatientID		int            `json:"patientID" validate:"required"`
+	BloodSugar      string		   `json:"booldSugar" validate:"required"`	
+	Hemoglobin      string         `json:"hemoglobin" validate:"required"`
+	BloodPressure   string         `json:"bloodPressure" validate:"required"`
+	SugarType		string         `json:"sugarType" validate:"required"`	
+	DiseaseDetection string        `json:"diseaseDetection" validate:"required"`
+	OtherDisease     string        `json:"OtherDisease" validate:"required"`
+	TypeOfMedicine   string        `json:"typeOfMedicine" validate:"required"`
+	UrineAcid        string        `json:"urineAcid" validate:"required"`
+	Cholesterol      string        `json:"cholesterol" validate:"required"`
+	Grease			 string        `json:"grease" validate:"required"`
+	HistoryOfFamilyDisease string  `json:"historyOfFamilyDisease" validate:"required"`
+}
+
+
+type ReaturnAllPatientInfo struct {
+	FullName		string		   `json:"fullname"`
+	Email			string		   `json:"email"`
+	Age             string		   `json:"age"`
+	Phone			string         `json:"phone"`
+	Weight			string         `json:"weight"`
+	Length          string		   `json:"lenght" `
+	Address			string         `json:"address"`
+	Gender          string         `json:"gender" `
+	IDNumber        string         `json:"idNumber"`
+	BloodSugar      string		   `json:"booldSugar" `	
+	Hemoglobin      string         `json:"hemoglobin"`
+	BloodPressure   string         `json:"bloodPressure" `
+	SugarType		string         `json:"sugarType"`	
+	DiseaseDetection string        `json:"diseaseDetection"`
+	OtherDisease     string        `json:"OtherDisease" `
+	TypeOfMedicine   string        `json:"typeOfMedicine"`
+	UrineAcid        string        `json:"urineAcid"`
+	Cholesterol      string        `json:"cholesterol"`
+	Grease			 string        `json:"grease"`
+	HistoryOfFamilyDisease string  `json:"historyOfFamilyDisease"`
+}
+
+
 //end.......................................
 //center....................................
 
@@ -119,7 +179,9 @@ type RegisterCenterPayload struct {
 //end....................................................
 
 
-
+type OTpPayload struct {
+	OTPCode          int16         `json:"otpCode"`        
+}
 
 
 

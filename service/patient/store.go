@@ -172,3 +172,68 @@ func (s *Store) SetPersonlPatientBasicInfo(basicInfo types.BasicPatientInfo) err
 
 	return nil
 }
+
+
+func (s *Store) SetPatientHealthInfo(healthInfo types.HealthPatientData) error {
+	_ , err := s.db.Exec("INSERT INTO patient_health_info (patient_id , bloodSugar , hemoglobin , bloodPressure ,sugarType , diseaseDetection , otherDisease , typeOfMedicine , urineAcid  , cholesterol , grease , historyOfFamilyDisease) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)" , healthInfo.PatientID , healthInfo.BloodSugar , healthInfo.Hemoglobin , healthInfo.BloodPressure ,healthInfo.SugarType ,  healthInfo.DiseaseDetection , healthInfo.OtherDisease , healthInfo.TypeOfMedicine , healthInfo.UrineAcid , healthInfo.Cholesterol , healthInfo.Grease , healthInfo.HistoryOfFamilyDisease)
+	if err  != nil {
+		return err
+	}
+
+	return nil
+}
+
+
+func (s *Store) GetAllPatientInfo(id int) (*types.ReaturnAllPatientInfo , error) {
+	rows , err := s.db.Query(`SELECT fullName,email,phone,date,wight,length_patient,address_patient,gender,id_number,bloodSugar,hemoglobin,bloodPressure,
+	sugarType,diseaseDetection,otherDisease,typeOfMedicine,urineAcid,cholesterol,grease,historyOfFamilyDisease
+	FROM patients INNER JOIN basic_patient_info,patient_health_info ON id=patient_id  WHERE id=$1`,id)
+	if err != nil {
+		return nil , err
+	}
+	defer rows.Close()
+
+	allPatentInfo := new(types.ReaturnAllPatientInfo)
+	for rows.Next() {
+		allPatentInfo , err = scanRowIntoAllPatient(rows)
+		if err != nil {
+			return nil , err
+		}
+	}
+
+	return allPatentInfo , nil
+}
+
+func scanRowIntoAllPatient(rows *sql.Rows) (*types.ReaturnAllPatientInfo , error ){
+	allpatientInfo := new(types.ReaturnAllPatientInfo)
+
+	err := rows.Scan(
+		&allpatientInfo.FullName,
+		&allpatientInfo.Email,
+		&allpatientInfo.Phone,
+		&allpatientInfo.Age,
+		&allpatientInfo.Weight,
+		&allpatientInfo.Length,
+		&allpatientInfo.Address,
+		&allpatientInfo.Gender,
+		&allpatientInfo.IDNumber,
+		&allpatientInfo.BloodSugar,
+		&allpatientInfo.Hemoglobin,
+		&allpatientInfo.BloodPressure,
+		&allpatientInfo.SugarType,
+		&allpatientInfo.DiseaseDetection,
+		&allpatientInfo.OtherDisease,
+		&allpatientInfo.TypeOfMedicine,
+		&allpatientInfo.UrineAcid,
+		&allpatientInfo.Cholesterol,
+		&allpatientInfo.Grease,
+		&allpatientInfo.HistoryOfFamilyDisease,
+
+	)
+	
+	if err  != nil {
+		return nil , err
+	}
+
+	return allpatientInfo , nil
+}

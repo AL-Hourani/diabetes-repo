@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/AL-Hourani/care-center/types"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -26,4 +28,19 @@ func WriteJSON(w http.ResponseWriter , status int , v any) error {
 
 func WriteError(w http.ResponseWriter , status int , err error) {
 	WriteJSON(w , status , map[string]string{"error":err.Error()})
+}
+
+
+
+func CheckOTP(w http.ResponseWriter  , r *http.Request, status int , GeneratedOTP int){
+	var optCode types.OTpPayload
+	if err := ParseJSON(r , &optCode); err != nil {
+		WriteError(w , http.StatusBadRequest , err)
+		return
+	}
+
+	if optCode.OTPCode == int16(GeneratedOTP) {
+		WriteJSON(w , status , map[string]string{"success":"valid Email"})
+	}
+
 }

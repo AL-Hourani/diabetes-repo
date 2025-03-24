@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS health_info;
+DROP TABLE IF EXISTS basic_patient_info;
