@@ -48,6 +48,8 @@ func scanRowIntoPatientBy(rows *sql.Rows) (*types.Patient , error ){
 		&patient.Email,
 		&patient.Password,
 		&patient.Age,
+		&patient.IDNumber,
+		&patient.IsCompleted,
 		&patient.Phone,
 		&patient.CenterID,
 		&patient.CreateAt,
@@ -92,6 +94,8 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 		&patient.Email,
 		&patient.Password,
 		&patient.Age,
+		&patient.IDNumber,
+		&patient.IsCompleted,
 		&patient.Phone,
 		&patient.CenterID,
 		&patient.CreateAt,
@@ -108,39 +112,41 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 
 // 2
 
-func  (s *Store) GetPatientsForCenter(CenterID int) ([]int , error) {
-	rows , err := s.db.Query("SELECT * FROM patients WHERE center_id=$1",CenterID)
+func  (s *Store) GetPatientsForCenter(CenterID int) ([]types.CardData , error) {
+	rows , err := s.db.Query(`SELECT fullName,email,phone,isCompleted,date,id_number,sugarType 
+	 FROM patients p INNER JOIN patient_health_info h ON p.id = h.patient_id  WHERE p.center_id=$1`,CenterID)
 	if err != nil {
 		return nil , err
 	}
 	defer rows.Close()
 
-	patients_id := make([]int , 0)
+	patientsCard := make([]types.CardData , 0)
 	for rows.Next() {
 		p , err := scanRowIntoPatients(rows)
 		if err != nil {
 			return nil , err
 		}
 
-		patients_id = append(patients_id , p.ID)
+		patientsCard = append(patientsCard , *p)
 	}
 
-	return patients_id , nil
+	return patientsCard , nil
 }
 
 
-func scanRowIntoPatients(rows *sql.Rows) (*types.Patient , error ){
-	patient := new(types.Patient)
+func scanRowIntoPatients(rows *sql.Rows) (*types.CardData , error ){
+	patient := new(types.CardData)
 
 	err := rows.Scan(
 		&patient.ID,
 		&patient.FullName,
 		&patient.Email,
-		&patient.Password,
 		&patient.Age,
 		&patient.Phone,
-		&patient.CenterID,
-		&patient.CreateAt,
+		&patient.IDNumber,
+		&patient.IsCompleted,
+		&patient.SugarType,
+        
 	)
 	
 	if err  != nil {
@@ -155,7 +161,7 @@ func scanRowIntoPatients(rows *sql.Rows) (*types.Patient , error ){
 
 // 3
 func (s *Store)	GreatePatient(patient types.Patient) error {
-	_ , err := s.db.Exec("INSERT INTO patients (fullName , email , password ,phone , date , center_id) VALUES ($1,$2,$3,$4,$5,$6)" , patient.FullName , patient.Email , patient.Password,patient.Phone, patient.Age , patient.CenterID)
+	_ , err := s.db.Exec("INSERT INTO patients (fullName , email , password ,phone , date , id_number , isCompleted , center_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)" , patient.FullName , patient.Email , patient.Password,patient.Phone, patient.Age ,patient.IDNumber , patient.IsCompleted , patient.CenterID)
 	if err  != nil {
 		return err
 	}
@@ -165,7 +171,7 @@ func (s *Store)	GreatePatient(patient types.Patient) error {
 
 
 func (s *Store) SetPersonlPatientBasicInfo(basicInfo types.BasicPatientInfo) error{
-	_ , err := s.db.Exec("INSERT INTO basic_patient_info (patient_id , gender , wight , length_patient ,address_patient , id_number) VALUES ($1,$2,$3,$4,$5,$6)" , basicInfo.PatientID , basicInfo.Gender , basicInfo.Weight , basicInfo.Length , basicInfo.Address , basicInfo.IDNumber )
+	_ , err := s.db.Exec("INSERT INTO basic_patient_info (patient_id , gender , wight , length_patient ,address_patient) VALUES ($1,$2,$3,$4,$5)" , basicInfo.PatientID , basicInfo.Gender , basicInfo.Weight , basicInfo.Length , basicInfo.Address  )
 	if err  != nil {
 		return err
 	}
@@ -185,7 +191,7 @@ func (s *Store) SetPatientHealthInfo(healthInfo types.HealthPatientData) error {
 
 
 func (s *Store) GetAllPatientInfo(id int) (*types.ReaturnAllPatientInfo , error) {
-	rows , err := s.db.Query(`SELECT fullName,email,phone,date,wight,length_patient,address_patient,gender,id_number,bloodSugar,hemoglobin,bloodPressure,
+	rows , err := s.db.Query(`SELECT fullName,email,phone,isCompleted,date,wight,length_patient,address_patient,gender,id_number,bloodSugar,hemoglobin,bloodPressure,
 	sugarType,diseaseDetection,otherDisease,typeOfMedicine,urineAcid,cholesterol,grease,historyOfFamilyDisease
 	FROM patients p INNER JOIN  basic_patient_info b ON p.id = b.patient_id  INNER JOIN 
 	patient_health_info h ON p.id = h.patient_id  WHERE p.id=$1`,id)
@@ -217,6 +223,7 @@ func scanRowIntoAllPatient(rows *sql.Rows) (*types.ReaturnAllPatientInfo , error
 		&allpatientInfo.Length,
 		&allpatientInfo.Address,
 		&allpatientInfo.Gender,
+		&allpatientInfo.IsCompleted,
 		&allpatientInfo.IDNumber,
 		&allpatientInfo.BloodSugar,
 		&allpatientInfo.Hemoglobin,

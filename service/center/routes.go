@@ -3,14 +3,15 @@ package center
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/service/auth"
 	"github.com/AL-Hourani/care-center/types"
 	"github.com/AL-Hourani/care-center/utils"
+
 	// "github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
-    
 )
 
 type Handler struct {
@@ -26,6 +27,9 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/centerRegister", h.handleCenterRegister).Methods("POST")
 	router.HandleFunc("/getPatients", h.handleGetPatients).Methods(http.MethodGet)
 	router.HandleFunc("/getCenters", h.handleGetCenters).Methods(http.MethodGet)
+	router.HandleFunc("/addPatient/{id}", h.handleGetCenters).Methods(http.MethodPost)
+	router.HandleFunc("/updatePatient/{id}", h.handleGetCenters).Methods(http.MethodPut)
+	router.HandleFunc("/deletePatient/{id}", h.handleDeletePatient).Methods(http.MethodDelete)
 }
 
 
@@ -154,4 +158,22 @@ func (h *Handler) handleGetCenters(w http.ResponseWriter , r *http.Request) {
 		return
 	}
 	utils.WriteJSON(w , http.StatusOK , centerList)
+}
+
+
+
+func (h *Handler) handleDeletePatient(w http.ResponseWriter , r *http.Request) {
+	vars := mux.Vars(r)
+	id , err := strconv.Atoi(vars["id"])
+	if err != nil  {
+       utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid ID"))
+       return
+	}
+
+	err = h.store.DeletePatient(id)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest , err)
+	}
+
+	utils.WriteJSON(w , http.StatusOK ,  map[string]string{"message":"successfully Deleted"})
 }

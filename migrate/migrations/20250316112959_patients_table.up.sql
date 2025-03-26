@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS patients (
     password VARCHAR(255) NOT NULL,
     phone    VARCHAR(255) NOT NULL,
     date     VARCHAR(255) NOT NULL,
+    id_number VARCHAR(255) NOT NULL,
+    isCompleted BOOLEAN NOT NULL,
     center_id INT NOT NULL,
     createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     

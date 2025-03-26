@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS basic_patient_info (
     wight VARCHAR(255) NOT NULL,
     length_patient  VARCHAR(255) NOT NULL,
     address_patient  VARCHAR(255) NOT NULL,
-    id_number VARCHAR(255) NOT NULL,
     createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     
     CONSTRAINT fk_patient FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE

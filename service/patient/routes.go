@@ -31,6 +31,7 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/setPatientPersonalInfo",h.handleSetPatientPersonalInfo).Methods("POST")
 	router.HandleFunc("/getPatient/{id}" , h.handleGetPatient).Methods("GET")
 	router.HandleFunc("/getAllPatientInfo/{id}" , h.handleGetAllPatientInfo).Methods("GET")
+	router.HandleFunc("/Logout" , h.handleGetAllPatientInfo).Methods("GET")
 }
 
 
@@ -109,7 +110,7 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 			return
 		}
 
-		patients_id , err := h.store.GetPatientsForCenter(center.ID)
+		patients , err := h.store.GetPatientsForCenter(center.ID)
 		if err != nil {
 			
 		}
@@ -120,7 +121,7 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 			Email: center.CenterEmail,
 			Role: "center",
 			IsCompletes: true,
-			Patient: patients_id,
+			Patient: patients,
 			Token: token,
 		}
 	
@@ -176,6 +177,8 @@ func (h *Handler) handlePatientRegister(w http.ResponseWriter , r *http.Request)
 		Password: hashedPassword,
 		Age: patientPayload.Age,
 		Phone:patientPayload.Phone,
+	    IDNumber: patientPayload.IDNumber,
+		IsCompleted: false,
 		CenterID: cenetr.ID,
 		
 	})
@@ -225,7 +228,6 @@ func (h *Handler) handleSetPatientPersonalInfo(w http.ResponseWriter , r *http.R
 		Length: personalPatientInfo.Length,
 		Address: personalPatientInfo.Address,
 		Gender: personalPatientInfo.Gender,
-		IDNumber: personalPatientInfo.IDNumber,
 		
 	})
 
@@ -348,6 +350,6 @@ func (h *Handler) handleGetAllPatientInfo (w http.ResponseWriter , r *http.Reque
 	utils.WriteJSON(w , http.StatusOK ,AllpatientInfo)
 
 
-
-
 }
+
+

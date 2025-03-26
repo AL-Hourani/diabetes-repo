@@ -148,6 +148,8 @@ func scanRowIntoPatients(rows *sql.Rows) (*types.Patient , error ){
 		&patient.ID,
 		&patient.FullName,
 		&patient.Email,
+		&patient.IDNumber,
+		&patient.IsCompleted,
 		&patient.CenterID,
 		&patient.Password,
 		&patient.CreateAt,
@@ -197,4 +199,30 @@ func scanRowIntoCenters(rows *sql.Rows) (*types.Center , error ){
 	}
 
 	return center, nil
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// deleted patient..............
+func (s *Store) DeletePatient(id int) error { 
+	_ , err := s.db.Query("DELETE FROM")
+	if err != nil {
+		return err
+	}
+
+	return nil
+
 }

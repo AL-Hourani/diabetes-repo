@@ -15,7 +15,7 @@ type PatientStore interface {
 	GreatePatient(Patient) error
 	SetPersonlPatientBasicInfo(BasicPatientInfo) error
 	SetPatientHealthInfo(HealthPatientData) error
-	GetPatientsForCenter(CenterID int) ([]int , error) 
+	GetPatientsForCenter(CenterID int) ([]CardData , error) 
 	GetAllPatientInfo(id int) (*ReaturnAllPatientInfo , error)
 
 }
@@ -26,8 +26,10 @@ type Patient struct {
 	Email			string		 `json:"email"`
 	Password		string       `json:"password"`
 	Age             string		 `json:"age"`
-	Phone			string        `json:"phone"`
+	Phone			string       `json:"phone"`
 	CenterID		int			 `json:"center_id"`
+	IDNumber		string       `json:"id_number"`
+	IsCompleted     bool         `json:"isCompleted"`
 	CreateAt        time.Time    `json:"createAt"`
 }
 
@@ -37,6 +39,7 @@ type RegisterPatientPayload struct {
 	Age 			string       `json:"age"    validate:"required"`
 	Phone           string	     `json:"phone"    validate:"required"`
 	Password		string		 `json:"password" validate:"required"`
+	IDNumber		string       `json:"id_number" validate:"required"`
 	CenterName		string		 `json:"center_name" validate:"required"`
       
 }
@@ -50,7 +53,6 @@ type BasicPatientInfo struct {
 	Length          string		   `json:"lenght" validate:"required"`
 	Address			string         `json:"address" validate:"required"`
 	Gender          string         `json:"gender" validate:"required"`
-	IDNumber        string         `json:"idNumber" validate:"required"`
     CreateAt        time.Time      `json:"createAt"`
 } 
 
@@ -80,8 +82,19 @@ type ReturnLoggingCenterData struct {
 	Email			string		 `json:"email"`
 	Role 			string       `json:"role"`
 	IsCompletes     bool         `json:"isCompleted"`
-	Patient			[]int        `json:"patient"`
-	Token           string      `json:"token"`
+	Patient			[]CardData   `json:"patient"`
+	Token           string       `json:"token"`
+}
+
+type CardData struct {
+	ID				int			 `json:"id"`
+	FullName		string		 `json:"fullname"`
+	Email			string		 `json:"email"`
+	Age             string		 `json:"age"`
+	Phone			string       `json:"phone"`
+	IDNumber		string       `json:"id_number"`
+	IsCompleted     bool         `json:"isCompleted"`
+	SugarType		string       `json:"sugarType"`
 }
 
 type HealthPatientData struct {
@@ -127,6 +140,7 @@ type ReaturnAllPatientInfo struct {
 	Length          string		   `json:"lenght" `
 	Address			string         `json:"address"`
 	Gender          string         `json:"gender" `
+	IsCompleted     bool           `json:"isCompleted"`
 	IDNumber        string         `json:"idNumber"`
 	BloodSugar      string		   `json:"booldSugar" `	
 	Hemoglobin      string         `json:"hemoglobin"`
@@ -151,6 +165,7 @@ type CenterStore interface {
 	GreateCenter(Center) error
 	GetPatients(centerID int)([]Patient , error)
 	GetCenters()([]Center , error)
+	DeletePatient(id int) error
 }
 
 type Center struct {
@@ -179,10 +194,16 @@ type RegisterCenterPayload struct {
 //end....................................................
 
 
-type OTpPayload struct {
-	OTPCode          int16         `json:"otpCode"`        
+
+type OTPRequest struct {
+	Email string `json:"email"`
 }
 
+
+type VerifyRequest struct {
+	Email   string `json:"email"`
+	OTPCode string `json:"otp"`
+}
 
 
 

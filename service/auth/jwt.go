@@ -22,3 +22,4 @@ func CreateJWT(secret []byte, patientID int) (string, error) {
 
 	return tokenString , nil
 }
+
