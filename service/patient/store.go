@@ -47,10 +47,10 @@ func scanRowIntoPatientBy(rows *sql.Rows) (*types.Patient , error ){
 		&patient.FullName,
 		&patient.Email,
 		&patient.Password,
+		&patient.Phone,
 		&patient.Age,
 		&patient.IDNumber,
 		&patient.IsCompleted,
-		&patient.Phone,
 		&patient.CenterID,
 		&patient.CreateAt,
 	)
@@ -93,10 +93,10 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 		&patient.FullName,
 		&patient.Email,
 		&patient.Password,
+		&patient.Phone,
 		&patient.Age,
 		&patient.IDNumber,
 		&patient.IsCompleted,
-		&patient.Phone,
 		&patient.CenterID,
 		&patient.CreateAt,
 	)
@@ -113,7 +113,7 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 // 2
 
 func  (s *Store) GetPatientsForCenter(CenterID int) ([]types.CardData , error) {
-	rows , err := s.db.Query(`SELECT fullName,email,phone,isCompleted,date,id_number,sugarType 
+	rows , err := s.db.Query(`SELECT p.id,fullName,email,phone,isCompleted,date,id_number,sugarType 
 	 FROM patients p INNER JOIN patient_health_info h ON p.id = h.patient_id  WHERE p.center_id=$1`,CenterID)
 	if err != nil {
 		return nil , err
@@ -141,10 +141,10 @@ func scanRowIntoPatients(rows *sql.Rows) (*types.CardData , error ){
 		&patient.ID,
 		&patient.FullName,
 		&patient.Email,
-		&patient.Age,
 		&patient.Phone,
-		&patient.IDNumber,
 		&patient.IsCompleted,
+		&patient.Age,
+		&patient.IDNumber,
 		&patient.SugarType,
         
 	)
@@ -218,12 +218,12 @@ func scanRowIntoAllPatient(rows *sql.Rows) (*types.ReaturnAllPatientInfo , error
 		&allpatientInfo.FullName,
 		&allpatientInfo.Email,
 		&allpatientInfo.Phone,
+		&allpatientInfo.IsCompleted,
 		&allpatientInfo.Age,
 		&allpatientInfo.Weight,
 		&allpatientInfo.Length,
 		&allpatientInfo.Address,
 		&allpatientInfo.Gender,
-		&allpatientInfo.IsCompleted,
 		&allpatientInfo.IDNumber,
 		&allpatientInfo.BloodSugar,
 		&allpatientInfo.Hemoglobin,

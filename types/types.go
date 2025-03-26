@@ -27,9 +27,9 @@ type Patient struct {
 	Password		string       `json:"password"`
 	Age             string		 `json:"age"`
 	Phone			string       `json:"phone"`
-	CenterID		int			 `json:"center_id"`
 	IDNumber		string       `json:"id_number"`
 	IsCompleted     bool         `json:"isCompleted"`
+	CenterID		int			 `json:"center_id"`
 	CreateAt        time.Time    `json:"createAt"`
 }
 
@@ -81,7 +81,6 @@ type ReturnLoggingCenterData struct {
 	Name		    string		 `json:"name"`
 	Email			string		 `json:"email"`
 	Role 			string       `json:"role"`
-	IsCompletes     bool         `json:"isCompleted"`
 	Patient			[]CardData   `json:"patient"`
 	Token           string       `json:"token"`
 }

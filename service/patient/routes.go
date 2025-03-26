@@ -120,7 +120,6 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 			Name: center.CenterName,
 			Email: center.CenterEmail,
 			Role: "center",
-			IsCompletes: true,
 			Patient: patients,
 			Token: token,
 		}
