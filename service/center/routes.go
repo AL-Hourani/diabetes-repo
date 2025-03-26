@@ -25,6 +25,7 @@ func NewHandler(store types.CenterStore) *Handler {
 func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	// router.HandleFunc("/centerLogin", h.handleCenterLogin).Methods("POST")
 	router.HandleFunc("/centerRegister", h.handleCenterRegister).Methods("POST")
+	router.HandleFunc("/confirmAccount", h.handleConfirmPatientAccount).Methods("POST")
 	router.HandleFunc("/getPatients", h.handleGetPatients).Methods(http.MethodGet)
 	router.HandleFunc("/getCenters", h.handleGetCenters).Methods(http.MethodGet)
 	router.HandleFunc("/addPatient/{id}", h.handleGetCenters).Methods(http.MethodPost)
@@ -176,4 +177,24 @@ func (h *Handler) handleDeletePatient(w http.ResponseWriter , r *http.Request) {
 	}
 
 	utils.WriteJSON(w , http.StatusOK ,  map[string]string{"message":"successfully Deleted"})
+}
+
+
+// handle confirm patient ....
+
+
+func (h *Handler) handleConfirmPatientAccount(w http.ResponseWriter , r *http.Request) {
+	var confrimAccout types.ConfirmAccount
+	
+	if err := utils.ParseJSON(r , &confrimAccout); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+	}
+
+	err := h.store.UpdateIsCompletedPatientField(confrimAccout)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest ,err)
+	}
+
+	utils.WriteJSON(w , http.StatusOK ,  map[string]string{"message":"successfully Confirm Account"})
+
 }

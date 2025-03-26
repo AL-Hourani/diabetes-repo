@@ -164,6 +164,7 @@ type CenterStore interface {
 	GetPatients(centerID int)([]Patient , error)
 	GetCenters()([]Center , error)
 	DeletePatient(id int) error
+	UpdateIsCompletedPatientField(confirmAcc ConfirmAccount) error
 }
 
 type Center struct {
@@ -204,10 +205,10 @@ type VerifyRequest struct {
 }
 
 
-
-
-
-
+type ConfirmAccount struct {
+	ID				int			 `json:"id" validate:"required"`
+	IsCompleted     bool         `json:"isCompleted" validate:"required"`
+}
 
 
 

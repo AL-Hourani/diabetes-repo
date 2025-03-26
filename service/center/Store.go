@@ -3,6 +3,7 @@ package center
 import (
 	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/AL-Hourani/care-center/types"
 )
@@ -225,4 +226,14 @@ func (s *Store) DeletePatient(id int) error {
 
 	return nil
 
+}
+
+//update iscompleate field in patients tabel
+func (s *Store) UpdateIsCompletedPatientField(confirmAcc types.ConfirmAccount) error { 
+	_, err := s.db.Exec("UPDATE patients SET isCompleted = $1 WHERE id = $2",confirmAcc.IsCompleted,confirmAcc.ID )
+		if err != nil {
+			log.Fatal(err)
+		}
+		
+	return nil
 }
