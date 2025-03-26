@@ -62,7 +62,6 @@ type BasicPatientInfoPalyoad struct {
 	Length          string		   `json:"lenght" validate:"required"`
 	Address			string         `json:"address" validate:"required"`
 	Gender          string         `json:"gender" validate:"required"`
-	IDNumber        string         `json:"idNumber" validate:"required"`
 } 
 
 type LoginPayload struct {
