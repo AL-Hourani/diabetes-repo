@@ -153,8 +153,8 @@ func scanRowIntoPatients(rows *sql.Rows) (*types.CardData , error ){
 		return nil , err
 	}
 
-	if patient.SugarType == "" {
-		patient.SugarType = "null" 
+	if patient.SugarType == nil {
+		patient.SugarType = nil 
 	}
 
 	return patient , nil
