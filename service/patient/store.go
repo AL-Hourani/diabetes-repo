@@ -113,7 +113,7 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 // 2
 
 func  (s *Store) GetPatientsForCenter(CenterID int) ([]types.CardData , error) {
-	rows , err := s.db.Query(`SELECT p.id,fullName,email,phone,isCompleted,date,id_number,sugarType 
+	rows , err := s.db.Query(`SELECT p.id,fullName,email,phone,isCompleted,date,id_number,COALESCE(h.sugarType, NULL)
 	 FROM patients p LEFT JOIN patient_health_info h ON p.id = h.patient_id  WHERE p.center_id=$1`,CenterID)
 	if err != nil {
 		return nil , err
