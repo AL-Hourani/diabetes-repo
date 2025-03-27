@@ -237,3 +237,44 @@ func (s *Store) UpdateIsCompletedPatientField(confirmAcc types.ConfirmAccount) e
 		
 	return nil
 }
+
+
+func (s *Store) PatchUpdatePatient(patient *types.PatientUpdatePayload) error {
+	query := `UPDATE patients
+	SET
+		fullName = COALESCE($1, fullName),
+		email = COALESCE($2, email),
+		phone = COALESCE($3, phone),
+		date = COALESCE($4, date),
+		id_number = COALESCE($5, id_number),
+		gender = COALESCE($6, gender),
+		weight = COALESCE($7, weight),
+		length_patient = COALESCE($8, length_patient),
+		address_patient = COALESCE($9, address_patient),
+		bloodSugar = COALESCE($10, bloodSugar),
+		hemoglobin = COALESCE($11, hemoglobin),
+		bloodPressure = COALESCE($12, bloodPressure),
+		sugarType = COALESCE($13, sugarType),
+		diseaseDetection = COALESCE($14, diseaseDetection),
+		otherDisease = COALESCE($15, otherDisease),
+		typeOfMedicine = COALESCE($16, typeOfMedicine),
+		urineAcid = COALESCE($17, urineAcid),
+		cholesterol = COALESCE($18, cholesterol),
+		grease = COALESCE($19, grease),
+		historyOfFamilyDisease = COALESCE($20, historyOfFamilyDisease),
+	WHERE id = $21`
+
+	_, err := s.db.Exec(query,
+        patient.FullName, patient.Email, patient.Phone,
+        patient.Age, patient.IDNumber, patient.Gender, patient.Weight, patient.LengthPatient,
+        patient.AddressPatient, patient.BloodSugar, patient.Hemoglobin, patient.BloodPressure,
+        patient.SugarType, patient.DiseaseDetection, patient.OtherDisease, patient.TypeOfMedicine,
+        patient.UrineAcid, patient.Cholesterol, patient.Grease, patient.HistoryOfFamilyDisease,
+        patient.ID)
+    
+    if err != nil {
+        return fmt.Errorf("error updating patient: %v", err)
+    }
+
+    return nil
+}

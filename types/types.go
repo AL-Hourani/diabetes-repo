@@ -71,6 +71,32 @@ type PatientDetails struct {
 	CreateAt              time.Time `json:"createAt"`
 }
 
+type PatientUpdatePayload struct
+{
+	ID				        int			 `json:"id"`
+	FullName		        string		 `json:"fullname"`
+	Email			        string		 `json:"email"`
+	Age                     string		 `json:"age"`
+	Phone			        string       `json:"phone"`
+	IDNumber		        string       `json:"id_number"`
+	Gender                  string   `json:"gender"`
+	Weight                  string   `json:"weight"`
+	LengthPatient           string   `json:"length_patient"`
+	AddressPatient          string  `json:"address_patient"`
+	BloodSugar              string  `json:"bloodSugar"`
+	Hemoglobin              string   `json:"hemoglobin"`
+	BloodPressure           string   `json:"bloodPressure"`
+	SugarType               string  `json:"sugarType"`
+	DiseaseDetection        string   `json:"diseaseDetection"`
+	OtherDisease            string   `json:"otherDisease"`
+	TypeOfMedicine          string   `json:"typeOfMedicine"`
+	UrineAcid               string   `json:"urineAcid"`
+	Cholesterol             string   `json:"cholesterol"`
+	Grease                  string   `json:"grease"`
+	HistoryOfFamilyDisease  string `json:"historyOfFamilyDisease"`
+	CreateAt                time.Time    `json:"createAt"`
+}
+
 
 
 
@@ -134,6 +160,7 @@ type CenterStore interface {
 	GetCenters()([]Center , error)
 	DeletePatient(id int) error
 	UpdateIsCompletedPatientField(confirmAcc ConfirmAccount) error
+	PatchUpdatePatient(patient *PatientUpdatePayload) error
 }
 
 type Center struct {

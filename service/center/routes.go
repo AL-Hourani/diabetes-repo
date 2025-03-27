@@ -29,49 +29,12 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/getPatients", h.handleGetPatients).Methods(http.MethodGet)
 	router.HandleFunc("/getCenters", h.handleGetCenters).Methods(http.MethodGet)
 	router.HandleFunc("/addPatient/{id}", h.handleGetCenters).Methods(http.MethodPost)
-	router.HandleFunc("/updatePatient/{id}", h.handleGetCenters).Methods(http.MethodPut)
+	router.HandleFunc("/updatePatient", h.handleUpdatePatient).Methods(http.MethodPatch)
 	router.HandleFunc("/deletePatient/{id}", h.handleDeletePatient).Methods(http.MethodDelete)
 }
 
 
 
-// func (h *Handler) handleCenterLogin(w http.ResponseWriter , r *http.Request) {
-// 		//get json payload
-// 		var centerPayload types.LoginCenterPayload
-// 		if err := utils.ParseJSON(r , &centerPayload); err != nil {
-// 			utils.WriteError(w , http.StatusBadRequest , err)
-// 		}
-
-// 		//validate the payoad .....................
-// 	if err := utils.Validate.Struct(centerPayload);err != nil {
-// 		error := err.(validator.ValidationErrors)
-// 		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("invalid payload %v", error) )
-// 		return
-// 	}
-
-// 	//find center
-// 	center , err := h.store.GetCenterByEmail(centerPayload.CenterEmail)
-// 	if err != nil {
-// 		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("not found invalid center email or center password"))
-// 		return 
-// 	}
-
-// 	if !auth.ComparePasswords(center.CenterPassword , [] byte(centerPayload.CenterPassword)) {
-// 		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("not found invalid password"))
-// 		return
-// 	}
-
-// 	secret := []byte(config.Envs.JWTSecret)
-// 	token , err := auth.CreateJWT(secret , center.ID)
-    
-// 	if err != nil {
-// 		utils.WriteError(w , http.StatusInternalServerError ,err)
-// 		return
-// 	}
-
-// 	utils.WriteJSON(w , http.StatusOK ,map[string]string{"toke":token})
-
-// }
 
 
 
@@ -197,4 +160,34 @@ func (h *Handler) handleConfirmPatientAccount(w http.ResponseWriter , r *http.Re
 
 	utils.WriteJSON(w , http.StatusOK ,  map[string]string{"message":"successfully Confirm Account"})
 
+}
+
+
+
+
+
+
+// update patient
+
+func (h *Handler) handleUpdatePatient(w http.ResponseWriter , r *http.Request) { 
+	var udpatePayload types.PatientUpdatePayload
+		
+	if err := utils.ParseJSON(r , &udpatePayload); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+	}
+
+	if udpatePayload.ID == 0 {
+        utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("patient ID is required"))
+        return
+    }
+
+	
+    // تحديث بيانات المريض جزئيًا باستخدام دالة PATCH
+    err := h.store.PatchUpdatePatient(&udpatePayload)
+    if err != nil {
+        utils.WriteError(w, http.StatusInternalServerError, err)
+        return
+    }
+
+    utils.WriteJSON(w, http.StatusOK, udpatePayload)
 }
