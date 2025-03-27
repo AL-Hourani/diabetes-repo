@@ -275,6 +275,7 @@ func (s *Store) GetUserByEmail(email string) (*types.UserLoginData, error) {
 		FROM centers
 		WHERE centerEmail = ?
 	)
+	ORDER BY role
 	LIMIT 1`
 
     row := s.db.QueryRow(query, email, email)
