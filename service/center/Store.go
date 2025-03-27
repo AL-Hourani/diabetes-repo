@@ -248,7 +248,7 @@ func (s *Store) PatchUpdatePatient(patient *types.PatientUpdatePayload) error {
 		date = COALESCE($4, date),
 		id_number = COALESCE($5, id_number),
 		gender = COALESCE($6, gender),
-		weight = COALESCE($7, weight),
+		wight = COALESCE($7, wight),
 		length_patient = COALESCE($8, length_patient),
 		address_patient = COALESCE($9, address_patient),
 		bloodSugar = COALESCE($10, bloodSugar),

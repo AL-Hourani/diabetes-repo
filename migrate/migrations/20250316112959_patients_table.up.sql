@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS patients (
     wight VARCHAR(255) DEFAULT NULL,
     length_patient  VARCHAR(255) DEFAULT NULL,
     address_patient  VARCHAR(255) DEFAULT NULL,
-     bloodSugar VARCHAR(255) DEFAULT NULL,
+    bloodSugar VARCHAR(255) DEFAULT NULL,
     hemoglobin VARCHAR(255) DEFAULT NULL,
     bloodPressure VARCHAR(255) DEFAULT NULL,
     sugarType VARCHAR(255) DEFAULT NULL,
