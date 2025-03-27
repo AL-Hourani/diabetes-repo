@@ -1,11 +1,11 @@
 package types
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
 
-
-
-//postgress strorge 
-
+//postgress strorge
 
 // patients..............................
 
@@ -51,21 +51,21 @@ type PatientDetails struct {
 	Date                  string    `json:"date"`
 	IDNumber              string    `json:"id_number"`
 	IsCompleted           bool      `json:"isCompleted"`
-	Gender                *string   `json:"gender,omitempty"`
-	Weight                *string   `json:"weight,omitempty"`
-	LengthPatient         *string   `json:"length_patient,omitempty"`
-	AddressPatient        *string   `json:"address_patient,omitempty"`
-	BloodSugar            *string   `json:"bloodSugar,omitempty"`
-	Hemoglobin            *string   `json:"hemoglobin,omitempty"`
-	BloodPressure         *string   `json:"bloodPressure,omitempty"`
-	SugarType             *string   `json:"sugarType,omitempty"`
-	DiseaseDetection      *string   `json:"diseaseDetection,omitempty"`
-	OtherDisease          *string   `json:"otherDisease,omitempty"`
-	TypeOfMedicine        *string   `json:"typeOfMedicine,omitempty"`
-	UrineAcid             *string   `json:"urineAcid,omitempty"`
-	Cholesterol           *string   `json:"cholesterol,omitempty"`
-	Grease                *string   `json:"grease,omitempty"`
-	HistoryOfFamilyDisease *string  `json:"historyOfFamilyDisease,omitempty"`
+	Gender                sql.NullString   `json:"gender"`
+	Weight                sql.NullString   `json:"weight"`
+	LengthPatient         sql.NullString   `json:"length_patient"`
+	AddressPatient        sql.NullString   `json:"address_patient"`
+	BloodSugar            sql.NullString   `json:"bloodSugar"`
+	Hemoglobin            sql.NullString   `json:"hemoglobin"`
+	BloodPressure         sql.NullString   `json:"bloodPressure"`
+	SugarType             sql.NullString  `json:"sugarType"`
+	DiseaseDetection      sql.NullString   `json:"diseaseDetection"`
+	OtherDisease          sql.NullString   `json:"otherDisease"`
+	TypeOfMedicine        sql.NullString   `json:"typeOfMedicine"`
+	UrineAcid             sql.NullString   `json:"urineAcid"`
+	Cholesterol           sql.NullString   `json:"cholesterol"`
+	Grease                sql.NullString   `json:"grease"`
+	HistoryOfFamilyDisease sql.NullString `json:"historyOfFamilyDisease"`
 	CenterID              int       `json:"center_id"`
 	CreateAt              time.Time `json:"createAt"`
 }
