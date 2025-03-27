@@ -127,6 +127,7 @@ func (s *Store)	GetPatients(centerId int)([]types.Patient , error) {
 	if err != nil {
 		return nil , err
 	}
+	defer rows.Close()
 
 	patients := make([]types.Patient , 0)
 	for rows.Next() {
@@ -171,6 +172,8 @@ func (s *Store) GetCenters()([]types.Center , error) {
 		return nil , err
 	}
 
+	defer rows.Close()
+	
 	centers := make([]types.Center , 0)
 	for rows.Next() {
 		p , err := scanRowIntoCenters(rows)
