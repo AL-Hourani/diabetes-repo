@@ -1,7 +1,7 @@
 package types
 
 import (
-	"database/sql"
+
 	"time"
 )
 
@@ -51,21 +51,21 @@ type PatientDetails struct {
 	Date                  string    `json:"date"`
 	IDNumber              string    `json:"id_number"`
 	IsCompleted           bool      `json:"isCompleted"`
-	Gender                sql.NullString   `json:"gender"`
-	Weight                sql.NullString   `json:"weight"`
-	LengthPatient         sql.NullString   `json:"length_patient"`
-	AddressPatient        sql.NullString   `json:"address_patient"`
-	BloodSugar            sql.NullString   `json:"bloodSugar"`
-	Hemoglobin            sql.NullString   `json:"hemoglobin"`
-	BloodPressure         sql.NullString   `json:"bloodPressure"`
-	SugarType             sql.NullString  `json:"sugarType"`
-	DiseaseDetection      sql.NullString   `json:"diseaseDetection"`
-	OtherDisease          sql.NullString   `json:"otherDisease"`
-	TypeOfMedicine        sql.NullString   `json:"typeOfMedicine"`
-	UrineAcid             sql.NullString   `json:"urineAcid"`
-	Cholesterol           sql.NullString   `json:"cholesterol"`
-	Grease                sql.NullString   `json:"grease"`
-	HistoryOfFamilyDisease sql.NullString `json:"historyOfFamilyDisease"`
+	Gender                *string   `json:"gender"`
+	Weight                *string   `json:"weight"`
+	LengthPatient          *string   `json:"length_patient"`
+	AddressPatient       *string  `json:"address_patient"`
+	BloodSugar             *string  `json:"bloodSugar"`
+	Hemoglobin             *string   `json:"hemoglobin"`
+	BloodPressure          *string   `json:"bloodPressure"`
+	SugarType              *string  `json:"sugarType"`
+	DiseaseDetection       *string   `json:"diseaseDetection"`
+	OtherDisease           *string   `json:"otherDisease"`
+	TypeOfMedicine         *string   `json:"typeOfMedicine"`
+	UrineAcid             *string   `json:"urineAcid"`
+	Cholesterol            *string   `json:"cholesterol"`
+	Grease                *string   `json:"grease"`
+	HistoryOfFamilyDisease  *string `json:"historyOfFamilyDisease"`
 	CenterID              int       `json:"center_id"`
 	CreateAt              time.Time `json:"createAt"`
 }
