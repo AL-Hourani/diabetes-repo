@@ -90,51 +90,6 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 
 // 2
 
-func (s *Store) GetPatientsForCenter(CenterID int) ([]types.CardData , error) {
-	rows , err := s.db.Query("SELECT id,fullName,email,date,phone,id_number,isCompleted,sugarType FROM patients WHERE center_id=$1",CenterID)
-	if err != nil {
-		return nil , err
-	}
-	defer rows.Close()
-
-	cardData := make([]types.CardData,0)
-	for rows.Next() {
-		cardd , err := scanRowIntoPatientsCard(rows)
-		if err != nil {
-			return nil , err
-		}
-		cardData = append(cardData, *cardd)
-	}
-
-	return cardData , nil
-
-}
-
-
-func scanRowIntoPatientsCard(rows *sql.Rows) (*types.CardData , error ){
-	patient := new(types.CardData)
-
-    var sugarType     sql.NullString
-	err := rows.Scan(
-		&patient.ID,
-		&patient.FullName,
-		&patient.Email,
-		&patient.Age,
-		&patient.Phone,
-		&patient.IDNumber,
-		&patient.IsCompleted,
-		&sugarType,
-	)
-
-	
-	if err  != nil {
-		return nil , err
-	}
-	patient.SugarType = convertNullStringToPointer(sugarType)
-
-	return patient , nil
-}
-
 
 
 

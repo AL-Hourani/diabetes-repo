@@ -1,7 +1,8 @@
 package auth
 
 import (
-    "fmt"
+	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -10,10 +11,10 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func CreateJWT(secret []byte, patientID int) (string, error) {
+func CreateJWT(secret []byte, id int) (string, error) {
 	expiration := time.Second * time.Duration(config.Envs.JWTExpirationInSecond)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256 , jwt.MapClaims{
-		"patientID":strconv.Itoa(patientID),
+		"ID":strconv.Itoa(id),
 		"expiredAt":time.Now().Add(expiration).Unix(),
 	})
 
@@ -24,6 +25,11 @@ func CreateJWT(secret []byte, patientID int) (string, error) {
 
 	return tokenString , nil
 }
+
+type ContextKey string
+
+
+const UserContextKey ContextKey = "user"
 
 
 func WithJWTAuth(handlerFunc http.HandlerFunc) http.HandlerFunc {
@@ -48,8 +54,10 @@ func WithJWTAuth(handlerFunc http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		// استدعاء الدالة المحمية إذا كان التوكن صالحًا
-		handlerFunc(w, r)
+		ctx := context.WithValue(r.Context(), UserContextKey, token)
+		
+		// استدعاء الدالة المحمية مع تمرير السياق الجديد
+		handlerFunc(w, r.WithContext(ctx))
 	}
 }
 
@@ -80,4 +88,29 @@ func validateToken(tokenString string) (*jwt.Token, error) {
 		// إرجاع المفتاح السري المستخدم للتوقيع
 		return []byte(config.Envs.JWTSecret), nil
 	})
+}
+
+
+// get id fro token
+
+func GetIDFromToken(token *jwt.Token) (int, error) {
+	// استخراج claims من التوكن
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return 0, fmt.Errorf("invalid token")
+	}
+
+	// استخراج الحقل ID
+	idStr, ok := claims["ID"].(string)
+	if !ok {
+		return 0, fmt.Errorf("ID not found in token")
+	}
+
+	// تحويل ID إلى int
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return 0, fmt.Errorf("invalid ID format")
+	}
+
+	return id, nil
 }

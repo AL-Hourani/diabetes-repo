@@ -122,44 +122,53 @@ func (s *Store)	GreateCenter(center types.Center) error {
 
 //this is not completed
 
-func (s *Store)	GetPatients(centerId int)([]types.Patient , error) {
-	rows , err := s.db.Query("SELECT * FROM patients WHERE center_id=?" ,centerId )
+func (s *Store) GetPatientsForCenter(CenterID int) ([]types.CardData , error) {
+	rows , err := s.db.Query("SELECT id,fullName,email,date,phone,id_number,isCompleted,sugarType FROM patients WHERE center_id=$1",CenterID)
 	if err != nil {
 		return nil , err
 	}
 	defer rows.Close()
 
-	patients := make([]types.Patient , 0)
+	cardData := make([]types.CardData,0)
 	for rows.Next() {
-		p , err := scanRowIntoPatients(rows)
+		cardd , err := scanRowIntoPatientsCard(rows)
 		if err != nil {
 			return nil , err
 		}
-		patients = append(patients, *p)
+		cardData = append(cardData, *cardd)
 	}
 
-	return patients , nil
+	return cardData , nil
 
+}
+func convertNullStringToPointer(ns sql.NullString) *string {
+	if ns.Valid {
+		return &ns.String
+	}
+	return nil
 }
 
 
-func scanRowIntoPatients(rows *sql.Rows) (*types.Patient , error ){
-	patient := new(types.Patient)
+func scanRowIntoPatientsCard(rows *sql.Rows) (*types.CardData , error ){
+	patient := new(types.CardData)
 
+    var sugarType     sql.NullString
 	err := rows.Scan(
 		&patient.ID,
 		&patient.FullName,
 		&patient.Email,
+		&patient.Age,
+		&patient.Phone,
 		&patient.IDNumber,
 		&patient.IsCompleted,
-		&patient.CenterID,
-		&patient.Password,
-		&patient.CreateAt,
+		&sugarType,
 	)
+
 	
 	if err  != nil {
 		return nil , err
 	}
+	patient.SugarType = convertNullStringToPointer(sugarType)
 
 	return patient , nil
 }

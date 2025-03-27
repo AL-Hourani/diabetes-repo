@@ -9,6 +9,7 @@ import (
 	"github.com/AL-Hourani/care-center/service/auth"
 	"github.com/AL-Hourani/care-center/types"
 	"github.com/AL-Hourani/care-center/utils"
+	"github.com/golang-jwt/jwt/v5"
 
 	// "github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
@@ -26,14 +27,11 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	// router.HandleFunc("/centerLogin", h.handleCenterLogin).Methods("POST")
 	router.HandleFunc("/centerRegister", h.handleCenterRegister).Methods("POST")
 	router.HandleFunc("/confirmAccount", h.handleConfirmPatientAccount).Methods("POST")
-	router.HandleFunc("/getPatients", h.handleGetPatients).Methods(http.MethodGet)
-	router.HandleFunc("/getCenters", h.handleGetCenters).Methods(http.MethodGet)
+	router.HandleFunc("/getPatients", auth.WithJWTAuth(h.handleGetPatients)).Methods(http.MethodGet)
 	router.HandleFunc("/addPatient/{id}", h.handleGetCenters).Methods(http.MethodPost)
 	router.HandleFunc("/updatePatient", h.handleUpdatePatient).Methods(http.MethodPatch)
 	router.HandleFunc("/deletePatient/{id}", auth.WithJWTAuth(h.handleDeletePatient)).Methods(http.MethodDelete)
 }
-
-
 
 
 
@@ -92,19 +90,20 @@ func (h *Handler) handleCenterRegister(w http.ResponseWriter , r *http.Request) 
 }
 
 func (h *Handler) handleGetPatients(w http.ResponseWriter , r *http.Request) {
-	    var centerName string
-	
-		if err := utils.ParseJSON(r , &centerName); err != nil {
-			utils.WriteError(w , http.StatusBadRequest , err)
-		}
-		// check if center exists
-        center , err := h.store.GetCenterByName(centerName)
-		if err != nil {
-			utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("center with name %s is not exists" , centerName))
-			return 
-		}
 
-	patientsList , err := h.store.GetPatients(center.ID)
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	id, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	patientsList , err := h.store.GetPatientsForCenter(id)
 	if err != nil {
 		utils.WriteError(w , http.StatusInternalServerError , err)
 		return

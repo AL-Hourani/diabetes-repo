@@ -86,17 +86,12 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 			}
 			utils.WriteJSON(w, http.StatusOK, returnLoggingData)
 		} else {
-			patients, err := h.store.GetPatientsForCenter(user.ID)
-			if err != nil {
-				utils.WriteError(w, http.StatusInternalServerError, err)
-				return
-			}
+
 	
 			returnLoggingData := types.ReturnLoggingCenterData{
 				Name:    user.Name,
 				Email:   user.Email,
 				Role:    "center",
-				Patient: patients,
 				Token:   token,
 			}
 			utils.WriteJSON(w, http.StatusOK, returnLoggingData)

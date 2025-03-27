@@ -14,7 +14,6 @@ type PatientStore interface {
 	GetPatientById(id int) (*Patient , error)
 	GreatePatient(Patient) error
 	GetPatientDetailsByID(patientID int) (*PatientDetails, error)
-	GetPatientsForCenter(CenterID int) ([]CardData , error) 
 	GetUserByEmail(email string) (*UserLoginData, error)
 
 }
@@ -129,7 +128,6 @@ type ReturnLoggingCenterData struct {
 	Name		    string		 `json:"name"`
 	Email			string		 `json:"email"`
 	Role 			string       `json:"role"`
-	Patient			[]CardData   `json:"patient"`
 	Token           string       `json:"token"`
 }
 
@@ -156,11 +154,11 @@ type CenterStore interface {
 	GetCenterByName(centerName string) (*Center , error) 
 	GetCenterByEmail(centerEmail string) (*Center , error)
 	GreateCenter(Center) error
-	GetPatients(centerID int)([]Patient , error)
 	GetCenters()([]Center , error)
 	DeletePatient(id int) error
 	UpdateIsCompletedPatientField(confirmAcc ConfirmAccount) error
 	PatchUpdatePatient(patient *PatientUpdatePayload) error
+	GetPatientsForCenter(CenterID int) ([]CardData , error)
 }
 
 type Center struct {
