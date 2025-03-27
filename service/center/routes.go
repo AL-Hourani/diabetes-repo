@@ -30,7 +30,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/getCenters", h.handleGetCenters).Methods(http.MethodGet)
 	router.HandleFunc("/addPatient/{id}", h.handleGetCenters).Methods(http.MethodPost)
 	router.HandleFunc("/updatePatient", h.handleUpdatePatient).Methods(http.MethodPatch)
-	router.HandleFunc("/deletePatient/{id}", h.handleDeletePatient).Methods(http.MethodDelete)
+	router.HandleFunc("/deletePatient/{id}", auth.WithJWTAuth(h.handleDeletePatient)).Methods(http.MethodDelete)
 }
 
 

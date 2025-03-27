@@ -1,6 +1,8 @@
 package auth
 
 import (
+    "fmt"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -23,3 +25,59 @@ func CreateJWT(secret []byte, patientID int) (string, error) {
 	return tokenString , nil
 }
 
+
+func WithJWTAuth(handlerFunc http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// استخراج التوكن من الطلب
+		tokenString := getTokenFromRequest(r)
+		if tokenString == "" {
+			http.Error(w, "Unauthorized: No token provided", http.StatusUnauthorized)
+			return
+		}
+
+		// التحقق من صحة التوكن
+		token, err := validateToken(tokenString)
+		if err != nil {
+			http.Error(w, "Unauthorized: Invalid token", http.StatusUnauthorized)
+			return
+		}
+
+		// التأكد من أن التوكن صالح ولم ينتهِ
+		if !token.Valid {
+			http.Error(w, "Unauthorized: Token is not valid", http.StatusUnauthorized)
+			return
+		}
+
+		// استدعاء الدالة المحمية إذا كان التوكن صالحًا
+		handlerFunc(w, r)
+	}
+}
+
+
+
+func getTokenFromRequest(r *http.Request) string {
+	// الحصول على التوكن من هيدر Authorization
+	tokenAuth := r.Header.Get("Authorization")
+	if tokenAuth != "" {
+		// التحقق إذا كان التوكن على شكل Bearer
+		if len(tokenAuth) > 7 && tokenAuth[:7] == "Bearer " {
+			return tokenAuth[7:] // حذف كلمة "Bearer " واستخراج التوكن
+		}
+		return tokenAuth
+	}
+	return ""
+}
+
+
+func validateToken(tokenString string) (*jwt.Token, error) {
+	// التحقق من صحة التوكن وتفسيره
+	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// التحقق من خوارزمية التوقيع المستخدمة
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+
+		// إرجاع المفتاح السري المستخدم للتوقيع
+		return []byte(config.Envs.JWTSecret), nil
+	})
+}
