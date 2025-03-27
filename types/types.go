@@ -13,6 +13,7 @@ type PatientStore interface {
 	GetPatientByEmail(email string) (*Patient , error)
 	GetPatientById(id int) (*Patient , error)
 	GreatePatient(Patient) error
+	GetPatientDetailsByID(patientID int) (*PatientDetails, error)
 	GetPatientsForCenter(CenterID int) ([]CardData , error) 
 
 }
@@ -39,6 +40,34 @@ type RegisterPatientPayload struct {
 	IDNumber		string       `json:"id_number" validate:"required"`
 	CenterName		string		 `json:"center_name" validate:"required"`
       
+}
+
+
+type PatientDetails struct {
+	ID                    int       `json:"id"`
+	FullName              string    `json:"fullName"`
+	Email                 string    `json:"email"`
+	Phone                 string    `json:"phone"`
+	Date                  string    `json:"date"`
+	IDNumber              string    `json:"id_number"`
+	IsCompleted           bool      `json:"isCompleted"`
+	Gender                *string   `json:"gender,omitempty"`
+	Weight                *string   `json:"weight,omitempty"`
+	LengthPatient         *string   `json:"length_patient,omitempty"`
+	AddressPatient        *string   `json:"address_patient,omitempty"`
+	BloodSugar            *string   `json:"bloodSugar,omitempty"`
+	Hemoglobin            *string   `json:"hemoglobin,omitempty"`
+	BloodPressure         *string   `json:"bloodPressure,omitempty"`
+	SugarType             *string   `json:"sugarType,omitempty"`
+	DiseaseDetection      *string   `json:"diseaseDetection,omitempty"`
+	OtherDisease          *string   `json:"otherDisease,omitempty"`
+	TypeOfMedicine        *string   `json:"typeOfMedicine,omitempty"`
+	UrineAcid             *string   `json:"urineAcid,omitempty"`
+	Cholesterol           *string   `json:"cholesterol,omitempty"`
+	Grease                *string   `json:"grease,omitempty"`
+	HistoryOfFamilyDisease *string  `json:"historyOfFamilyDisease,omitempty"`
+	CenterID              int       `json:"center_id"`
+	CreateAt              time.Time `json:"createAt"`
 }
 
 

@@ -28,7 +28,7 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/Login", h.handleLogin).Methods("POST")
 	router.HandleFunc("/patientRegister", h.handlePatientRegister).Methods("POST")
 	router.HandleFunc("/getPatient/{id}" , h.handleGetPatient).Methods("GET")
-	// router.HandleFunc("/getAllPatientInfo/{id}" , h.handleGetAllPatientInfo).Methods("GET")
+	router.HandleFunc("/getAllPatientInfo/{id}" , h.handleGetAllPatientInfo).Methods("GET")
 }
 
 
@@ -53,8 +53,6 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("invalid payload %v", error) )
 		return
 	}
-
-
 
 
 	// find patient .............................................................
@@ -228,11 +226,25 @@ func (h *Handler) handleGetPatient (w http.ResponseWriter , r *http.Request) {
 // handle get all patient info ..........................................
 
 
+func (h *Handler) handleGetAllPatientInfo (w http.ResponseWriter , r *http.Request) {
 
-// func (h *Handler) handleGetAllPatientInfo (w http.ResponseWriter , r *http.Request) {
+	vars := mux.Vars(r)
+	id , err := strconv.Atoi(vars["id"])
+	if err != nil  {
+       utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid ID"))
+       return
+	}
+
+	patientDetials , err := h.store.GetPatientDetailsByID(id)
+	if err != nil {
+		utils.WriteError(w , http.StatusBadRequest ,err)
+		return 
+	}
 
 
+	utils.WriteJSON(w , http.StatusOK , patientDetials)
 
-// }
+
+}
 
 
