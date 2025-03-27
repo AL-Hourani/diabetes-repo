@@ -56,71 +56,51 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 
 
 	// find patient .............................................................
-
-
-    
-    patient , errLogin := h.store.GetPatientByEmail(LoginPayload.Email)
-	if errLogin == nil {
-	    if !auth.ComparePasswords(patient.Password , [] byte(LoginPayload.Password)) {
-				utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("not found invalid password"))
-			return
-	    }
-
-		secret := []byte(config.Envs.JWTSecret)
-		token , err := auth.CreateJWT(secret , patient.ID)
-		
-		if err != nil {
-			utils.WriteError(w , http.StatusInternalServerError ,err)
-			return
-		}
-
-		returnLoggingData := types.ReturnLoggingData {
-			Name: patient.FullName,
-			Email: patient.Email,
-			Role: "patient",
-			IsCompletes: false,
-			Token: token,
-		}
-		
-
-	    
-		utils.WriteJSON(w , http.StatusOK ,returnLoggingData)
-		
-	} else  {
-		center , err2 := h.storeCenter.GetCenterByEmail(LoginPayload.Email)
-		if err2 != nil {
-			utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("not found invalid  email or password"))
-			return 
-		}
-		if !auth.ComparePasswords(center.CenterPassword , [] byte(LoginPayload.Password)) {
-			utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("not found invalid password"))
-			return
-		}
-	
-		secret := []byte(config.Envs.JWTSecret)
-		token , err := auth.CreateJWT(secret , center.ID)
-		
-		if err != nil {
-			utils.WriteError(w , http.StatusInternalServerError ,err)
-			return
-		}
-
-		patients , err := h.store.GetPatientsForCenter(center.ID)
-		if err != nil {
-			
-		}
-
-
-		returnLoggingData := types.ReturnLoggingCenterData {
-			Name: center.CenterName,
-			Email: center.CenterEmail,
-			Role: "center",
-			Patient: patients,
-			Token: token,
-		}
-	
-		utils.WriteJSON(w , http.StatusOK ,returnLoggingData)
+	user, err := h.store.GetUserByEmail(LoginPayload.Email)
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("invalid email or password"))
+		return
 	}
+
+		// التحقق من صحة كلمة المرور
+		if !auth.ComparePasswords(user.Password, []byte(LoginPayload.Password)) {
+			utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("invalid email or password"))
+			return
+		}
+
+		// إنشاء JWT Token
+		secret := []byte(config.Envs.JWTSecret)
+		token, err := auth.CreateJWT(secret, user.ID)
+		if err != nil {
+			utils.WriteError(w, http.StatusInternalServerError, err)
+			return
+		}
+
+		if user.Role == "patient" {
+			returnLoggingData := types.ReturnLoggingData{
+				Name:       user.Name,
+				Email:      user.Email,
+				Role:       "patient",
+				IsCompletes: false,
+				Token:      token,
+			}
+			utils.WriteJSON(w, http.StatusOK, returnLoggingData)
+		} else {
+			patients, err := h.store.GetPatientsForCenter(user.ID)
+			if err != nil {
+				utils.WriteError(w, http.StatusInternalServerError, err)
+				return
+			}
+	
+			returnLoggingData := types.ReturnLoggingCenterData{
+				Name:    user.Name,
+				Email:   user.Email,
+				Role:    "center",
+				Patient: patients,
+				Token:   token,
+			}
+			utils.WriteJSON(w, http.StatusOK, returnLoggingData)
+		}
 	
 
 }
@@ -248,3 +228,49 @@ func (h *Handler) handleGetAllPatientInfo (w http.ResponseWriter , r *http.Reque
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+// secret := []byte(config.Envs.JWTSecret)
+// token , err := auth.CreateJWT(secret , center.ID)
+
+// if err != nil {
+// 	utils.WriteError(w , http.StatusInternalServerError ,err)
+// 	return
+// }
+
+// patients , err := h.store.GetPatientsForCenter(center.ID)
+// if err != nil {
+	
+// }
+
+
+// returnLoggingData := types.ReturnLoggingCenterData {
+// 	Name: center.CenterName,
+// 	Email: center.CenterEmail,
+// 	Role: "center",
+// 	Patient: patients,
+// 	Token: token,
+// }
+
+// utils.WriteJSON(w , http.StatusOK ,returnLoggingData)

@@ -91,8 +91,50 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 // 2
 
 func (s *Store) GetPatientsForCenter(CenterID int) ([]types.CardData , error) {
-	return nil , nil
+	rows , err := s.db.Query("SELECT id,fullName,email,date,phone,id_number,isCompleted,sugarType FROM patients WHERE center_id=$1",CenterID)
+	if err != nil {
+		return nil , err
+	}
+	defer rows.Close()
+
+	cardData := make([]types.CardData,0)
+	for rows.Next() {
+		cardd , err := scanRowIntoPatientsCard(rows)
+		if err != nil {
+			return nil , err
+		}
+		cardData = append(cardData, *cardd)
+	}
+
+	return cardData , nil
+
 }
+
+
+func scanRowIntoPatientsCard(rows *sql.Rows) (*types.CardData , error ){
+	patient := new(types.CardData)
+
+    var sugarType     sql.NullString
+	err := rows.Scan(
+		&patient.ID,
+		&patient.FullName,
+		&patient.Email,
+		&patient.Age,
+		&patient.Phone,
+		&patient.IDNumber,
+		&patient.IsCompleted,
+		&sugarType,
+	)
+
+	
+	if err  != nil {
+		return nil , err
+	}
+	patient.SugarType = convertNullStringToPointer(sugarType)
+
+	return patient , nil
+}
+
 
 
 
@@ -218,4 +260,44 @@ func scanRowIntoPatientDeatials(rows *sql.Rows) (*types.PatientDetails , error )
 
 	return patient , nil
 }
+
+
+func (s *Store) GetUserByEmail(email string) (*types.UserLoginData, error) {
+	query := `
+	(
+		SELECT 'patient' AS role, id, fullName AS name, email, password, NULL AS centerName
+		FROM patients
+		WHERE email = ?
+	)
+	UNION ALL
+	(
+		SELECT 'center' AS role, id, centerName AS name, centerEmail AS email, centerPassword AS password, centerName
+		FROM centers
+		WHERE centerEmail = ?
+	)
+	LIMIT 1`
+
+    row := s.db.QueryRow(query, email, email)
+	
+	user := new(types.UserLoginData)
+
+	err := row.Scan(
+		&user.Role,
+		&user.ID,
+		&user.Name,
+		&user.Email,
+		&user.Password,
+		&user.CenterName,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("user not found")
+		}
+		return nil, err
+	}
+
+	return user , nil
+}
+
+
 

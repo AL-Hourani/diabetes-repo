@@ -15,6 +15,7 @@ type PatientStore interface {
 	GreatePatient(Patient) error
 	GetPatientDetailsByID(patientID int) (*PatientDetails, error)
 	GetPatientsForCenter(CenterID int) ([]CardData , error) 
+	GetUserByEmail(email string) (*UserLoginData, error)
 
 }
 
@@ -78,6 +79,18 @@ type LoginPayload struct {
 	Email			string		 `json:"email"    validate:"required,email"`
 	Password		string		 `json:"password" validate:"required"`
 }
+
+//البيانات المشتركة 
+type UserLoginData struct {
+	Role       string  `json:"role"`
+	ID         int     `json:"id"`
+	Name       string  `json:"name"`
+	Email      string  `json:"email"`
+	Password   string  `json:"-"`
+	CenterName *string `json:"centerName,omitempty"`
+}
+
+
 
 type ReturnLoggingData struct {
 	Name		    string		 `json:"name"`
