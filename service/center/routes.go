@@ -27,6 +27,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	// router.HandleFunc("/centerLogin", h.handleCenterLogin).Methods("POST")
 	router.HandleFunc("/centerRegister", h.handleCenterRegister).Methods("POST")
 	router.HandleFunc("/confirmAccount", h.handleConfirmPatientAccount).Methods("POST")
+	router.HandleFunc("/getCenters",h.handleGetCenters).Methods("GET")
 	router.HandleFunc("/getPatients", auth.WithJWTAuth(h.handleGetPatients)).Methods(http.MethodGet)
 	router.HandleFunc("/addPatient/{id}", h.handleGetCenters).Methods(http.MethodPost)
 	router.HandleFunc("/updatePatient", h.handleUpdatePatient).Methods(http.MethodPatch)
