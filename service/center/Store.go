@@ -243,28 +243,28 @@ func (s *Store) UpdateIsCompletedPatientField(confirmAcc types.ConfirmAccount) e
 
 
 func (s *Store) PatchUpdatePatient(patient *types.PatientUpdatePayload) error {
-	query := `UPDATE patients
-	SET
-		fullName = COALESCE($1, fullName),
-		email = COALESCE($2, email),
-		phone = COALESCE($3, phone),
-		date = COALESCE($4, date),
-		id_number = COALESCE($5, id_number),
-		gender = COALESCE($6, gender),
-		wight = COALESCE($7, wight),
-		length_patient = COALESCE($8, length_patient),
-		address_patient = COALESCE($9, address_patient),
-		bloodSugar = COALESCE($10, bloodSugar),
-		hemoglobin = COALESCE($11, hemoglobin),
-		bloodPressure = COALESCE($12, bloodPressure),
-		sugarType = COALESCE($13, sugarType),
-		diseaseDetection = COALESCE($14, diseaseDetection),
-		otherDisease = COALESCE($15, otherDisease),
-		typeOfMedicine = COALESCE($16, typeOfMedicine),
-		urineAcid = COALESCE($17, urineAcid),
-		cholesterol = COALESCE($18, cholesterol),
-		grease = COALESCE($19, grease),
-		historyOfFamilyDisease = COALESCE($20, historyOfFamilyDisease)
+	query :=` 	UPDATE patients
+	    SET
+		fullName = CASE WHEN $1 != '' THEN $1 ELSE fullName END,
+		email = CASE WHEN $2 != '' THEN $2 ELSE email END,
+		phone = CASE WHEN $3 != '' THEN $3 ELSE phone END,
+		date = CASE WHEN $4 != '' THEN $4 ELSE date END,
+		id_number = CASE WHEN $5 != '' THEN $5 ELSE id_number END,
+		gender = CASE WHEN $6 != '' THEN $6 ELSE gender END,
+		wight = CASE WHEN $7 != '' THEN $7 ELSE wight END,
+		length_patient = CASE WHEN $8 != '' THEN $8 ELSE length_patient END,
+		address_patient = CASE WHEN $9 != '' THEN $9 ELSE address_patient END,
+		bloodSugar = CASE WHEN $10 != '' THEN $10 ELSE bloodSugar END,
+		hemoglobin = CASE WHEN $11 != '' THEN $11 ELSE hemoglobin END,
+		bloodPressure = CASE WHEN $12 != '' THEN $12 ELSE bloodPressure END,
+		sugarType = CASE WHEN $13 != '' THEN $13 ELSE sugarType END,
+		diseaseDetection = CASE WHEN $14 != '' THEN $14 ELSE diseaseDetection END,
+		otherDisease = CASE WHEN $15 != '' THEN $15 ELSE otherDisease END,
+		typeOfMedicine = CASE WHEN $16 != '' THEN $16 ELSE typeOfMedicine END,
+		urineAcid = CASE WHEN $17 != '' THEN $17 ELSE urineAcid END,
+		cholesterol = CASE WHEN $18 != '' THEN $18 ELSE cholesterol END,
+		grease = CASE WHEN $19 != '' THEN $19 ELSE grease END,
+		historyOfFamilyDisease = CASE WHEN $20 != '' THEN $20 ELSE historyOfFamilyDisease END
 	WHERE id = $21`
 
 	_, err := s.db.Exec(query,
