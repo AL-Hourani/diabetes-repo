@@ -219,7 +219,7 @@ func scanRowIntoCenters(rows *sql.Rows) (*types.Center , error ){
 
 // deleted patient..............
 func (s *Store) DeletePatient(id int) error { 
-	_ , err := s.db.Query("DELETE FROM")
+	_ , err := s.db.Query(`DELETE FROM patients WHERE id = $1` , id)
 	if err != nil {
 		return err
 	}
