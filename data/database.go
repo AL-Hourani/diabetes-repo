@@ -32,8 +32,8 @@ func NewMQLStorage(cfg PostgresConfig) (*sql.DB , error) {
 	}
 
 
-	db.SetMaxOpenConns(10)    // الحد الأقصى للاتصالات المفتوحة في نفس الوقت
-    db.SetMaxIdleConns(5)     // الحد الأقصى للاتصالات الفارغة التي يمكن أن تبقى مفتوحة
+	db.SetMaxOpenConns(50)    // الحد الأقصى للاتصالات المفتوحة في نفس الوقت
+    db.SetMaxIdleConns(20)     // الحد الأقصى للاتصالات الفارغة التي يمكن أن تبقى مفتوحة
     db.SetConnMaxLifetime(0)  
 
 	return db , nil
