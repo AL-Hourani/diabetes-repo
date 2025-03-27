@@ -261,7 +261,7 @@ func (s *Store) PatchUpdatePatient(patient *types.PatientUpdatePayload) error {
 		urineAcid = COALESCE($17, urineAcid),
 		cholesterol = COALESCE($18, cholesterol),
 		grease = COALESCE($19, grease),
-		historyOfFamilyDisease = COALESCE($20, historyOfFamilyDisease),
+		historyOfFamilyDisease = COALESCE($20, historyOfFamilyDisease)
 	WHERE id = $21`
 
 	_, err := s.db.Exec(query,
