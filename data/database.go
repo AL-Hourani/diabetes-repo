@@ -30,8 +30,16 @@ func NewMQLStorage(cfg PostgresConfig) (*sql.DB , error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+
+	db.SetMaxOpenConns(10)    // الحد الأقصى للاتصالات المفتوحة في نفس الوقت
+    db.SetMaxIdleConns(5)     // الحد الأقصى للاتصالات الفارغة التي يمكن أن تبقى مفتوحة
+    db.SetConnMaxLifetime(0)  
+
 	return db , nil
+
 }
+
 
 func InitStorage(db *sql.DB) {
 	err := db.Ping()
