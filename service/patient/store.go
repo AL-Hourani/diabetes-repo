@@ -267,13 +267,13 @@ func (s *Store) GetUserByEmail(email string) (*types.UserLoginData, error) {
 	(
 		SELECT 'patient' AS role, id, fullName AS name, email, password, NULL AS centerName
 		FROM patients
-		WHERE email = ?
+		WHERE email = $1
 	)
-	UNION ALL
+	UNION 
 	(
 		SELECT 'center' AS role, id, centerName AS name, centerEmail AS email, centerPassword AS password, centerName
 		FROM centers
-		WHERE centerEmail = ?
+		WHERE centerEmail = $2
 	)
 	ORDER BY role
 	LIMIT 1`
