@@ -189,5 +189,5 @@ func (h *Handler) handleUpdatePatient(w http.ResponseWriter , r *http.Request) {
         return
     }
 
-    utils.WriteJSON(w, http.StatusOK, udpatePayload)
+    utils.WriteJSON(w, http.StatusOK,  map[string]string{"message":"Patient updated successfully"})
 }
