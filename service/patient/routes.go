@@ -27,11 +27,8 @@ func NewHandler(store types.PatientStore , centerStore types.CenterStore ) *Hand
 func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/Login", h.handleLogin).Methods("POST")
 	router.HandleFunc("/patientRegister", h.handlePatientRegister).Methods("POST")
-	router.HandleFunc("/setPatientHealthInfo",h.handleSetPatientHealthInfo).Methods("POST")
-	router.HandleFunc("/setPatientPersonalInfo",h.handleSetPatientPersonalInfo).Methods("POST")
 	router.HandleFunc("/getPatient/{id}" , h.handleGetPatient).Methods("GET")
-	router.HandleFunc("/getAllPatientInfo/{id}" , h.handleGetAllPatientInfo).Methods("GET")
-	router.HandleFunc("/Logout" , h.handleGetAllPatientInfo).Methods("GET")
+	// router.HandleFunc("/getAllPatientInfo/{id}" , h.handleGetAllPatientInfo).Methods("GET")
 }
 
 
@@ -197,50 +194,6 @@ func (h *Handler) handlePatientRegister(w http.ResponseWriter , r *http.Request)
 //
 
 
-func (h *Handler) handleSetPatientPersonalInfo(w http.ResponseWriter , r *http.Request) {
-	var personalPatientInfo types.BasicPatientInfoPalyoad
-		//get json payload
-		if err := utils.ParseJSON(r , &personalPatientInfo); err != nil {
-			utils.WriteError(w , http.StatusBadRequest , err)
-			return
-		}
-
-	//validate the payoad .....................
-	if err := utils.Validate.Struct(personalPatientInfo);err != nil {
-		error := err.(validator.ValidationErrors)
-		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("invalid payload %v", error) )
-		return
-	}
-
-
-
-	_ , err := h.store.GetPatientById(personalPatientInfo.PatientID)
-	if err != nil {
-		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("patient with id %d is not exists" ,personalPatientInfo.PatientID ))
-		return 
-	}
-
-
-	err = h.store.SetPersonlPatientBasicInfo(types.BasicPatientInfo{
-        PatientID: personalPatientInfo.PatientID,
-		Weight: personalPatientInfo.Weight,
-		Length: personalPatientInfo.Length,
-		Address: personalPatientInfo.Address,
-		Gender: personalPatientInfo.Gender,
-		
-	})
-
-	if err != nil {
-		utils.WriteError(w , http.StatusBadRequest ,err)
-		return 
-	}
-
-
-    utils.WriteJSON(w , http.StatusCreated , map[string]string{"message":"successfully add basic info"})
-
-
-}
-
 
 
 func (h *Handler) handleGetPatient (w http.ResponseWriter , r *http.Request) {
@@ -269,58 +222,6 @@ func (h *Handler) handleGetPatient (w http.ResponseWriter , r *http.Request) {
 
 
 //router agign
-func (h *Handler) handleSetPatientHealthInfo(w http.ResponseWriter , r *http.Request) {
-	var patientHealtPayload  types.RegisterHealthPatientData
-	//get json payload
-			if err := utils.ParseJSON(r , &patientHealtPayload); err != nil {
-				utils.WriteError(w , http.StatusBadRequest , err)
-				return
-			}
-
-    
-
-	//validate the payoad .....................
-
-	if err := utils.Validate.Struct(patientHealtPayload);err != nil {
-		error := err.(validator.ValidationErrors)
-		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("invalid payload %v", error) )
-		return
-	}
-
-	//check if patient is exists 
-
-	_ , err := h.store.GetPatientById(patientHealtPayload.PatientID)
-	if err != nil {
-		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("patient with id %d is not exists" ,patientHealtPayload.PatientID ))
-		return 
-	}
-
-	err = h.store.SetPatientHealthInfo(types.HealthPatientData {
-		PatientID: patientHealtPayload.PatientID,
-		BloodSugar: patientHealtPayload.BloodSugar,
-		Hemoglobin: patientHealtPayload.Hemoglobin,
-		BloodPressure: patientHealtPayload.BloodPressure,
-		SugarType: patientHealtPayload.SugarType,
-		DiseaseDetection: patientHealtPayload.DiseaseDetection,
-		OtherDisease: patientHealtPayload.OtherDisease,
-		TypeOfMedicine: patientHealtPayload.TypeOfMedicine,
-		UrineAcid: patientHealtPayload.UrineAcid,
-		Cholesterol: patientHealtPayload.Cholesterol,
-		Grease: patientHealtPayload.Grease,
-		HistoryOfFamilyDisease: patientHealtPayload.HistoryOfFamilyDisease,
-	})
-
-	if err != nil {
-		utils.WriteError(w , http.StatusBadRequest ,err)
-		return 
-	}
-
-
-    utils.WriteJSON(w , http.StatusCreated , map[string]string{"message":"successfully add health info"})
-
-
-}
-
 
 
 
@@ -328,27 +229,10 @@ func (h *Handler) handleSetPatientHealthInfo(w http.ResponseWriter , r *http.Req
 
 
 
-func (h *Handler) handleGetAllPatientInfo (w http.ResponseWriter , r *http.Request) {
-
-
-	vars := mux.Vars(r)
-	id , err := strconv.Atoi(vars["id"])
-	if err != nil  {
-       utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid ID"))
-       return
-	}
-
-	AllpatientInfo , err := h.store.GetAllPatientInfo(id)
-	if err != nil {
-		utils.WriteError(w , http.StatusBadRequest ,err)
-		return 
-	}
+// func (h *Handler) handleGetAllPatientInfo (w http.ResponseWriter , r *http.Request) {
 
 
 
-	utils.WriteJSON(w , http.StatusOK ,AllpatientInfo)
-
-
-}
+// }
 
 
