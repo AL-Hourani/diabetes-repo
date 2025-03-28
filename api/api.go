@@ -32,11 +32,12 @@ func (s *APIServer) Run() error {
 	
 	// center .....
 	centerStore := center.NewStore(s.db)
-	centerHandler := center.NewHandler(centerStore)
+	patientStore := patient.NewStore(s.db)
+
+	centerHandler := center.NewHandler(centerStore ,patientStore)
 	centerHandler.RegisterCenterRoutes(subrouter)
 	// patients ....
 
-	patientStore := patient.NewStore(s.db)
 	patientHandler := patient.NewHandler(patientStore , centerStore)
 	patientHandler.RegisterPatientRoutes(subrouter)
    

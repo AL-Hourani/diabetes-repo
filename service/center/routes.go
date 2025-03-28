@@ -17,10 +17,14 @@ import (
 
 type Handler struct {
 	store types.CenterStore
+    pStore types.PatientStore
 }
 
-func NewHandler(store types.CenterStore) *Handler {
-	return &Handler{store: store}
+func NewHandler(store types.CenterStore , patientStore types.PatientStore) *Handler {
+	return &Handler {
+		store: store,
+		pStore: patientStore,
+	}
 }
 
 func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
@@ -173,7 +177,7 @@ func (h *Handler) handleConfirmPatientAccount(w http.ResponseWriter , r *http.Re
 func (h *Handler) handleUpdatePatient(w http.ResponseWriter , r *http.Request) { 
 	var udpatePayload types.PatientUpdatePayload
 		
-	if err := utils.ParseJSONUpdate(r , &udpatePayload); err != nil {
+	if err := utils.ParseJSON(r , &udpatePayload); err != nil {
 		utils.WriteError(w , http.StatusBadRequest , err)
 		return
 	}
@@ -191,7 +195,13 @@ func (h *Handler) handleUpdatePatient(w http.ResponseWriter , r *http.Request) {
         return
     }
 
-    utils.WriteJSON(w, http.StatusOK,  map[string]string{"message":"Patient updated successfully"})
+	patient , err := h.pStore.GetPatientById(udpatePayload.ID)
+	if err != nil {
+        utils.WriteError(w, http.StatusInternalServerError, err)
+        return
+    }
+
+    utils.WriteJSON(w, http.StatusOK,patient)
 }
 
 

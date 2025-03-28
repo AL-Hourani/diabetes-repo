@@ -66,7 +66,6 @@ type PatientDetails struct {
 	Cholesterol            *string   `json:"cholesterol"`
 	Grease                *string   `json:"grease"`
 	HistoryOfFamilyDisease  *string `json:"historyOfFamilyDisease"`
-	CenterID              int       `json:"center_id"`
 	CreateAt              time.Time `json:"createAt"`
 }
 

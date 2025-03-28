@@ -189,7 +189,6 @@ func scanRowIntoPatientDeatials(rows *sql.Rows) (*types.PatientDetails , error )
 		&cholesterol,
 		&grease,
 		&historyOfFamilyDisease,
-		&patient.CenterID,
 		&patient.CreateAt,
 	)
 	
