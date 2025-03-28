@@ -94,7 +94,7 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 func  (s *Store) GetPatientDetailsById(id int) (*types.PatientDetails , error) {
 	rows , err := s.db.Query(`SELECT id,fullName,email,phone,date,id_number,isCompleted,gender,wight,length_patient,address_patient,
 	bloodSugar,hemoglobin,bloodPressure,sugarType,diseaseDetection,otherDisease,typeOfMedicine,
-	urineAcid,cholesterol,grease,historyOfFamilyDisease 
+	urineAcid,cholesterol,grease,historyOfFamilyDisease,createAt 
 	FROM patients WHERE id=$1`,id)
 	if err != nil {
 		return nil , err
@@ -143,6 +143,7 @@ func scanRowIntoPatientdetails(rows *sql.Rows) (*types.PatientDetails , error ){
 		&patient.Cholesterol,
 		&patient.Grease,
 		&patient.HistoryOfFamilyDisease,
+		&patient.CreateAt,
 	)
 	
 	if err  != nil {

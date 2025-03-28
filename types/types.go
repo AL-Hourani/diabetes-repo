@@ -69,8 +69,7 @@ type PatientDetails struct {
 	CreateAt              time.Time `json:"createAt"`
 }
 
-type PatientUpdatePayload struct
-{
+type PatientUpdatePayload struct {
 	ID				        int			 `json:"id"`
 	FullName		        string		 `json:"fullname"`
 	Email			        string		 `json:"email"`
