@@ -73,7 +73,7 @@ type PatientUpdatePayload struct {
 	ID				        int			 `json:"id"`
 	FullName		        string		 `json:"fullname"`
 	Email			        string		 `json:"email"`
-	Age                     string		 `json:"age"`
+	Date                    string    `json:"date"`
 	Phone			        string       `json:"phone"`
 	IDNumber		        string       `json:"id_number"`
 	IsCompleted             bool      `json:"isCompleted"`

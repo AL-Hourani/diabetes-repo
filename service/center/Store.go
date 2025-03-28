@@ -281,7 +281,7 @@ func (s *Store) PatchUpdatePatient(patient *types.PatientUpdatePayload) error {
         patient.FullName,
 		patient.Email,
 		patient.Phone,
-        patient.Age, 
+        patient.Date, 
 		patient.IDNumber,
 		patient.IsCompleted,
 		patient.Gender,
