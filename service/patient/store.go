@@ -92,32 +92,28 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 //get patient detials
 
 func  (s *Store) GetPatientDetailsById(id int) (*types.PatientDetails , error) {
-	rows , err := s.db.Query(`SELECT id,fullName,email,phone,date,id_number,isCompleted,gender,wight,length_patient,address_patient,
+	row := s.db.QueryRow(`SELECT id,fullName,email,phone,date,id_number,isCompleted,gender,wight,length_patient,address_patient,
 	bloodSugar,hemoglobin,bloodPressure,sugarType,diseaseDetection,otherDisease,typeOfMedicine,
 	urineAcid,cholesterol,grease,historyOfFamilyDisease,createAt 
 	FROM patients WHERE id=$1`,id)
+
+	patient, err := scanRowIntoPatientDetails(row)
 	if err != nil {
-		return nil , err
-	}
-	defer rows.Close()
-
-	p := new(types.PatientDetails)
-	for rows.Next() {
-		p , err = scanRowIntoPatientdetails(rows)
-		if err != nil {
-			return nil , err
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("patient not found")
 		}
+		return nil, err
 	}
 
-	if p.ID == 0 {
+	if patient.ID == 0 {
 		return nil , fmt.Errorf("patient not found")
 	}
 
-	return p , nil
+	return patient , nil
 }
 
 
-func scanRowIntoPatientdetails(rows *sql.Rows) (*types.PatientDetails , error ){
+func scanRowIntoPatientDetails(rows *sql.Row) (*types.PatientDetails , error ){
 	patient := new(types.PatientDetails)
 	var (
 

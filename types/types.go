@@ -52,9 +52,9 @@ type PatientDetails struct {
 	IDNumber              string    `json:"id_number"`
 	IsCompleted           bool      `json:"isCompleted"`
 	Gender                *string   `json:"gender"`
-	Weight                *string   `json:"weight"`
-	LengthPatient          *string   `json:"length_patient"`
-	AddressPatient       *string     `json:"address_patient"`
+	Weight                 *string   `json:"weight"`
+	LengthPatient           *string   `json:"length_patient"`
+	AddressPatient          *string     `json:"address_patient"`
 	BloodSugar             *string  `json:"bloodSugar"`
 	Hemoglobin             *string   `json:"hemoglobin"`
 	BloodPressure          *string   `json:"bloodPressure"`
