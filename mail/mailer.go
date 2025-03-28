@@ -12,6 +12,7 @@ func SendOTP(email, otpCode string) error {
 	mailer.SetHeader("To", email)
 	mailer.SetHeader("Subject", "Your OTP Code")
 	mailer.SetBody("text/html", fmt.Sprintf(`
+	    <h3>مرحبا بك في مركز عناية</h3>
         <h3>Your OTP code is:</h3>
         <h2>%s</h2>
     `, otpCode))

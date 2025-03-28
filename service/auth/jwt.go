@@ -35,14 +35,14 @@ const UserContextKey ContextKey = "user"
 func WithJWTAuth(handlerFunc http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// استخراج التوكن من الطلب
-		tokenString := getTokenFromRequest(r)
+		tokenString := GetTokenFromRequest(r)
 		if tokenString == "" {
 			http.Error(w, "Unauthorized: No token provided", http.StatusUnauthorized)
 			return
 		}
 
 		// التحقق من صحة التوكن
-		token, err := validateToken(tokenString)
+		token, err := ValidateToken(tokenString)
 		if err != nil {
 			http.Error(w, "Unauthorized: Invalid token", http.StatusUnauthorized)
 			return
@@ -63,7 +63,7 @@ func WithJWTAuth(handlerFunc http.HandlerFunc) http.HandlerFunc {
 
 
 
-func getTokenFromRequest(r *http.Request) string {
+func GetTokenFromRequest(r *http.Request) string {
 	// الحصول على التوكن من هيدر Authorization
 	tokenAuth := r.Header.Get("Authorization")
 	if tokenAuth != "" {
@@ -77,7 +77,7 @@ func getTokenFromRequest(r *http.Request) string {
 }
 
 
-func validateToken(tokenString string) (*jwt.Token, error) {
+func ValidateToken(tokenString string) (*jwt.Token, error) {
 	// التحقق من صحة التوكن وتفسيره
 	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// التحقق من خوارزمية التوقيع المستخدمة

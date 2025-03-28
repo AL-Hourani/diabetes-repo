@@ -54,7 +54,7 @@ type PatientDetails struct {
 	Gender                *string   `json:"gender"`
 	Weight                *string   `json:"weight"`
 	LengthPatient          *string   `json:"length_patient"`
-	AddressPatient       *string  `json:"address_patient"`
+	AddressPatient       *string     `json:"address_patient"`
 	BloodSugar             *string  `json:"bloodSugar"`
 	Hemoglobin             *string   `json:"hemoglobin"`
 	BloodPressure          *string   `json:"bloodPressure"`

@@ -32,6 +32,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/addPatient/{id}", h.handleGetCenters).Methods(http.MethodPost)
 	router.HandleFunc("/updatePatient", h.handleUpdatePatient).Methods(http.MethodPatch)
 	router.HandleFunc("/deletePatient/{id}", auth.WithJWTAuth(h.handleDeletePatient)).Methods(http.MethodDelete)
+	router.HandleFunc("/logout",auth.WithJWTAuth(h.Logout)).Methods("POST")
 }
 
 
@@ -190,4 +191,16 @@ func (h *Handler) handleUpdatePatient(w http.ResponseWriter , r *http.Request) {
     }
 
     utils.WriteJSON(w, http.StatusOK,  map[string]string{"message":"Patient updated successfully"})
+}
+
+
+
+
+
+//logout
+
+func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
+	utils.WriteJSON(w, http.StatusOK, map[string]string{
+		"message": "Logout successful",
+	})
 }

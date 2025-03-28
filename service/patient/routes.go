@@ -29,6 +29,8 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/patientRegister", h.handlePatientRegister).Methods("POST")
 	router.HandleFunc("/getPatient/{id}" , h.handleGetPatient).Methods("GET")
 	router.HandleFunc("/getAllPatientInfo/{id}" , h.handleGetAllPatientInfo).Methods("GET")
+	router.HandleFunc("/verify-token", h.VerifyTokenHandler).Methods("POST")
+
 }
 
 
@@ -225,7 +227,26 @@ func (h *Handler) handleGetAllPatientInfo (w http.ResponseWriter , r *http.Reque
 
 
 
+func (h *Handler)  VerifyTokenHandler(w http.ResponseWriter , r *http.Request) {
+	tokenString := auth.GetTokenFromRequest(r)
+	if tokenString == "" {
+		http.Error(w, "No token provided", http.StatusUnauthorized)
+		return
+	}
 
+	token, err := auth.ValidateToken(tokenString)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	if !token.Valid {
+		http.Error(w, "Token expired or invalid", http.StatusUnauthorized)
+		return
+	}
+
+	utils.WriteJSON(w , http.StatusOK , "Token is Vaild")
+}
 
 
 
