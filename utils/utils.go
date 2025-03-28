@@ -82,3 +82,29 @@ func VerifyOTP(w http.ResponseWriter, r *http.Request) {
 
 
 
+
+func ParseJSONUpdate(r *http.Request, payload any) error {
+	if r.Body == nil {
+		return fmt.Errorf("missing request body")
+	}
+	defer r.Body.Close()
+
+	// فك ترميز JSON إلى map مؤقت
+	var rawData map[string]interface{}
+	if err := json.NewDecoder(r.Body).Decode(&rawData); err != nil {
+		return err
+	}
+
+	// فك تشفير البيانات النهائية إلى struct مع الحفاظ على القيم الأصلية
+	payloadData, err := json.Marshal(rawData)
+	if err != nil {
+		return err
+	}
+
+	// تحديث القيم فقط إذا كانت موجودة في الطلب
+	if err := json.Unmarshal(payloadData, payload); err != nil {
+		return err
+	}
+
+	return nil
+}
