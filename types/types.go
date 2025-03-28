@@ -71,7 +71,7 @@ type PatientDetails struct {
 
 type PatientUpdatePayload struct {
 	ID				        int			 `json:"id"`
-	FullName		        string		 `json:"fullname"`
+	FullName		        string		 `json:"fullName"`
 	Email			        string		 `json:"email"`
 	Date                    string    `json:"date"`
 	Phone			        string       `json:"phone"`

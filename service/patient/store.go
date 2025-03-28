@@ -91,7 +91,7 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 
 //get patient detials
 
-func  (s *Store) GetPatientDetailsById(id int) (*types.PatientDetails , error) {
+func  (s *Store) GetPatientDetailsById(id int)(*types.PatientDetails , error) {
 	
 	row := s.db.QueryRow(`
 	SELECT 
