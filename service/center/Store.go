@@ -278,11 +278,27 @@ func (s *Store) PatchUpdatePatient(patient *types.PatientUpdatePayload) error {
 	WHERE id = $22`
 
 	_, err := s.db.Exec(query,
-        patient.FullName, patient.Email, patient.Phone,
-        patient.Age, patient.IDNumber,patient.IsCompleted, patient.Gender, patient.Weight, patient.LengthPatient,
-        patient.AddressPatient, patient.BloodSugar, patient.Hemoglobin, patient.BloodPressure,
-        patient.SugarType, patient.DiseaseDetection, patient.OtherDisease, patient.TypeOfMedicine,
-        patient.UrineAcid, patient.Cholesterol, patient.Grease, patient.HistoryOfFamilyDisease,
+        patient.FullName,
+		patient.Email,
+		patient.Phone,
+        patient.Age, 
+		patient.IDNumber,
+		patient.IsCompleted,
+		patient.Gender,
+		patient.Weight,
+		patient.LengthPatient,
+        patient.AddressPatient,
+		patient.BloodSugar,
+		patient.Hemoglobin,
+		patient.BloodPressure,
+        patient.SugarType,
+		patient.DiseaseDetection,
+		patient.OtherDisease, 
+		patient.TypeOfMedicine,
+        patient.UrineAcid, 
+		patient.Cholesterol, 
+		patient.Grease, 
+		patient.HistoryOfFamilyDisease,
         patient.ID)
     
     if err != nil {
