@@ -77,6 +77,7 @@ type PatientUpdatePayload struct
 	Age                     string		 `json:"age"`
 	Phone			        string       `json:"phone"`
 	IDNumber		        string       `json:"id_number"`
+	IsCompleted             bool      `json:"isCompleted"`
 	Gender                  string   `json:"gender"`
 	Weight                  string   `json:"weight"`
 	LengthPatient           string   `json:"length_patient"`
