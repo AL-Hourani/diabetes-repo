@@ -88,6 +88,71 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 
 
 
+
+//get patient detials
+
+func  (s *Store) GetPatientDetailsById(id int) (*types.PatientDetails , error) {
+	rows , err := s.db.Query(`SELECT id,fullName,email,phone,date,id_number,isCompleted,gender,wight,length_patient,address_patient,
+	bloodSugar,hemoglobin,bloodPressure,sugarType,diseaseDetection,otherDisease,typeOfMedicine,
+	urineAcid,cholesterol,grease,historyOfFamilyDisease 
+	FROM patients WHERE id=$1`,id)
+	if err != nil {
+		return nil , err
+	}
+	defer rows.Close()
+
+	p := new(types.PatientDetails)
+	for rows.Next() {
+		p , err = scanRowIntoPatientdetails(rows)
+		if err != nil {
+			return nil , err
+		}
+	}
+
+	if p.ID == 0 {
+		return nil , fmt.Errorf("patient not found")
+	}
+
+	return p , nil
+}
+
+
+func scanRowIntoPatientdetails(rows *sql.Rows) (*types.PatientDetails , error ){
+	patient := new(types.PatientDetails)
+
+	err := rows.Scan(
+		&patient.ID,
+		&patient.FullName,
+		&patient.Email,
+		&patient.Phone,
+		&patient.Date,
+		&patient.IDNumber,
+		&patient.IsCompleted,
+	    &patient.Gender,
+		&patient.Weight,
+		&patient.LengthPatient,
+		&patient.AddressPatient,
+		&patient.BloodSugar,
+		&patient.Hemoglobin,
+		&patient.BloodPressure,
+		&patient.SugarType,
+		&patient.DiseaseDetection,
+		&patient.OtherDisease,
+		&patient.TypeOfMedicine,
+		&patient.UrineAcid,
+		&patient.Cholesterol,
+		&patient.Grease,
+		&patient.HistoryOfFamilyDisease,
+	)
+	
+	if err  != nil {
+		return nil , err
+	}
+
+	return patient , nil
+}
+
+
 // 2
 
 

@@ -195,7 +195,7 @@ func (h *Handler) handleUpdatePatient(w http.ResponseWriter , r *http.Request) {
         return
     }
 
-	patient , err := h.pStore.GetPatientById(udpatePayload.ID)
+	patient , err := h.pStore.GetPatientDetailsByID(udpatePayload.ID)
 	if err != nil {
         utils.WriteError(w, http.StatusInternalServerError, err)
         return
