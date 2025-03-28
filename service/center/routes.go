@@ -175,6 +175,7 @@ func (h *Handler) handleUpdatePatient(w http.ResponseWriter , r *http.Request) {
 		
 	if err := utils.ParseJSONUpdate(r , &udpatePayload); err != nil {
 		utils.WriteError(w , http.StatusBadRequest , err)
+		return
 	}
 
 	if udpatePayload.ID == 0 {
