@@ -119,7 +119,24 @@ func  (s *Store) GetPatientDetailsById(id int) (*types.PatientDetails , error) {
 
 func scanRowIntoPatientdetails(rows *sql.Rows) (*types.PatientDetails , error ){
 	patient := new(types.PatientDetails)
+	var (
 
+		gender                sql.NullString
+		weight                sql.NullString
+		lengthPatient         sql.NullString
+		addressPatient        sql.NullString
+		bloodSugar            sql.NullString
+		hemoglobin            sql.NullString
+		bloodPressure         sql.NullString
+		sugarType             sql.NullString
+		diseaseDetection      sql.NullString
+		otherDisease          sql.NullString
+		typeOfMedicine        sql.NullString
+		urineAcid             sql.NullString
+		cholesterol           sql.NullString
+		grease                sql.NullString
+		historyOfFamilyDisease sql.NullString
+	)
 	err := rows.Scan(
 		&patient.ID,
 		&patient.FullName,
@@ -128,27 +145,43 @@ func scanRowIntoPatientdetails(rows *sql.Rows) (*types.PatientDetails , error ){
 		&patient.Date,
 		&patient.IDNumber,
 		&patient.IsCompleted,
-	    &patient.Gender,
-		&patient.Weight,
-		&patient.LengthPatient,
-		&patient.AddressPatient,
-		&patient.BloodSugar,
-		&patient.Hemoglobin,
-		&patient.BloodPressure,
-		&patient.SugarType,
-		&patient.DiseaseDetection,
-		&patient.OtherDisease,
-		&patient.TypeOfMedicine,
-		&patient.UrineAcid,
-		&patient.Cholesterol,
-		&patient.Grease,
-		&patient.HistoryOfFamilyDisease,
+		&gender,
+		&weight,
+		&lengthPatient,
+		&addressPatient,
+		&bloodSugar,
+		&hemoglobin,
+		&bloodPressure,
+		&sugarType,
+		&diseaseDetection,
+		&otherDisease,
+		&typeOfMedicine,
+		&urineAcid,
+		&cholesterol,
+		&grease,
+		&historyOfFamilyDisease,
 		&patient.CreateAt,
 	)
 	
 	if err  != nil {
 		return nil , err
 	}
+
+	patient.Gender = convertNullStringToPointer(gender)
+	patient.Weight = convertNullStringToPointer(weight)
+	patient.LengthPatient = convertNullStringToPointer(lengthPatient)
+	patient.AddressPatient = convertNullStringToPointer(addressPatient)
+	patient.BloodSugar = convertNullStringToPointer(bloodSugar)
+	patient.Hemoglobin = convertNullStringToPointer(hemoglobin)
+	patient.BloodPressure = convertNullStringToPointer(bloodPressure)
+	patient.SugarType = convertNullStringToPointer(sugarType)
+	patient.DiseaseDetection = convertNullStringToPointer(diseaseDetection)
+	patient.OtherDisease = convertNullStringToPointer(otherDisease)
+	patient.TypeOfMedicine = convertNullStringToPointer(typeOfMedicine)
+	patient.UrineAcid = convertNullStringToPointer(urineAcid)
+	patient.Cholesterol = convertNullStringToPointer(cholesterol)
+	patient.Grease = convertNullStringToPointer(grease)
+	patient.HistoryOfFamilyDisease = convertNullStringToPointer(historyOfFamilyDisease)
 
 	return patient , nil
 }

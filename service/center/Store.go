@@ -252,7 +252,7 @@ func (s *Store) UpdateIsCompletedPatientField(confirmAcc types.ConfirmAccount) e
 
 
 func (s *Store) PatchUpdatePatient(patient *types.PatientUpdatePayload) error {
-	query :=` 	UPDATE patients
+	query :=`UPDATE patients
 	    SET
 		fullName = CASE WHEN $1 != '' THEN $1 ELSE fullName END,
 		email = CASE WHEN $2 != '' THEN $2 ELSE email END,
