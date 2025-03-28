@@ -41,7 +41,7 @@ func  (s *Store) GetPatientByEmail(email string) (*types.Patient , error) {
 
 
 func  (s *Store) GetPatientById(id int) (*types.Patient , error) {
-	rows , err := s.db.Query("SELECT id,fullName,email,password,phone,date,id_number,isCompleted,createAt FROM patients WHERE id=$1",id)
+	rows , err := s.db.Query("SELECT id,fullName,email,password,phone,date,id_number,isCompleted,center_id,createAt FROM patients WHERE id=$1",id)
 	if err != nil {
 		return nil , err
 	}
@@ -75,6 +75,7 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 		&patient.Age,
 		&patient.IDNumber,
 		&patient.IsCompleted,
+		&patient.CenterID,
 		&patient.CreateAt,
 	)
 	
@@ -91,10 +92,14 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 //get patient detials
 
 func  (s *Store) GetPatientDetailsById(id int) (*types.PatientDetails , error) {
-	row := s.db.QueryRow(`SELECT id,fullName,email,phone,date,id_number,isCompleted,gender,wight,length_patient,address_patient,
-	bloodSugar,hemoglobin,bloodPressure,sugarType,diseaseDetection,otherDisease,typeOfMedicine,
-	urineAcid,cholesterol,grease,historyOfFamilyDisease,createAt 
-	FROM patients WHERE id=$1`,id)
+	
+	row := s.db.QueryRow(`
+	SELECT 
+		id, fullName, email, phone, date, id_number, isCompleted, gender, wight, 
+		length_patient, address_patient, bloodSugar, hemoglobin, bloodPressure, 
+		sugarType, diseaseDetection, otherDisease, typeOfMedicine, urineAcid, 
+		cholesterol, grease, historyOfFamilyDisease, createAt 
+	FROM patients WHERE id=$1`, id)
 
 	patient, err := scanRowIntoPatientDetails(row)
 	if err != nil {
@@ -104,9 +109,6 @@ func  (s *Store) GetPatientDetailsById(id int) (*types.PatientDetails , error) {
 		return nil, err
 	}
 
-	if patient.ID == 0 {
-		return nil , fmt.Errorf("patient not found")
-	}
 
 	return patient , nil
 }

@@ -191,7 +191,7 @@ func (h *Handler) handleUpdatePatient(w http.ResponseWriter , r *http.Request) {
     // تحديث بيانات المريض جزئيًا باستخدام دالة PATCH
     err := h.store.PatchUpdatePatient(&udpatePayload)
     if err != nil {
-        utils.WriteError(w, http.StatusInternalServerError, err)
+        utils.WriteError(w, http.StatusInternalServerError,fmt.Errorf("faild updated"))
         return
     }
 
