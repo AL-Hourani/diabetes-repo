@@ -259,7 +259,7 @@ func (s *Store) PatchUpdatePatient(patient *types.PatientUpdatePayload) error {
 		phone = CASE WHEN $3 != '' THEN $3 ELSE phone END,
 		date = CASE WHEN $4 != '' THEN $4 ELSE date END,
 		id_number = CASE WHEN $5 != '' THEN $5 ELSE id_number END,
-		isCompleted = = CASE WHEN $6 != '' THEN $5 ELSE id_number END,
+		isCompleted = CASE WHEN $6 != '' THEN $5 ELSE id_number END,
 		gender = CASE WHEN $7 != '' THEN $6 ELSE gender END,
 		wight = CASE WHEN $8 != '' THEN $7 ELSE wight END,
 		length_patient = CASE WHEN $9 != '' THEN $8 ELSE length_patient END,
