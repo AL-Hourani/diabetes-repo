@@ -75,7 +75,6 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 		&patient.Age,
 		&patient.IDNumber,
 		&patient.IsCompleted,
-		&patient.CenterID,
 		&patient.CreateAt,
 	)
 	
