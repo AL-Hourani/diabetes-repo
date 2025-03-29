@@ -250,56 +250,72 @@ func (s *Store) UpdateIsCompletedPatientField(confirmAcc types.ConfirmAccount) e
 	return nil
 }
 
+func nullifyString(s *string) interface{} {
+	if s == nil || *s == "" {
+		return nil
+	}
+	return *s
+}
+
+func nullifyBool(b *bool) interface{} {
+	if b == nil {
+		return nil
+	}
+	return *b
+}
+
 
 func (s *Store) PatchUpdatePatient(patient *types.PatientUpdatePayload) error {
-	query :=`UPDATE patients
-	    SET
-		fullName = CASE WHEN $1 != '' THEN $1 ELSE fullName END,
-		email = CASE WHEN $2 != '' THEN $2 ELSE email END,
-		phone = CASE WHEN $3 != '' THEN $3 ELSE phone END,
-		date = CASE WHEN $4 != '' THEN $4 ELSE date END,
-		id_number = CASE WHEN $5 != '' THEN $5 ELSE id_number END,
-		isCompleted = CASE WHEN $6::text != '' THEN $6::boolean ELSE isCompleted END,
-		gender = CASE WHEN $7 != '' THEN $7 ELSE gender END,
-		wight = CASE WHEN $8 != '' THEN $8 ELSE wight END,
-		length_patient = CASE WHEN $9 != '' THEN $9 ELSE length_patient END,
-		address_patient = CASE WHEN $10 != '' THEN $10 ELSE address_patient END,
-		bloodSugar = CASE WHEN $11 != '' THEN $11 ELSE bloodSugar END,
-		hemoglobin = CASE WHEN $12 != '' THEN $12 ELSE hemoglobin END,
-		bloodPressure = CASE WHEN $13 != '' THEN $13 ELSE bloodPressure END,
-		sugarType = CASE WHEN $14 != '' THEN $14 ELSE sugarType END,
-		diseaseDetection = CASE WHEN $15 != '' THEN $15 ELSE diseaseDetection END,
-		otherDisease = CASE WHEN $16 != '' THEN $16 ELSE otherDisease END,
-		typeOfMedicine = CASE WHEN $17 != '' THEN $17 ELSE typeOfMedicine END,
-		urineAcid = CASE WHEN $18 != '' THEN $18 ELSE urineAcid END,
-		cholesterol = CASE WHEN $19 != '' THEN $19 ELSE cholesterol END,
-		grease = CASE WHEN $20 != '' THEN $20 ELSE grease END,
-		historyOfFamilyDisease = CASE WHEN $21 != '' THEN $21 ELSE historyOfFamilyDisease END
+	query := `
+	UPDATE patients
+	SET
+		fullName = COALESCE($1, fullName),
+		email = COALESCE($2, email),
+		phone = COALESCE($3, phone),
+		date = COALESCE($4, date),
+		id_number = COALESCE($5, id_number),
+		isCompleted = COALESCE($6, isCompleted),
+		gender = COALESCE($7, gender),
+		wight = COALESCE($8, wight),
+		length_patient = COALESCE($9, length_patient),
+		address_patient = COALESCE($10, address_patient),
+		bloodSugar = COALESCE($11, bloodSugar),
+		hemoglobin = COALESCE($12, hemoglobin),
+		bloodPressure = COALESCE($13, bloodPressure),
+		sugarType = COALESCE($14, sugarType),
+		diseaseDetection = COALESCE($15, diseaseDetection),
+		otherDisease = COALESCE($16, otherDisease),
+		typeOfMedicine = COALESCE($17, typeOfMedicine),
+		urineAcid = COALESCE($18, urineAcid),
+		cholesterol = COALESCE($19, cholesterol),
+		grease = COALESCE($20, grease),
+		historyOfFamilyDisease = COALESCE($21, historyOfFamilyDisease)
 	WHERE id = $22`
 
 	_, err := s.db.Exec(query,
-        patient.FullName,
-		patient.Email,
-		patient.Phone,
-        patient.Date, 
-		patient.IDNumber,
-		patient.IsCompleted,
-		patient.Gender,
-		patient.Weight,
-		patient.LengthPatient,
-        patient.AddressPatient,
-		patient.BloodSugar,
-		patient.Hemoglobin,
-		patient.BloodPressure,
-        patient.SugarType,
-		patient.DiseaseDetection,
-		patient.OtherDisease, 
-		patient.TypeOfMedicine,
-        patient.UrineAcid, 
-		patient.Cholesterol, 
-		patient.Grease, 
-		patient.HistoryOfFamilyDisease,
-        patient.ID)
+		nullifyString(patient.FullName),
+		nullifyString(patient.Email),
+		nullifyString(patient.Phone),
+		nullifyString(patient.Date),
+		nullifyString(patient.IDNumber),
+		nullifyBool(patient.IsCompleted),
+		nullifyString(patient.Gender),
+		nullifyString(patient.Weight),
+		nullifyString(patient.LengthPatient),
+		nullifyString(patient.AddressPatient),
+		nullifyString(patient.BloodSugar),
+		nullifyString(patient.Hemoglobin),
+		nullifyString(patient.BloodPressure),
+		nullifyString(patient.SugarType),
+		nullifyString(patient.DiseaseDetection),
+		nullifyString(patient.OtherDisease),
+		nullifyString(patient.TypeOfMedicine),
+		nullifyString(patient.UrineAcid),
+		nullifyString(patient.Cholesterol),
+		nullifyString(patient.Grease),
+		nullifyString(patient.HistoryOfFamilyDisease),
+		patient.ID,
+	)
     
     if err != nil {
         return fmt.Errorf("error updating patient: %v", err)
