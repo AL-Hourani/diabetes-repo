@@ -69,13 +69,8 @@ type PatientDetails struct {
 }
 
 type PatientUpdatePayload struct {
-	ID				        int			 `json:"id"`
-	FullName		        *string		 `json:"fullName"`
-	Email			        *string		 `json:"email"`
-	Date                    *string    `json:"date"`
-	Phone			        *string       `json:"phone"`
-	IDNumber		        *string       `json:"id_number"`
-	IsCompleted             *bool      `json:"isCompleted"`
+    ID                    int         `json:"id"`
+	IsCompleted             bool      `json:"isCompleted"`
 	Gender                  *string   `json:"gender"`
 	Weight                  *string   `json:"weight"`
 	LengthPatient           *string   `json:"length_patient"`

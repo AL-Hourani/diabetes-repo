@@ -250,55 +250,30 @@ func (s *Store) UpdateIsCompletedPatientField(confirmAcc types.ConfirmAccount) e
 	return nil
 }
 
-func nullifyString(s *string) interface{} {
-	if s == nil || *s == "" {
-		return nil
-	}
-	return *s
-}
-
-func nullifyBool(b *bool) interface{} {
-	if b == nil {
-		return nil
-	}
-	return *b
-}
-
 
 func (s *Store) PatchUpdatePatient(patient *types.PatientUpdatePayload) error {
-	query := `
-	UPDATE patients
+	query := `UPDATE patients
 	SET
-		fullName = COALESCE($1, fullName),
-		email = COALESCE($2, email),
-		phone = COALESCE($3, phone),
-		date = COALESCE($4, date),
-		id_number = COALESCE($5, id_number),
-		isCompleted = COALESCE($6, isCompleted),
-		gender = COALESCE($7, gender),
-		wight = COALESCE($8, wight),
-		length_patient = COALESCE($9, length_patient),
-		address_patient = COALESCE($10, address_patient),
-		bloodSugar = COALESCE($11, bloodSugar),
-		hemoglobin = COALESCE($12, hemoglobin),
-		bloodPressure = COALESCE($13, bloodPressure),
-		sugarType = COALESCE($14, sugarType),
-		diseaseDetection = COALESCE($15, diseaseDetection),
-		otherDisease = COALESCE($16, otherDisease),
-		typeOfMedicine = COALESCE($17, typeOfMedicine),
-		urineAcid = COALESCE($18, urineAcid),
-		cholesterol = COALESCE($19, cholesterol),
-		grease = COALESCE($20, grease),
-		historyOfFamilyDisease = COALESCE($21, historyOfFamilyDisease)
-	WHERE id = $22`
+		isCompleted = COALESCE($1, isCompleted),
+		gender = COALESCE($2, gender),
+		wight = COALESCE($3, wight),
+		length_patient = COALESCE($4, length_patient),
+		address_patient = COALESCE($5, address_patient),
+		bloodSugar = COALESCE($6, bloodSugar),
+		hemoglobin = COALESCE($7, hemoglobin),
+		bloodPressure = COALESCE($8, bloodPressure),
+		sugarType = COALESCE($9, sugarType),
+		diseaseDetection = COALESCE($10, diseaseDetection),
+		otherDisease = COALESCE($11, otherDisease),
+		typeOfMedicine = COALESCE($12, typeOfMedicine),
+		urineAcid = COALESCE($13, urineAcid),
+		cholesterol = COALESCE($14, cholesterol),
+		grease = COALESCE($15, grease),
+		historyOfFamilyDisease = COALESCE($16, historyOfFamilyDisease)
+	    WHERE id = $17`
 
 	_, err := s.db.Exec(query,
-		nullifyString(patient.FullName),
-		nullifyString(patient.Email),
-		nullifyString(patient.Phone),
-		nullifyString(patient.Date),
-		nullifyString(patient.IDNumber),
-		nullifyBool(patient.IsCompleted),
+		patient.IsCompleted,
 		nullifyString(patient.Gender),
 		nullifyString(patient.Weight),
 		nullifyString(patient.LengthPatient),
@@ -322,4 +297,18 @@ func (s *Store) PatchUpdatePatient(patient *types.PatientUpdatePayload) error {
     }
 
     return nil
+}
+
+func nullifyString(s *string) interface{} {
+	if s == nil || *s == "" {
+		return nil
+	}
+	return *s
+}
+
+func nullifyBool(b *bool) interface{} {
+	if b == nil {
+		return nil
+	}
+	return *b
 }
