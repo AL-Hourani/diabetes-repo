@@ -2,10 +2,12 @@ package patient
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/AL-Hourani/care-center/config"
+	"github.com/AL-Hourani/care-center/mail"
 	"github.com/AL-Hourani/care-center/service/auth"
 
 	// "github.com/AL-Hourani/care-center/service/patient"
@@ -134,6 +136,24 @@ func (h *Handler) handlePatientRegister(w http.ResponseWriter , r *http.Request)
 	if err != nil {
 		utils.WriteError(w , http.StatusInternalServerError , err)
 	}
+
+	//                verfiy email 
+	
+	//0- generate otp code 6 number 
+		optCode , err := auth.GenerateOTP(patientPayload.Email)
+		if err != nil {
+			log.Fatal(err)
+		}
+	//1- send otp code to the user
+        err = mail.SendOTP(patientPayload.Email,optCode,patientPayload.CenterName,patientPayload.FullName)
+		if err != nil {
+	
+			utils.WriteError(w , http.StatusBadRequest , err)
+		}
+
+
+	//2- check if user otp corccert 
+
 
 	//get center 
 

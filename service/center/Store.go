@@ -306,9 +306,9 @@ func nullifyString(s *string) interface{} {
 	return *s
 }
 
-func nullifyBool(b *bool) interface{} {
-	if b == nil {
-		return nil
-	}
-	return *b
-}
+// func nullifyBool(b *bool) interface{} {
+// 	if b == nil {
+// 		return nil
+// 	}
+// 	return *b
+// }

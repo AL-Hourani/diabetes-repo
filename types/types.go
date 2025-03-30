@@ -200,5 +200,24 @@ type ConfirmAccount struct {
 
 
 
+// config email 
+type EmailRequest struct {
+	Sender      SenderInfo    `json:"sender"`
+	To          []Recipient   `json:"to"`
+	Subject     string        `json:"subject"`
+	HTMLContent string        `json:"htmlContent"`
+}
+
+// SenderInfo معلومات المرسل
+type SenderInfo struct {
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
+// Recipient معلومات المستلم
+type Recipient struct {
+	Email string `json:"email"`
+	Name  string `json:"name"`
+}
 
 

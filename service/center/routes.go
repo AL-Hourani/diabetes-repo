@@ -77,6 +77,19 @@ func (h *Handler) handleCenterRegister(w http.ResponseWriter , r *http.Request) 
 			utils.WriteError(w , http.StatusInternalServerError , err)
 		}
 
+		
+	//                verfiy email 
+	
+	//1- send otp code to the user
+
+
+	//2- check if user otp corccert 
+
+
+
+
+	
+
 	//if it dosen't we create the new center
 	err = h.store.GreateCenter(types.Center{
 		CenterName: centerPayload.CenterName,
