@@ -187,7 +187,7 @@ type OTPRequest struct {
 
 type VerifyRequest struct {
 	Email   string `json:"email"`
-	OTPCode string `json:"otp"`
+	OTPCode string `json:"code"`
 }
 
 
