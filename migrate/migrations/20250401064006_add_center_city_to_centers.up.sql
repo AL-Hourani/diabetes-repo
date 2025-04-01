@@ -1,0 +1,1 @@
+ALTER TABLE centers ADD COLUMN centerCity VARCHAR(255) NOT NULL DEFAULT 'Unknown';

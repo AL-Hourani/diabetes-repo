@@ -49,6 +49,7 @@ func scanRowIntoCenter(rows *sql.Rows) (*types.Center , error ){
 		&center.CenterName,
 		&center.CenterPassword,
 		&center.CenterEmail,
+		&center.CenterCity,
 		&center.CreateAt,
 	)
 	
@@ -92,6 +93,7 @@ func scanRowIntoCenterByEmail(rows *sql.Rows) (*types.Center , error ){
 		&center.CenterName,
 		&center.CenterPassword,
 		&center.CenterEmail,
+		&center.CenterCity,
 		&center.CreateAt,
 	)
 	
@@ -109,7 +111,7 @@ func scanRowIntoCenterByEmail(rows *sql.Rows) (*types.Center , error ){
 
 
 func (s *Store)	GreateCenter(center types.Center) error {
-	_ , err := s.db.Exec("INSERT INTO centers (centerName ,centerPassword , centerEmail) VALUES ($1, $2, $3)" , center.CenterName , center.CenterPassword , center.CenterEmail)
+	_ , err := s.db.Exec("INSERT INTO centers (centerName ,centerPassword , centerEmail , centerCity) VALUES ($1, $2, $3 ,$4)" , center.CenterName , center.CenterPassword , center.CenterEmail , center.CenterCity)
 	if err  != nil {
 		return err
 	}
@@ -175,8 +177,8 @@ func scanRowIntoPatientsCard(rows *sql.Rows) (*types.CardData , error ){
 
 
 
-func (s *Store) GetCenters()([]types.Center , error) {
-	rows , err := s.db.Query("SELECT * FROM centers")
+func (s *Store) GetCentersByCity(cityName string)([]types.Center , error) {
+	rows , err := s.db.Query("SELECT * FROM centers WHERE centerCity=$1" , cityName)
 	if err != nil {
 		return nil , err
 	}
@@ -204,6 +206,7 @@ func scanRowIntoCenters(rows *sql.Rows) (*types.Center , error ){
 		&center.CenterName,
 		&center.CenterPassword,
 		&center.CenterEmail,
+		&center.CenterCity,
 		&center.CreateAt,
 	)
 	

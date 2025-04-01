@@ -31,7 +31,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	// router.HandleFunc("/centerLogin", h.handleCenterLogin).Methods("POST")
 	router.HandleFunc("/centerRegister", h.handleCenterRegister).Methods("POST")
 	router.HandleFunc("/confirmAccount", h.handleConfirmPatientAccount).Methods("POST")
-	router.HandleFunc("/getCenters",h.handleGetCenters).Methods("GET")
+	router.HandleFunc("/getCenters/{city}",h.handleGetCenters).Methods("GET")
 	router.HandleFunc("/getPatients", auth.WithJWTAuth(h.handleGetPatients)).Methods(http.MethodGet)
 	router.HandleFunc("/addPatient/{id}", h.handleGetCenters).Methods(http.MethodPost)
 	router.HandleFunc("/updatePatient", h.handleUpdatePatient).Methods(http.MethodPatch)
@@ -95,10 +95,9 @@ func (h *Handler) handleCenterRegister(w http.ResponseWriter , r *http.Request) 
 		CenterName: centerPayload.CenterName,
 		CenterPassword:hashedPassword,
 		CenterEmail:centerPayload.CenterEmail,
-
+        CenterCity: centerPayload.CenterCity,
 	})
   
-	
 
 	if err != nil {
 		utils.WriteError(w , http.StatusBadRequest ,err)
@@ -134,7 +133,10 @@ func (h *Handler) handleGetPatients(w http.ResponseWriter , r *http.Request) {
 
 
 func (h *Handler) handleGetCenters(w http.ResponseWriter , r *http.Request) {
-	centerList , err := h.store.GetCenters()
+	vars := mux.Vars(r)
+	cityName := vars["city"]
+
+	centerList , err := h.store.GetCentersByCity(cityName)
 	if err != nil {
 		utils.WriteError(w , http.StatusInternalServerError , err)
 		return

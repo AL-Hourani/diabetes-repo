@@ -146,7 +146,7 @@ type CenterStore interface {
 	GetCenterByName(centerName string) (*Center , error) 
 	GetCenterByEmail(centerEmail string) (*Center , error)
 	GreateCenter(Center) error
-	GetCenters()([]Center , error)
+	GetCentersByCity(cityName string)([]Center , error)
 	DeletePatient(id int) error
 	UpdateIsCompletedPatientField(confirmAcc ConfirmAccount) error
 	PatchUpdatePatient(patient *PatientUpdatePayload) error
@@ -158,6 +158,7 @@ type Center struct {
     CenterName		string		 `json:"centerName"`
 	CenterPassword  string       `json:"centerPassword"`
 	CenterEmail	    string       `json:"centerEmail"`
+	CenterCity      string       `json:"centerCity"`
 	CreateAt        time.Time    `json:"createAt"`
 }
 
@@ -167,6 +168,7 @@ type RegisterCenterPayload struct {
 	CenterName		string		 `json:"centerName"  validate:"required"`
 	CenterPassword  string       `json:"centerPassword"  validate:"required"`
 	CenterEmail	    string       `json:"centerEmail"    validate:"required,email"`
+	CenterCity      string       `json:"centerCity"    validate:"required"`
 	CenterKey		string		 `json:"centerKey" validate:"required"`
 
 }
