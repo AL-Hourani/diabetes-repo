@@ -59,7 +59,9 @@ func (h *Handler) uploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-    utils.WriteJSON(w , http.StatusOK ,[]byte("Image uploaded successfully"))
+    utils.WriteJSON(w , http.StatusOK ,map[string]string{
+		"message": "Image uploaded successfully",
+	})
 }
 
 

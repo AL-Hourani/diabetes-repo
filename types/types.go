@@ -151,6 +151,7 @@ type CenterStore interface {
 	UpdateIsCompletedPatientField(confirmAcc ConfirmAccount) error
 	PatchUpdatePatient(patient *PatientUpdatePayload) error
 	GetPatientsForCenter(CenterID int) ([]CardData , error)
+	GetCities()([]string , error)
 }
 
 type Center struct {

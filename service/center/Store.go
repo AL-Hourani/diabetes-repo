@@ -177,6 +177,34 @@ func scanRowIntoPatientsCard(rows *sql.Rows) (*types.CardData , error ){
 
 
 
+
+
+// get cities 
+
+
+func (s *Store) GetCities()([]string , error) {
+	rows , err := s.db.Query("SELECT DISTINCT centerCity FROM centers")
+	if err != nil {
+		return nil , err
+	}
+	defer rows.Close()
+	cities := make([]string ,0)
+	for rows.Next() {
+		var city string
+		if err := rows.Scan(&city); err != nil {
+			log.Println("Error in reading data", err)
+			continue
+		}
+		cities = append(cities, city)
+	}
+
+	return cities , nil
+	
+}
+
+//-----------------------------------------------
+
+
 func (s *Store) GetCentersByCity(cityName string)([]types.Center , error) {
 	rows , err := s.db.Query("SELECT * FROM centers WHERE centerCity=$1" , cityName)
 	if err != nil {

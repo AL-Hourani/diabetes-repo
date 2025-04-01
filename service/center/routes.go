@@ -32,6 +32,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/centerRegister", h.handleCenterRegister).Methods("POST")
 	router.HandleFunc("/confirmAccount", h.handleConfirmPatientAccount).Methods("POST")
 	router.HandleFunc("/getCenters/{city}",h.handleGetCenters).Methods("GET")
+	router.HandleFunc("/getCities",h.handleGetCities).Methods("GET")
 	router.HandleFunc("/getPatients", auth.WithJWTAuth(h.handleGetPatients)).Methods(http.MethodGet)
 	router.HandleFunc("/addPatient/{id}", h.handleGetCenters).Methods(http.MethodPost)
 	router.HandleFunc("/updatePatient", h.handleUpdatePatient).Methods(http.MethodPatch)
@@ -233,4 +234,17 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	utils.WriteJSON(w, http.StatusOK, map[string]string{
 		"message": "Logout successful",
 	})
+}
+
+
+
+func (h *Handler) handleGetCities(w http.ResponseWriter, r *http.Request) {
+
+   cities_list , err := h.store.GetCities()
+   if err != nil {
+	utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error get cities"))
+	return
+   }
+
+   utils.WriteJSON(w, http.StatusOK, cities_list)
 }
