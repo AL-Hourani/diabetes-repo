@@ -91,7 +91,7 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 
 // 3
 func (s *Store)	GreatePatient(patient types.Patient) error {
-	_ , err := s.db.Exec("INSERT INTO patients (fullName , email , password ,phone , date , id_number , isCompleted , center_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)" , patient.FullName , patient.Email , patient.Password,patient.Phone, patient.Age ,patient.IDNumber , patient.IsCompleted , patient.CenterID)
+	_ , err := s.db.Exec("INSERT INTO patients (fullName , email , password ,phone , date , id_number , isCompleted , center_id , city) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)" , patient.FullName , patient.Email , patient.Password,patient.Phone, patient.Age ,patient.IDNumber , patient.IsCompleted , patient.CenterID , patient.City)
 	if err  != nil {
 		return err
 	}

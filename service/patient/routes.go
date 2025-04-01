@@ -200,6 +200,7 @@ func (h *Handler) VerifyOTPHandler(w http.ResponseWriter , r *http.Request) {
 	    IDNumber: patientPayload.IDNumber,
 		IsCompleted: false,
 		CenterID: cenetr.ID,
+		City: patientPayload.City,
 		
 	})
 	if err != nil {

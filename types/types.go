@@ -29,6 +29,7 @@ type Patient struct {
 	IsCompleted     bool         `json:"isCompleted"`
 	CenterID		int			 `json:"center_id"`
 	CreateAt        time.Time    `json:"createAt"`
+	City            string       `json:"city"`
 }
 
 type RegisterPatientPayload struct {
@@ -38,6 +39,7 @@ type RegisterPatientPayload struct {
 	Phone           string	     `json:"phone"    validate:"required"`
 	Password		string		 `json:"password" validate:"required"`
 	IDNumber		string       `json:"id_number" validate:"required"`
+	City            string       `json:"city" validate:"required"`
 	CenterName		string		 `json:"center_name" validate:"required"`
       
 }
