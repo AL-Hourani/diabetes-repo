@@ -7,8 +7,9 @@ import (
 
 	"github.com/AL-Hourani/care-center/service/center"
 	"github.com/AL-Hourani/care-center/service/patient"
-	"github.com/gorilla/mux"
+	"github.com/AL-Hourani/care-center/service/readimage"
 	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 )
 
 type APIServer struct {
@@ -40,6 +41,9 @@ func (s *APIServer) Run() error {
 
 	patientHandler := patient.NewHandler(patientStore , centerStore)
 	patientHandler.RegisterPatientRoutes(subrouter)
+
+	imageHandler := readimage.NewHandler()
+	imageHandler.RegisterRoutes(subrouter)
    
 		// إعدادات CORS
 		cors := handlers.CORS(
