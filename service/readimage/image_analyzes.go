@@ -7,6 +7,7 @@ import (
 	"io"
 	"github.com/AL-Hourani/care-center/utils"
 	"github.com/gorilla/mux"
+	"regexp"
 )
 
 type Handler struct {
@@ -36,8 +37,16 @@ func (h *Handler) uploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
+	sanitizedFilename := sanitizeFilename(header.Filename)
 
-	dst, err := os.Create(fmt.Sprintf("./uploads/%s", header.Filename))
+	// التأكد من وجود المجلد uploads
+	err = os.MkdirAll("./uploads", os.ModePerm)
+	if err != nil {
+		http.Error(w, "Failed to create upload directory", http.StatusInternalServerError)
+		return
+	}
+
+	dst, err := os.Create(fmt.Sprintf("./uploads/%s",sanitizedFilename ))
 	if err != nil {
 		http.Error(w, "Failed to save image", http.StatusInternalServerError)
 		return
@@ -53,3 +62,9 @@ func (h *Handler) uploadHandler(w http.ResponseWriter, r *http.Request) {
     utils.WriteJSON(w , http.StatusOK ,[]byte("Image uploaded successfully"))
 }
 
+
+func sanitizeFilename(filename string) string {
+	// إزالة الأقواس والمسافات
+	re := regexp.MustCompile(`[^a-zA-Z0-9\-_\.]`)
+	return re.ReplaceAllString(filename, "_")
+}
