@@ -49,8 +49,8 @@ func scanRowIntoCenter(rows *sql.Rows) (*types.Center , error ){
 		&center.CenterName,
 		&center.CenterPassword,
 		&center.CenterEmail,
-		&center.CenterCity,
 		&center.CreateAt,
+		&center.CenterCity,
 	)
 	
 	if err  != nil {
@@ -93,8 +93,8 @@ func scanRowIntoCenterByEmail(rows *sql.Rows) (*types.Center , error ){
 		&center.CenterName,
 		&center.CenterPassword,
 		&center.CenterEmail,
-		&center.CenterCity,
 		&center.CreateAt,
+		&center.CenterCity,
 	)
 	
 	if err  != nil {
@@ -206,8 +206,8 @@ func scanRowIntoCenters(rows *sql.Rows) (*types.Center , error ){
 		&center.CenterName,
 		&center.CenterPassword,
 		&center.CenterEmail,
-		&center.CenterCity,
 		&center.CreateAt,
+		&center.CenterCity,
 	)
 	
 	if err  != nil {

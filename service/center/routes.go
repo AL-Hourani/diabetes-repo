@@ -134,11 +134,15 @@ func (h *Handler) handleGetPatients(w http.ResponseWriter , r *http.Request) {
 
 func (h *Handler) handleGetCenters(w http.ResponseWriter , r *http.Request) {
 	vars := mux.Vars(r)
-	cityName := vars["city"]
+	cityName, ok := vars["city"]
+	if !ok || cityName == "" {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("city name is required"))
+		return
+	}
 
 	centerList , err := h.store.GetCentersByCity(cityName)
 	if err != nil {
-		utils.WriteError(w , http.StatusInternalServerError , err)
+		utils.WriteError(w , http.StatusNotFound , err)
 		return
 	}
 	utils.WriteJSON(w , http.StatusOK , centerList)

@@ -170,7 +170,6 @@ type RegisterCenterPayload struct {
 	CenterEmail	    string       `json:"centerEmail"    validate:"required,email"`
 	CenterCity      string       `json:"centerCity"    validate:"required"`
 	CenterKey		string		 `json:"centerKey" validate:"required"`
-
 }
 
 // type LoginCenterPayload struct {
