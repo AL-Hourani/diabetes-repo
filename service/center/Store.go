@@ -389,6 +389,7 @@ func (s *Store) GetCenterProfile(id int) (*types.CenterProfile, error) {
 	}
 
 	cenetrProfile := &types.CenterProfile {
+		ID: center.ID,
 		CenterName: center.CenterName,
         CenterEmail: center.CenterEmail,
 		CenterCity: center.CenterCity,
@@ -415,6 +416,10 @@ func (s *Store) DeleteCenterAndReassignPatients(centerID int, newCenterID int) e
     return nil
 }
 
+
+
+
+
 func (s *Store)  DeleteCenter(id int) error {
 	_, err := s.db.Exec(`
 	DELETE FROM centers
@@ -428,3 +433,27 @@ if err != nil {
 
 return nil
 }
+
+
+
+func (s *Store) CenterUpdateCenterProfile(centerUpdate types.CenterUpdateProfilePayload) error {
+	query := `UPDATE centers
+	SET 
+	centerName = $1 
+	centerEmail = $2
+	centerCity = $3
+	WHERE id = $4`
+	_, err := s.db.Exec(query,
+	centerUpdate.CenterName,
+	centerUpdate.CenterEmail,
+	centerUpdate.CenterCity,
+    centerUpdate.ID)
+
+	if err != nil {
+        return fmt.Errorf("error updating center: %v", err)
+    }
+
+    return nil
+
+}
+

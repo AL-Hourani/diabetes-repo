@@ -16,6 +16,7 @@ type PatientStore interface {
 	GetPatientDetailsByID(patientID int) (*PatientDetails, error)
 	GetUserByEmail(email string) (*UserLoginData, error)
 	GetPatientProfile(id int)(*PatientProfile , error)
+	UpdatePatientProfile(patientPayload ParientUpdatePayload) error
 
 }
 
@@ -43,6 +44,16 @@ type RegisterPatientPayload struct {
 	City            string       `json:"city" validate:"required"`
 	CenterName		string		 `json:"center_name" validate:"required"`
       
+}
+
+type ParientUpdatePayload struct {
+	ID				int			 `json:"id"`
+	FullName		string		 `json:"fullname" validate:"required"`
+	Email			string		 `json:"email"    validate:"required,email"`
+	Age 			string       `json:"age"    validate:"required"`
+	Phone           string	     `json:"phone"    validate:"required"`
+	IDNumber		string       `json:"id_number" validate:"required"`
+	City            string       `json:"city" validate:"required"`
 }
 
 type PatientProfile struct {
@@ -185,6 +196,7 @@ type CenterStore interface {
 	GetCenterProfile(id int) (*CenterProfile, error)
 	DeleteCenter(id int) error 
 	DeleteCenterAndReassignPatients(centerID int, newCenterID int) error
+	CenterUpdateCenterProfile(centerUpdate CenterUpdateProfilePayload) error 
 }
 
 type Center struct {
@@ -208,6 +220,7 @@ type RegisterCenterPayload struct {
 
 
 type CenterProfile struct {
+	ID				int          `json:"centerId"`
 	CenterName		string		 `json:"centerName"`
 	CenterEmail	    string       `json:"centerEmail"`
 	CenterCity      string       `json:"centerCity"`
@@ -220,6 +233,12 @@ type DeleteCenter struct {
 	CenterNameReassignPatients  string `json:"centerNameReassignPatients"`
 }
 
+type CenterUpdateProfilePayload struct {
+	ID				int          `json:"centerId"`
+	CenterName		string		 `json:"centerName"  validate:"required"`
+	CenterEmail	    string       `json:"centerEmail"    validate:"required,email"`
+	CenterCity      string       `json:"centerCity"    validate:"required"`
+}
 
 // type LoginCenterPayload struct {
 // 	CenterEmail		string		 `json:"centerEmail"    validate:"required,email"`

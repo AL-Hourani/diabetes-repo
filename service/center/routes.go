@@ -34,6 +34,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/getCenters/{city}",h.handleGetCenters).Methods("GET")
 	router.HandleFunc("/getCities",h.handleGetCities).Methods("GET")
 	router.HandleFunc("/getCenterProfile/{id}",h.handleGetCenetrProfile).Methods("GET")
+	router.HandleFunc("/updateCenterProfile", h.handleUpdateCenterProfile).Methods(http.MethodPatch)
 	router.HandleFunc("/getPatients", auth.WithJWTAuth(h.handleGetPatients)).Methods(http.MethodGet)
 	router.HandleFunc("/addPatient/{id}", h.handleGetCenters).Methods(http.MethodPost)
 	router.HandleFunc("/updatePatient", h.handleUpdatePatient).Methods(http.MethodPatch)
@@ -307,6 +308,29 @@ func (h *Handler) handleDeleteCenter(w http.ResponseWriter, r *http.Request) {
 
 	utils.WriteJSON(w , http.StatusOK , map[string]string{
 		"message": "delete and And Reassign Patients successfully",
+	})
+
+}
+
+
+
+
+
+//update center profile 
+func (h *Handler) handleUpdateCenterProfile(w http.ResponseWriter, r *http.Request) {
+	var centerUpdatePayload types.CenterUpdateProfilePayload
+	if err := utils.ParseJSON(r , &centerUpdatePayload); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+		return
+	}
+
+	err := h.store.CenterUpdateCenterProfile(centerUpdatePayload)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error update center profile"))
+	}
+    
+	utils.WriteJSON(w , http.StatusOK , map[string]string{
+		"message": "center profile update successfully",
 	})
 
 }

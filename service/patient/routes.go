@@ -30,6 +30,7 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/getAllPatientInfo/{id}" , h.handleGetAllPatientInfo).Methods("GET")
 	router.HandleFunc("/verify-token", h.VerifyTokenHandler).Methods("POST")
 	router.HandleFunc("/verifyOtp", h.VerifyOTPHandler).Methods("POST")
+	router.HandleFunc("/updatePatientProfile", h.handleUpdatePatientProfile).Methods(http.MethodPatch)
 
 }
 
@@ -308,6 +309,25 @@ func (h *Handler)  VerifyTokenHandler(w http.ResponseWriter , r *http.Request) {
 	utils.WriteJSON(w , http.StatusOK , "Token is Vaild")
 }
 
+
+// update patient profile
+func (h *Handler) handleUpdatePatientProfile(w http.ResponseWriter , r *http.Request) {
+	var updatePatietPayload types.ParientUpdatePayload
+	if err := utils.ParseJSON(r , &updatePatietPayload); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+		return
+	}
+
+	err := h.store.UpdatePatientProfile(updatePatietPayload)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error update patient profile"))
+	}
+    
+	utils.WriteJSON(w , http.StatusOK , map[string]string{
+		"message": "patient profile update successfully",
+	})
+
+}
 
 
 
