@@ -439,8 +439,8 @@ return nil
 func (s *Store) CenterUpdateCenterProfile(centerUpdate types.CenterUpdateProfilePayload) error {
 	query := `UPDATE centers
 	SET 
-	centerName = $1 
-	centerEmail = $2
+	centerName = $1,
+	centerEmail = $2,
 	centerCity = $3
 	WHERE id = $4`
 	_, err := s.db.Exec(query,

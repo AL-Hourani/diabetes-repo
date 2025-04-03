@@ -327,6 +327,7 @@ func (h *Handler) handleUpdateCenterProfile(w http.ResponseWriter, r *http.Reque
 	err := h.store.CenterUpdateCenterProfile(centerUpdatePayload)
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error update center profile"))
+		return
 	}
     
 	utils.WriteJSON(w , http.StatusOK , map[string]string{

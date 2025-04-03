@@ -347,12 +347,12 @@ func scanRowIntoPatientProfile(rows *sql.Row) (*types.PatientProfile , error ){
 func (s *Store) UpdatePatientProfile(patientPayload types.ParientUpdatePayload)error {
 	query := `UPDATE Patients
 	SET 
-	fullName = $1 
-	email = $2
-	phone = $3
+	fullName = $1, 
+	email = $2,
+	phone = $3,
 	date = $4,
 	id_number = $5,
-	city = $6,
+	city = $6
 	WHERE id = $7`
 	_, err := s.db.Exec(query,patientPayload.FullName,patientPayload.Email,patientPayload.Phone,patientPayload.Age,patientPayload.IDNumber,patientPayload.City,patientPayload.ID)
 

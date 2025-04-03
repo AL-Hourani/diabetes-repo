@@ -321,6 +321,7 @@ func (h *Handler) handleUpdatePatientProfile(w http.ResponseWriter , r *http.Req
 	err := h.store.UpdatePatientProfile(updatePatietPayload)
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error update patient profile"))
+		return
 	}
     
 	utils.WriteJSON(w , http.StatusOK , map[string]string{
