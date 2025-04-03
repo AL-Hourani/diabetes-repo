@@ -245,3 +245,99 @@ func (s *Store) GetUserByEmail(email string) (*types.UserLoginData, error) {
 
 
 
+
+
+
+func (s *Store) GetPatientProfile(id int)(*types.PatientProfile , error) {
+	row := s.db.QueryRow(`SELECT id,fullName, email, phone, date, id_number,
+	isCompleted, gender, wight, length_patient, address_patient,
+	bloodSugar, hemoglobin, bloodPressure, sugarType, diseaseDetection,
+	otherDisease, typeOfMedicine, urineAcid, cholesterol, grease,
+	historyOfFamilyDisease,center_id,city
+
+		FROM patients
+		WHERE id=$1`,id)
+	patient , err := scanRowIntoPatientProfile(row)
+		if err != nil {
+			return nil , err
+		}
+	
+
+	if patient.ID == 0 {
+		return nil , fmt.Errorf("patient not found")
+	}
+
+	return patient , nil
+}
+
+
+func scanRowIntoPatientProfile(rows *sql.Row) (*types.PatientProfile , error ){
+	patient := new(types.PatientProfile)
+
+	var (
+		gender                sql.NullString
+		weight                sql.NullString
+		lengthPatient         sql.NullString
+		addressPatient        sql.NullString
+		bloodSugar            sql.NullString
+		hemoglobin            sql.NullString
+		bloodPressure         sql.NullString
+		sugarType             sql.NullString
+		diseaseDetection      sql.NullString
+		otherDisease          sql.NullString
+		typeOfMedicine        sql.NullString
+		urineAcid             sql.NullString
+		cholesterol           sql.NullString
+		grease                sql.NullString
+		historyOfFamilyDisease sql.NullString
+	)
+
+	err := rows.Scan(
+		&patient.ID,
+		&patient.FullName,
+		&patient.Email,
+		&patient.Phone,
+		&patient.Age,
+		&patient.IDNumber,
+		&patient.IsCompleted,
+		&gender,
+		&weight,
+		&lengthPatient,
+		&addressPatient,
+		&bloodSugar,
+		&hemoglobin,
+		&bloodPressure,
+		&sugarType,
+		&diseaseDetection,
+		&otherDisease,
+		&typeOfMedicine,
+		&urineAcid,
+		&cholesterol,
+		&grease,
+		&historyOfFamilyDisease,
+		&patient.CenterID,
+		&patient.City,
+	)
+	
+	if err  != nil {
+		return nil , err
+	}
+
+	patient.Gender = convertNullStringToPointer(gender)
+	patient.Weight = convertNullStringToPointer(weight)
+	patient.LengthPatient = convertNullStringToPointer(lengthPatient)
+	patient.AddressPatient = convertNullStringToPointer(addressPatient)
+	patient.BloodSugar = convertNullStringToPointer(bloodSugar)
+	patient.Hemoglobin = convertNullStringToPointer(hemoglobin)
+	patient.BloodPressure = convertNullStringToPointer(bloodPressure)
+	patient.SugarType = convertNullStringToPointer(sugarType)
+	patient.DiseaseDetection = convertNullStringToPointer(diseaseDetection)
+	patient.OtherDisease = convertNullStringToPointer(otherDisease)
+	patient.TypeOfMedicine = convertNullStringToPointer(typeOfMedicine)
+	patient.UrineAcid = convertNullStringToPointer(urineAcid)
+	patient.Cholesterol = convertNullStringToPointer(cholesterol)
+	patient.Grease = convertNullStringToPointer(grease)
+	patient.HistoryOfFamilyDisease = convertNullStringToPointer(historyOfFamilyDisease)
+
+	return patient , nil
+}

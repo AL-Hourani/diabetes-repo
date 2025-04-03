@@ -26,6 +26,7 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/Login", h.handleLogin).Methods("POST")
 	router.HandleFunc("/patientRegister", h.handlePatientRegister).Methods("POST")
 	router.HandleFunc("/getPatient/{id}" , h.handleGetPatient).Methods("GET")
+	router.HandleFunc("/getPatientProfile/{id}" , h.handleGetPatientProfile).Methods("GET")
 	router.HandleFunc("/getAllPatientInfo/{id}" , h.handleGetAllPatientInfo).Methods("GET")
 	router.HandleFunc("/verify-token", h.VerifyTokenHandler).Methods("POST")
 	router.HandleFunc("/verifyOtp", h.VerifyOTPHandler).Methods("POST")
@@ -344,3 +345,22 @@ func (h *Handler)  VerifyTokenHandler(w http.ResponseWriter , r *http.Request) {
 // }
 
 // utils.WriteJSON(w , http.StatusOK ,returnLoggingData)
+
+
+func (h *Handler) handleGetPatientProfile(w http.ResponseWriter , r *http.Request) {
+	vars := mux.Vars(r)
+	id , err := strconv.Atoi(vars["id"])
+	if err != nil  {
+       utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid ID"))
+       return
+	}
+	patientProfile , err := h.store.GetPatientProfile(id)
+	if err != nil {
+		utils.WriteError(w , http.StatusBadRequest ,err)
+		return 
+	}
+
+
+
+	utils.WriteJSON(w , http.StatusOK , patientProfile)
+}
