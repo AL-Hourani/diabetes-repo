@@ -168,7 +168,6 @@ type CardData struct {
 
 
 
-
 //end.......................................
 //center....................................
 
@@ -184,6 +183,8 @@ type CenterStore interface {
 	GetCities()([]string , error)
 	GetPatientCountByCenterName(centerName string) (int, error)
 	GetCenterProfile(id int) (*CenterProfile, error)
+	DeleteCenter(id int) error 
+	DeleteCenterAndReassignPatients(centerID int, newCenterID int) error
 }
 
 type Center struct {
@@ -213,6 +214,12 @@ type CenterProfile struct {
 	PatientNumber   int          `json:"patientNumber"`
 
 }
+
+type DeleteCenter struct {
+	CenterName		string		 `json:"centerName"`
+	CenterNameReassignPatients  string `json:"centerNameReassignPatients"`
+}
+
 
 // type LoginCenterPayload struct {
 // 	CenterEmail		string		 `json:"centerEmail"    validate:"required,email"`

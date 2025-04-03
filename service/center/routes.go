@@ -39,6 +39,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/updatePatient", h.handleUpdatePatient).Methods(http.MethodPatch)
 	router.HandleFunc("/deletePatient/{id}", auth.WithJWTAuth(h.handleDeletePatient)).Methods(http.MethodDelete)
 	router.HandleFunc("/logout",auth.WithJWTAuth(h.Logout)).Methods("POST")
+	router.HandleFunc("/deleteCenter",h.handleDeleteCenter).Methods("POST")
 }
 
 
@@ -268,5 +269,44 @@ func (h *Handler) handleGetCenetrProfile(w http.ResponseWriter, r *http.Request)
 	}
 
 	utils.WriteJSON(w, http.StatusOK, centerProfile)
+
+}
+
+
+func (h *Handler) handleDeleteCenter(w http.ResponseWriter, r *http.Request) {
+	var deleteCenter types.DeleteCenter
+	if err := utils.ParseJSON(r , &deleteCenter); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+		return
+	}
+
+	getCenter , err := h.store.GetCenterByName(deleteCenter.CenterName)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("no center for this name"))
+	}
+	toCenter , err := h.store.GetCenterByName(deleteCenter.CenterNameReassignPatients)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("no center for this name"))
+	}
+
+	numberPatinets , err := h.store.GetPatientCountByCenterName(getCenter.CenterName)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error get number of center"))
+	}
+	if numberPatinets > 0 {
+		err := h.store.DeleteCenterAndReassignPatients(getCenter.ID, toCenter.ID) 
+		if err != nil {
+			utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error delete Center And Reassign Patients"))
+		}
+	}
+
+	err = h.store.DeleteCenter(getCenter.ID)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error delete Center"))
+	}
+
+	utils.WriteJSON(w , http.StatusOK , map[string]string{
+		"message": "delete and And Reassign Patients successfully",
+	})
 
 }

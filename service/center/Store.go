@@ -398,3 +398,33 @@ func (s *Store) GetCenterProfile(id int) (*types.CenterProfile, error) {
 	return cenetrProfile , nil
 }
 
+
+
+func (s *Store) DeleteCenterAndReassignPatients(centerID int, newCenterID int) error {
+	_, err := s.db.Exec(`
+	UPDATE patients
+	SET center_id = $1
+	WHERE center_id = $2
+`, newCenterID, centerID)
+
+	if err != nil {
+		return fmt.Errorf("failed to reassign patients: %v", err)
+	}
+
+
+    return nil
+}
+
+func (s *Store)  DeleteCenter(id int) error {
+	_, err := s.db.Exec(`
+	DELETE FROM centers
+	WHERE id = $1
+`, 
+id)
+
+if err != nil {
+	return fmt.Errorf("failed to delete center: %v", err)
+}
+
+return nil
+}
