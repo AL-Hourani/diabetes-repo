@@ -154,6 +154,8 @@ type CenterStore interface {
 	PatchUpdatePatient(patient *PatientUpdatePayload) error
 	GetPatientsForCenter(CenterID int) ([]CardData , error)
 	GetCities()([]string , error)
+	GetPatientCountByCenterName(centerName string) (int, error)
+	GetCenterProfile(id int) (*CenterProfile, error)
 }
 
 type Center struct {
@@ -173,6 +175,15 @@ type RegisterCenterPayload struct {
 	CenterEmail	    string       `json:"centerEmail"    validate:"required,email"`
 	CenterCity      string       `json:"centerCity"    validate:"required"`
 	CenterKey		string		 `json:"centerKey" validate:"required"`
+}
+
+
+type CenterProfile struct {
+	CenterName		string		 `json:"centerName"`
+	CenterEmail	    string       `json:"centerEmail"`
+	CenterCity      string       `json:"centerCity"`
+	PatientNumber   int          `json:"patientNumber"`
+
 }
 
 // type LoginCenterPayload struct {

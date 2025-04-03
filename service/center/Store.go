@@ -343,3 +343,58 @@ func nullifyString(s *string) interface{} {
 // 	}
 // 	return *b
 // }
+
+
+
+// get number of patient in any center 
+func (s *Store) GetPatientCountByCenterName(centerName string) (int, error) {
+    var patientCount int
+    err := s.db.QueryRow(`
+        SELECT COUNT(*)
+        FROM patients
+        WHERE center_id = (
+            SELECT id FROM centers WHERE centerName = $1
+        )
+    `, centerName).Scan(&patientCount)
+
+    if err != nil {
+        return 0, err
+    }
+
+    return patientCount, nil
+}
+
+func (s *Store) GetCenterProfile(id int) (*types.CenterProfile, error) { 
+	row := s.db.QueryRow("SELECT * FROM centers WHERE id=$1",id)
+	
+	center := new(types.Center)
+	err := row.Scan(
+		&center.ID,
+		&center.CenterName,
+		&center.CenterPassword,
+		&center.CenterEmail,
+		&center.CreateAt,
+		&center.CenterCity,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("user not found")
+		}
+		return nil, err
+	}
+	patient_number , err := s.GetPatientCountByCenterName(center.CenterName)
+	if err != nil {
+		return nil, fmt.Errorf("error in get number of patients")
+	}
+
+	cenetrProfile := &types.CenterProfile {
+		CenterName: center.CenterName,
+        CenterEmail: center.CenterEmail,
+		CenterCity: center.CenterCity,
+		PatientNumber: patient_number,
+	}
+
+	return cenetrProfile , nil
+}
+

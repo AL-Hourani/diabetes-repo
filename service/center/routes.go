@@ -33,6 +33,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/confirmAccount", h.handleConfirmPatientAccount).Methods("POST")
 	router.HandleFunc("/getCenters/{city}",h.handleGetCenters).Methods("GET")
 	router.HandleFunc("/getCities",h.handleGetCities).Methods("GET")
+	router.HandleFunc("/getCenterProfile",h.handleGetCenetrProfile).Methods("GET")
 	router.HandleFunc("/getPatients", auth.WithJWTAuth(h.handleGetPatients)).Methods(http.MethodGet)
 	router.HandleFunc("/addPatient/{id}", h.handleGetCenters).Methods(http.MethodPost)
 	router.HandleFunc("/updatePatient", h.handleUpdatePatient).Methods(http.MethodPatch)
@@ -247,4 +248,25 @@ func (h *Handler) handleGetCities(w http.ResponseWriter, r *http.Request) {
    }
 
    utils.WriteJSON(w, http.StatusOK, cities_list)
+}
+
+
+
+// get center profile 
+
+func (h *Handler) handleGetCenetrProfile(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id , err := strconv.Atoi(vars["id"])
+	if err != nil  {
+       utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid ID"))
+       return
+	}
+
+	centerProfile ,err := h.store.GetCenterProfile(id)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error get center profile"))
+	}
+
+	utils.WriteJSON(w, http.StatusOK, centerProfile)
+
 }
