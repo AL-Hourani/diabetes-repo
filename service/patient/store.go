@@ -391,12 +391,23 @@ func (s *Store) GetSugarTypeStats(centerID int) ([]*types.SugarTypeStats, error)
 	var stats []*types.SugarTypeStats
 
 	for rows.Next() {
-		var stat types.SugarTypeStats
-		err := rows.Scan(&stat.SugarType, &stat.Total)
-		if err != nil {
-			return nil, err
-		}
-		stats = append(stats, &stat)
+			var sugarType sql.NullString
+			var total int
+
+			err := rows.Scan(&sugarType, &total)
+			if err != nil {
+				return nil, err
+			}
+
+			stat := &types.SugarTypeStats{
+				SugarType: "غير محدد", // default if NULL
+				Total:     total,
+			}
+			if sugarType.Valid {
+				stat.SugarType = sugarType.String
+			}
+
+			stats = append(stats, stat)
 	}
 
 	if err = rows.Err(); err != nil {
