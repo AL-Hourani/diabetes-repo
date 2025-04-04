@@ -31,6 +31,7 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/verify-token", h.VerifyTokenHandler).Methods("POST")
 	router.HandleFunc("/verifyOtp", h.VerifyOTPHandler).Methods("POST")
 	router.HandleFunc("/updatePatientProfile", h.handleUpdatePatientProfile).Methods(http.MethodPatch)
+	router.HandleFunc("/statisticsSugerType/{id}",h.handleStatisticsSugerType).Methods("GET")
 
 }
 
@@ -81,17 +82,19 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 
 		if user.Role == "patient" {
 			returnLoggingData := types.ReturnLoggingData{
-				Name:       user.Name,
-				Email:      user.Email,
-				Role:       "patient",
-				IsCompletes: false,
-				Token:      token,
+				ID:          user.ID,
+				Name:        user.Name,
+				Email:       user.Email,
+				Role:        "patient",
+				IsCompletes:  false,
+				Token:        token,
 			}
 			utils.WriteJSON(w, http.StatusOK, returnLoggingData)
 		} else {
 
 	
 			returnLoggingData := types.ReturnLoggingCenterData{
+			    ID:      user.ID,      
 				Name:    user.Name,
 				Email:   user.Email,
 				Role:    "center",
@@ -384,4 +387,24 @@ func (h *Handler) handleGetPatientProfile(w http.ResponseWriter , r *http.Reques
 
 
 	utils.WriteJSON(w , http.StatusOK , patientProfile)
+}
+
+
+
+
+// handleStatisticsSugerType
+func (h *Handler) handleStatisticsSugerType(w http.ResponseWriter , r *http.Request) {
+	vars := mux.Vars(r)
+	id , err := strconv.Atoi(vars["id"])
+	if err != nil  {
+       utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid ID"))
+       return
+	}
+	statisticSuger , err := h.store.GetSugarTypeStats(id)
+	if err != nil {
+		utils.WriteError(w , http.StatusBadRequest ,err)
+		return 
+	}
+
+	utils.WriteJSON(w , http.StatusOK , statisticSuger)
 }

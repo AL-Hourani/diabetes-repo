@@ -358,7 +358,50 @@ func (s *Store) UpdatePatientProfile(patientPayload types.ParientUpdatePayload)e
 
 	if err != nil {
         return fmt.Errorf("error updating patient: %v", err)
+		
     }
 
     return nil
+}
+
+
+
+
+// -------------------------------------------------------
+
+
+
+func (s *Store) GetSugarTypeStats(centerID int) ([]*types.SugarTypeStats, error) {
+	query := `
+	SELECT
+		sugarType,
+		COUNT(*) AS total
+	FROM patients
+	WHERE center_id = $1
+	GROUP BY sugarType
+	ORDER BY total DESC;
+	`
+
+	rows, err := s.db.Query(query, centerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var stats []*types.SugarTypeStats
+
+	for rows.Next() {
+		var stat types.SugarTypeStats
+		err := rows.Scan(&stat.SugarType, &stat.Total)
+		if err != nil {
+			return nil, err
+		}
+		stats = append(stats, &stat)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return stats, nil
 }

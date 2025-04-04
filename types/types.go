@@ -17,6 +17,7 @@ type PatientStore interface {
 	GetUserByEmail(email string) (*UserLoginData, error)
 	GetPatientProfile(id int)(*PatientProfile , error)
 	UpdatePatientProfile(patientPayload ParientUpdatePayload) error
+	GetSugarTypeStats(centerID int) ([]*SugarTypeStats, error)
 
 }
 
@@ -151,6 +152,7 @@ type UserLoginData struct {
 
 
 type ReturnLoggingData struct {
+	ID				int			 `json:"id"`
 	Name		    string		 `json:"name"`
 	Email			string		 `json:"email"`
 	Role 			string       `json:"role"`
@@ -158,6 +160,7 @@ type ReturnLoggingData struct {
 	Token            string      `json:"token"`
 }
 type ReturnLoggingCenterData struct {
+	ID				int			 `json:"id"`
 	Name		    string		 `json:"name"`
 	Email			string		 `json:"email"`
 	Role 			string       `json:"role"`
@@ -289,4 +292,14 @@ type Recipient struct {
 	Name  string `json:"name"`
 }
 
+
+
+
+
+// anlisze 
+
+type SugarTypeStats struct {
+	SugarType string `json:"sugarType"`
+	Total     int    `json:"total"`
+}
 

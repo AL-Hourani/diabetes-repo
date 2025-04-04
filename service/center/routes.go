@@ -41,6 +41,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/deletePatient/{id}", auth.WithJWTAuth(h.handleDeletePatient)).Methods(http.MethodDelete)
 	router.HandleFunc("/logout",auth.WithJWTAuth(h.Logout)).Methods("POST")
 	router.HandleFunc("/deleteCenter",h.handleDeleteCenter).Methods("POST")
+
 }
 
 
@@ -335,3 +336,10 @@ func (h *Handler) handleUpdateCenterProfile(w http.ResponseWriter, r *http.Reque
 	})
 
 }
+
+
+
+
+
+
+// 
