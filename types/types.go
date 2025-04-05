@@ -18,6 +18,7 @@ type PatientStore interface {
 	GetPatientProfile(id int)(*PatientProfile , error)
 	UpdatePatientProfile(patientPayload ParientUpdatePayload) error
 	GetSugarTypeStats(centerID int) ([]*SugarTypeStats, error)
+	GetUpdatePatientProfile(id int) (*GetPatientUpdateProfile , error) 
 
 }
 
@@ -49,6 +50,14 @@ type RegisterPatientPayload struct {
 
 type ParientUpdatePayload struct {
 	ID				int			 `json:"id"`
+	FullName		string		 `json:"fullname" validate:"required"`
+	Email			string		 `json:"email"    validate:"required,email"`
+	Age 			string       `json:"age"    validate:"required"`
+	Phone           string	     `json:"phone"    validate:"required"`
+	IDNumber		string       `json:"id_number" validate:"required"`
+	City            string       `json:"city" validate:"required"`
+}
+type GetPatientUpdateProfile struct {
 	FullName		string		 `json:"fullname" validate:"required"`
 	Email			string		 `json:"email"    validate:"required,email"`
 	Age 			string       `json:"age"    validate:"required"`
@@ -200,6 +209,7 @@ type CenterStore interface {
 	DeleteCenter(id int) error 
 	DeleteCenterAndReassignPatients(centerID int, newCenterID int) error
 	CenterUpdateCenterProfile(centerUpdate CenterUpdateProfilePayload) error 
+     GetCenterUpdateCenterProfile(id int)(*GetCenterUpdateProfile , error)
 }
 
 type Center struct {
@@ -242,6 +252,13 @@ type CenterUpdateProfilePayload struct {
 	CenterEmail	    string       `json:"centerEmail"    validate:"required,email"`
 	CenterCity      string       `json:"centerCity"    validate:"required"`
 }
+type GetCenterUpdateProfile struct {
+	CenterName		string		 `json:"centerName"  validate:"required"`
+	CenterEmail	    string       `json:"centerEmail"    validate:"required,email"`
+	CenterCity      string       `json:"centerCity"    validate:"required"`
+}
+
+
 
 // type LoginCenterPayload struct {
 // 	CenterEmail		string		 `json:"centerEmail"    validate:"required,email"`

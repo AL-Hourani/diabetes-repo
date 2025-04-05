@@ -379,7 +379,7 @@ func (s *Store) GetCenterProfile(id int) (*types.CenterProfile, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("user not found")
+			return nil, fmt.Errorf("center not found")
 		}
 		return nil, err
 	}
@@ -457,3 +457,31 @@ func (s *Store) CenterUpdateCenterProfile(centerUpdate types.CenterUpdateProfile
 
 }
 
+func (s *Store) GetCenterUpdateCenterProfile(id int)(*types.GetCenterUpdateProfile , error) {
+	row := s.db.QueryRow("SELECT * FROM centers WHERE id=$1",id)
+	center := new(types.Center)
+	err := row.Scan(
+		&center.ID,
+		&center.CenterName,
+		&center.CenterPassword,
+		&center.CenterEmail,
+		&center.CreateAt,
+		&center.CenterCity,
+	)
+	
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("center not found")
+		}
+		return nil, err
+	}
+
+	cenetrProfile := &types.GetCenterUpdateProfile {
+		CenterName: center.CenterName,
+        CenterEmail: center.CenterEmail,
+		CenterCity: center.CenterCity,
+	}
+
+	return cenetrProfile , nil
+	
+}

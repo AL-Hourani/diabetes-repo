@@ -416,3 +416,27 @@ func (s *Store) GetSugarTypeStats(centerID int) ([]*types.SugarTypeStats, error)
 
 	return stats, nil
 }
+
+
+
+func (s *Store) GetUpdatePatientProfile(id int) (*types.GetPatientUpdateProfile , error) {
+	row := s.db.QueryRow("SELECT fullName,email,phone,date,id_number,city FROM patients WHERE id=$1",id)
+	patientProfile := new(types.GetPatientUpdateProfile)
+	err := row.Scan(
+		&patientProfile.FullName,
+		&patientProfile.Email,
+		&patientProfile.Phone,
+		&patientProfile.Age,
+		&patientProfile.IDNumber,
+		&patientProfile.City,
+	)
+	
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("center not found")
+		}
+		return nil, err
+	}
+
+	return patientProfile , nil
+}

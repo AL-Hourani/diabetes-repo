@@ -40,7 +40,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/updatePatient", h.handleUpdatePatient).Methods(http.MethodPatch)
 	router.HandleFunc("/deletePatient/{id}", auth.WithJWTAuth(h.handleDeletePatient)).Methods(http.MethodDelete)
 	router.HandleFunc("/logout",auth.WithJWTAuth(h.Logout)).Methods("POST")
-	router.HandleFunc("/deleteCenter",h.handleDeleteCenter).Methods("POST")
+	router.HandleFunc("/deleteCenter",h.handleDeleteCenter).Methods(http.MethodDelete)
 
 }
 
@@ -330,11 +330,14 @@ func (h *Handler) handleUpdateCenterProfile(w http.ResponseWriter, r *http.Reque
 		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error update center profile"))
 		return
 	}
-    
-	utils.WriteJSON(w , http.StatusOK , map[string]string{
-		"message": "center profile update successfully",
-	})
 
+	updateProfileInfo , err := h.store.GetCenterUpdateCenterProfile(centerUpdatePayload.ID)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error get center profile"))
+		return
+	}
+
+	utils.WriteJSON(w , http.StatusOK , updateProfileInfo)
 }
 
 
