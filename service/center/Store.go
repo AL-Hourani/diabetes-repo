@@ -475,11 +475,17 @@ func (s *Store) GetCenterUpdateCenterProfile(id int)(*types.GetCenterUpdateProfi
 		}
 		return nil, err
 	}
+	patient_number , err := s.GetPatientCountByCenterName(center.CenterName)
+	if err != nil {
+		return nil, fmt.Errorf("error in get number of patients")
+	}
 
 	cenetrProfile := &types.GetCenterUpdateProfile {
+		ID: center.ID,
 		CenterName: center.CenterName,
         CenterEmail: center.CenterEmail,
 		CenterCity: center.CenterCity,
+		PatientNumber:patient_number ,
 	}
 
 	return cenetrProfile , nil

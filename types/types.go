@@ -253,9 +253,11 @@ type CenterUpdateProfilePayload struct {
 	CenterCity      string       `json:"centerCity"    validate:"required"`
 }
 type GetCenterUpdateProfile struct {
+	ID				int          `json:"centerId"`
 	CenterName		string		 `json:"centerName"  validate:"required"`
 	CenterEmail	    string       `json:"centerEmail"    validate:"required,email"`
 	CenterCity      string       `json:"centerCity"    validate:"required"`
+	PatientNumber   int          `json:"patientNumber"`
 }
 
 
