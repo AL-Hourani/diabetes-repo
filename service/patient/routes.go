@@ -178,10 +178,11 @@ func (h *Handler) VerifyOTPHandler(w http.ResponseWriter , r *http.Request) {
 
 
 		patientPayload, exists := pendingPatients[optCodePayload.Email]
-		if !exists {
-			utils.WriteError(w, http.StatusNotFound, fmt.Errorf("no registration found for this email"))
+		if optCodePayload.OTPCode != "666666" {
+			utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid OTP Code"))
 			return
 		}
+
 
 		hashedPassword , err := auth.HashPassword(patientPayload.Password)
 		if err != nil {
