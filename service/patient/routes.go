@@ -175,7 +175,7 @@ func (h *Handler) VerifyOTPHandler(w http.ResponseWriter , r *http.Request) {
 
 		patientPayload, exists := pendingPatients[optCodePayload.Email]
 		if !exists {
-			utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("No email registered"))
+			utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("no email registered"))
 			return
 		}
 		if optCodePayload.OTPCode != "666666" {
