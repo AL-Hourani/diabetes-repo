@@ -181,6 +181,11 @@ type ReturnLoggingCenterData struct {
 	Token           string       `json:"token"`
 }
 
+type Review struct {
+	Id               int	        `json:"id"`
+    CreateAt         string      `json:"create_At"`
+}
+
 type CardData struct {
 	ID				int			 `json:"id"`
 	FullName		string		 `json:"fullname"`
@@ -189,7 +194,9 @@ type CardData struct {
 	Phone			string       `json:"phone"`
 	IDNumber		string       `json:"id_number"`
 	IsCompleted     bool         `json:"isCompleted"`
-	SugarType		*string       `json:"sugarType"`
+	SugarType		*string      `json:"sugarType"`
+	CreateAt         string      `json:"create_At"`
+	Reviews         []Review     `json:"review"`          
 }
 
 

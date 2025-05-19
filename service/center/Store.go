@@ -125,7 +125,7 @@ func (s *Store)	GreateCenter(center types.Center) error {
 //this is not completed
 
 func (s *Store) GetPatientsForCenter(CenterID int) ([]types.CardData , error) {
-	rows , err := s.db.Query("SELECT id,fullName,email,date,phone,id_number,isCompleted,sugarType FROM patients WHERE center_id=$1",CenterID)
+	rows , err := s.db.Query("SELECT id,fullName,email,date,phone,id_number,isCompleted,sugarType , createAt FROM patients WHERE center_id=$1",CenterID)
 	if err != nil {
 		return nil , err
 	}
@@ -136,6 +136,16 @@ func (s *Store) GetPatientsForCenter(CenterID int) ([]types.CardData , error) {
 		cardd , err := scanRowIntoPatientsCard(rows)
 		if err != nil {
 			return nil , err
+		}
+        cardd.Reviews = []types.Review{
+			{
+				Id:        1,
+				CreateAt:  "2024-05-18",
+			},
+			{
+				Id:        2,
+				CreateAt:  "2024-05-19",
+			},
 		}
 		cardData = append(cardData, *cardd)
 	}
@@ -164,6 +174,7 @@ func scanRowIntoPatientsCard(rows *sql.Rows) (*types.CardData , error ){
 		&patient.IDNumber,
 		&patient.IsCompleted,
 		&sugarType,
+		&patient.CreateAt,
 	)
 
 	
