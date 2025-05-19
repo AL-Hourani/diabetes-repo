@@ -371,7 +371,7 @@ func (s *Store) UpdatePatientProfile(patientPayload types.ParientUpdatePayload)e
 
 
 
-func (s *Store) GetSugarTypeStats(centerID int) ([]*types.SugarTypeStats, error) {
+func (s *Store) GetSugarTypeStats(centerID int) ([]*types.Statistics, error) {
 	query := `
 	SELECT
 		sugarType,
@@ -388,7 +388,7 @@ func (s *Store) GetSugarTypeStats(centerID int) ([]*types.SugarTypeStats, error)
 	}
 	defer rows.Close()
 
-	var stats []*types.SugarTypeStats
+	var stats []*types.Statistics
 
 	for rows.Next() {
 			var sugarType sql.NullString
@@ -399,7 +399,7 @@ func (s *Store) GetSugarTypeStats(centerID int) ([]*types.SugarTypeStats, error)
 				return nil, err
 			}
 
-			stat := &types.SugarTypeStats{
+			stat := &types.Statistics{
 				SugarType: "غير محدد", // default if NULL
 				Total:     total,
 			}
@@ -416,6 +416,242 @@ func (s *Store) GetSugarTypeStats(centerID int) ([]*types.SugarTypeStats, error)
 
 	return stats, nil
 }
+
+func (s *Store) GetGenderCounts(centerID int) (int, int, error) {
+	query := `
+	SELECT gender, COUNT(*) FROM patients
+	WHERE center_id = $1
+	GROUP BY gender;
+	`
+
+	rows, err := s.db.Query(query, centerID)
+	if err != nil {
+		return 0, 0, err
+	}
+	defer rows.Close()
+
+	var maleCount, femaleCount int
+
+	for rows.Next() {
+		var gender sql.NullString
+		var count int
+
+		if err := rows.Scan(&gender, &count); err != nil {
+			return 0, 0, err
+		}
+
+		if gender.Valid {
+			switch gender.String {
+			case "male", "ذكر":
+				maleCount += count
+			case "female", "أنثى":
+				femaleCount += count
+			}
+		}
+	}
+
+	return maleCount, femaleCount, nil
+}
+
+func (s *Store) GetTotalPatientsInSystem() (int, error) {
+	query := `SELECT COUNT(*) FROM patients;`
+
+	var total int
+	err := s.db.QueryRow(query).Scan(&total)
+	if err != nil {
+		return 0, err
+	}
+
+	return total, nil
+}
+
+func (s *Store) GetSugarTypeAgeRangeStats(centerID int) ([]*types.SugarAgeRangeStat, error) {
+	query := `
+	SELECT
+		sugarType,
+		CASE
+			WHEN CAST(age AS INTEGER) BETWEEN 0 AND 18 THEN '0-18'
+			WHEN CAST(age AS INTEGER) BETWEEN 19 AND 35 THEN '19-35'
+			WHEN CAST(age AS INTEGER) BETWEEN 36 AND 50 THEN '36-50'
+			WHEN CAST(age AS INTEGER) > 50 THEN '51+'
+			ELSE 'غير معروف'
+		END AS age_range,
+		COUNT(*) AS total
+	FROM patients
+	WHERE sugarType IS NOT NULL 
+	  AND age IS NOT NULL 
+	  AND age != ''
+	  AND center_id = $1
+	GROUP BY sugarType, age_range
+	ORDER BY sugarType, total DESC;
+	`
+
+	rows, err := s.db.Query(query, centerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var stats []*types.SugarAgeRangeStat
+
+	for rows.Next() {
+		var sugarType, ageRange string
+		var total int
+
+		if err := rows.Scan(&sugarType, &ageRange, &total); err != nil {
+			return nil, err
+		}
+
+		stats = append(stats, &types.SugarAgeRangeStat{
+			SugarType: sugarType,
+			AgeRange:  ageRange,
+			Total:     total,
+		})
+	}
+
+	return stats, nil
+}
+
+func (s *Store) GetSugarTypeAgeRangeStatsAllSystem() ([]*types.SugarAgeRangeStat, error) {
+	query := `
+	SELECT
+		sugarType,
+		CASE
+			WHEN CAST(age AS INTEGER) BETWEEN 0 AND 18 THEN '0-18'
+			WHEN CAST(age AS INTEGER) BETWEEN 19 AND 35 THEN '19-35'
+			WHEN CAST(age AS INTEGER) BETWEEN 36 AND 50 THEN '36-50'
+			WHEN CAST(age AS INTEGER) > 50 THEN '51+'
+			ELSE 'غير معروف'
+		END AS age_range,
+		COUNT(*) AS total
+	FROM patients
+	WHERE sugarType IS NOT NULL 
+	  AND age IS NOT NULL 
+	  AND age != ''
+	GROUP BY sugarType, age_range
+	ORDER BY sugarType, total DESC;
+	`
+
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var stats []*types.SugarAgeRangeStat
+
+	for rows.Next() {
+		var sugarType, ageRange string
+		var total int
+
+		if err := rows.Scan(&sugarType, &ageRange, &total); err != nil {
+			return nil, err
+		}
+
+		stats = append(stats, &types.SugarAgeRangeStat{
+			SugarType: sugarType,
+			AgeRange:  ageRange,
+			Total:     total,
+		})
+	}
+
+	return stats, nil
+}
+
+
+func (s *Store) GetBMIStats(centerID int) ([]*types.BMIStat, error) {
+	query := `
+		SELECT
+			sugarType,
+			CASE
+				WHEN CAST(length_patient AS FLOAT) > 0 AND CAST(weight AS FLOAT) > 0 THEN
+					CASE
+						WHEN (CAST(weight AS FLOAT) / POWER(CAST(length_patient AS FLOAT)/100, 2)) < 18.5 THEN 'نحيف'
+						WHEN (CAST(weight AS FLOAT) / POWER(CAST(length_patient AS FLOAT)/100, 2)) BETWEEN 18.5 AND 24.9 THEN 'طبيعي'
+						WHEN (CAST(weight AS FLOAT) / POWER(CAST(length_patient AS FLOAT)/100, 2)) BETWEEN 25 AND 29.9 THEN 'زيادة وزن'
+						ELSE 'سمنة'
+					END
+				ELSE 'غير معروف'
+			END AS bmi_category,
+			COUNT(*) AS total
+		FROM patients
+		WHERE weight IS NOT NULL
+		  AND length_patient IS NOT NULL
+		  AND weight != ''
+		  AND length_patient != ''
+		  AND center_id = $1
+		GROUP BY sugarType, bmi_category
+		ORDER BY sugarType, total DESC;
+	`
+
+	rows, err := s.db.Query(query, centerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var stats []*types.BMIStat
+
+	for rows.Next() {
+		var sugarType, bmiCategory string
+		var total int
+
+		if err := rows.Scan(&sugarType, &bmiCategory, &total); err != nil {
+			return nil, err
+		}
+
+		stats = append(stats, &types.BMIStat{
+			SugarType:   sugarType,
+			BMICategory: bmiCategory,
+			Total:       total,
+		})
+	}
+
+	return stats, nil
+}
+
+
+
+func (s *Store) GetCityStats() ([]*types.CityStat, error) {
+	query := `
+		SELECT
+			city,
+			COUNT(*) AS total
+		FROM patients
+		WHERE city IS NOT NULL AND city != ''
+		GROUP BY city
+		ORDER BY total DESC;
+	`
+
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var stats []*types.CityStat
+
+	for rows.Next() {
+		var city string
+		var total int
+
+		if err := rows.Scan(&city, &total); err != nil {
+			return nil, err
+		}
+
+		stats = append(stats, &types.CityStat{
+			City:  city,
+			Total: total,
+		})
+	}
+
+	return stats, nil
+}
+
+
+
+
+
 
 
 

@@ -31,7 +31,7 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/verify-token", h.VerifyTokenHandler).Methods("POST")
 	router.HandleFunc("/verifyOtp", h.VerifyOTPHandler).Methods("POST")
 	router.HandleFunc("/updatePatientProfile", h.handleUpdatePatientProfile).Methods(http.MethodPatch)
-	router.HandleFunc("/statisticsSugerType/{id}",h.handleStatisticsSugerType).Methods("GET")
+	router.HandleFunc("/CenterStatistics/{id}",h.handleStatisticsSugerType).Methods("GET")
 
 }
 
@@ -411,6 +411,56 @@ func (h *Handler) handleStatisticsSugerType(w http.ResponseWriter , r *http.Requ
 		utils.WriteError(w , http.StatusBadRequest ,err)
 		return 
 	}
+		// Get gender counts
+	maleCount, femaleCount, err := h.store.GetGenderCounts(id)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
 
-	utils.WriteJSON(w , http.StatusOK , statisticSuger)
+	
+	totalSystemPatients, err := h.store.GetTotalPatientsInSystem()
+	if err != nil {
+		utils.WriteError(w , http.StatusInternalServerError ,err)
+		return 
+	}
+
+	sugarAgeStats, err := h.store.GetSugarTypeAgeRangeStats(id)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+	totoalsugarAgeStats, err := h.store.GetSugarTypeAgeRangeStatsAllSystem()
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	bmiStats, err := h.store.GetBMIStats(id)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	cityStats, err := h.store.GetCityStats()
+		if err != nil {
+			utils.WriteError(w, http.StatusInternalServerError, err)
+			return
+		}
+
+
+	response := types.SugarStatsResponse{
+		SugarTypes:  statisticSuger,
+		MaleCount:   maleCount,
+		FemaleCount: femaleCount,
+		TotalCount: maleCount + femaleCount,
+		TotalPatientsInSystem: totalSystemPatients,
+		SugarAgeRangeStats:     sugarAgeStats,
+		TotalSugarAgeRangeStats: totoalsugarAgeStats,
+		BMIStats: bmiStats,
+	    CityStats: cityStats,
+	}
+
+	utils.WriteJSON(w, http.StatusOK, response)
+
 }

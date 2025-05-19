@@ -17,9 +17,14 @@ type PatientStore interface {
 	GetUserByEmail(email string) (*UserLoginData, error)
 	GetPatientProfile(id int)(*PatientProfile , error)
 	UpdatePatientProfile(patientPayload ParientUpdatePayload) error
-	GetSugarTypeStats(centerID int) ([]*SugarTypeStats, error)
+	GetSugarTypeStats(centerID int) ([]*Statistics, error)
 	GetUpdatePatientProfile(id int) (*GetPatientUpdateProfile , error) 
-
+	GetGenderCounts(centerID int) (int, int, error)
+	GetTotalPatientsInSystem() (int, error)
+	GetSugarTypeAgeRangeStats(centerID int)([]*SugarAgeRangeStat, error)
+	GetSugarTypeAgeRangeStatsAllSystem() ([]*SugarAgeRangeStat, error)
+    GetBMIStats(centerID int) ([]*BMIStat, error)
+	GetCityStats() ([]*CityStat, error)
 }
 
 type Patient struct {
@@ -317,8 +322,42 @@ type Recipient struct {
 
 // anlisze 
 
-type SugarTypeStats struct {
+type Statistics  struct {
 	SugarType string `json:"sugarType"`
 	Total     int    `json:"total"`
+
+
+
+}
+
+type SugarAgeRangeStat struct {
+	SugarType string `json:"sugarType"`
+	AgeRange  string `json:"ageRange"`
+	Total     int    `json:"total"`
+}
+
+type BMIStat struct {
+	SugarType   string `json:"sugarType"`
+	BMICategory string `json:"bmiCategory"` // نحيف، طبيعي، سمنة...
+	Total       int    `json:"total"`
+}
+
+type CityStat struct {
+	City  string `json:"city"`
+	Total int    `json:"total"`
+}
+
+
+
+type SugarStatsResponse struct {
+	SugarTypes []*Statistics                    `json:"sugarTypes"`
+	MaleCount  int                               `json:"maleCount"`
+	FemaleCount int                              `json:"femaleCount"`
+	TotalCount  int                              `json:"totalCount"`
+	TotalPatientsInSystem int                    `json:"totalPatientsInSystem"`
+	SugarAgeRangeStats          []*SugarAgeRangeStat   `json:"sugarAgeRangeStats"`
+	TotalSugarAgeRangeStats     []*SugarAgeRangeStat   `json:"totalsugarAgeRangeStats"`
+	BMIStats                     []*BMIStat              `json:"bmiStats"`
+	CityStats      []*CityStat           `json:"cityStats"`
 }
 
