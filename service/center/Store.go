@@ -509,8 +509,8 @@ func  (s *Store)  InsertReview(reviewdata types.Reviwe) (int, error) {
         INSERT INTO reviews (
             patient_id, address_patient, wight, length_patient, sugarType,
             otherDisease, historyOfFamilyDisease, diseaseDetection, gender,
-            hemoglobin, grease, urineAcid, bloodPressure, cholesterol, LDL,
-            HDL, creatine, normal_clucose, clucose_after_meal,
+            hemoglobin, grease, urineAcid, bloodPressure, cholesterol, ldl,
+            hdl, creatine, normal_clucose, clucose_after_meal,
             triple_grease, hba1c, comments
         ) VALUES (
             $1, $2, $3, $4, $5,

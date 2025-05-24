@@ -26,3 +26,6 @@ CREATE TABLE IF NOT EXISTS reviews (
     CONSTRAINT fk_patient FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE
 
 );
+
+
+
