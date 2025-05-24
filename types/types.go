@@ -183,8 +183,8 @@ type ReturnLoggingCenterData struct {
 }
 
 type Review struct {
-	Id               int	        `json:"id"`
-    CreateAt         string      `json:"create_At"`
+	Id               int	     `json:"id"`
+    Date             string      `json:"date"`
 }
 
 type CardData struct {
@@ -197,7 +197,7 @@ type CardData struct {
 	IsCompleted     bool         `json:"isCompleted"`
 	SugarType		*string      `json:"sugarType"`
 	CreateAt         string      `json:"create_At"`
-	Reviews         []Review     `json:"review"`          
+	Reviews         []Review     `json:"reviews"`          
 }
 
 
@@ -232,6 +232,7 @@ type CenterStore interface {
 	InsertTreatment(data TreatmentInsert) (int, error)
 	FindOrCreateDrugByName(name string) (int, error) 
 	InsertTreatmentDrug(td TreatmentDrug) error 
+	GetReviewsByPatientID(patientID int) ([]Review, error)
 }
 
 type Center struct {

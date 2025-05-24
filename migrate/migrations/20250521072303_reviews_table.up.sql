@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS reviews (
     triple_grease VARCHAR(255) DEFAULT '',
     hba1c VARCHAR(255) DEFAULT '',
     comments VARCHAR(255) DEFAULT '',
-   
+    date_review DATE DEFAULT CURRENT_DATE,
     CONSTRAINT fk_patient FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE
 
 );

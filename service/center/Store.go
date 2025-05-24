@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/AL-Hourani/care-center/types"
 )
@@ -122,6 +123,51 @@ func (s *Store)	GreateCenter(center types.Center) error {
 
 
 
+
+
+
+
+
+
+func (s *Store) GetReviewsByPatientID(patientID int) ([]types.Review, error) {
+	query := `
+		SELECT id, date_review
+		FROM reviews
+		WHERE patient_id = $1
+		ORDER BY created_at DESC
+	`
+
+	rows, err := s.db.Query(query, patientID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query reviews: %w", err)
+	}
+	defer rows.Close()
+
+	var reviews []types.Review
+
+	for rows.Next() {
+		var review types.Review
+		var createdAt time.Time
+
+		if err := rows.Scan(&review.Id, &createdAt); err != nil {
+			return nil, fmt.Errorf("failed to scan review: %w", err)
+		}
+
+		// تنسيق التاريخ (مثلاً: "2025-05-22" أو "22/05/2025")
+		review.Date = createdAt.Format("2006-01-02") // أو "02/01/2006" حسب التنسيق المطلوب
+
+		reviews = append(reviews, review)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating over reviews: %w", err)
+	}
+
+	return reviews, nil
+}
+
+
+
 //this is not completed
 
 func (s *Store) GetPatientsForCenter(CenterID int) ([]types.CardData , error) {
@@ -137,16 +183,11 @@ func (s *Store) GetPatientsForCenter(CenterID int) ([]types.CardData , error) {
 		if err != nil {
 			return nil , err
 		}
-        cardd.Reviews = []types.Review{
-			{
-				Id:        1,
-				CreateAt:  "2024-05-18",
-			},
-			{
-				Id:        2,
-				CreateAt:  "2024-05-19",
-			},
+		reviews, err := s.GetReviewsByPatientID(cardd.ID)
+		if err != nil {
+			return nil, fmt.Errorf("error getting reviews for patient %d: %w", cardd.ID, err)
 		}
+		cardd.Reviews = reviews
 		cardData = append(cardData, *cardd)
 	}
 
