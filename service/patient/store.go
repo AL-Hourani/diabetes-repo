@@ -567,20 +567,20 @@ func (s *Store) GetBMIStats(centerID int) ([]*types.BMIStat, error) {
 		SELECT
 			sugarType,
 			CASE
-				WHEN CAST(length_patient AS FLOAT) > 0 AND CAST(weight AS FLOAT) > 0 THEN
+				WHEN CAST(length_patient AS FLOAT) > 0 AND CAST(wight AS FLOAT) > 0 THEN
 					CASE
-						WHEN (CAST(weight AS FLOAT) / POWER(CAST(length_patient AS FLOAT)/100, 2)) < 18.5 THEN 'نحيف'
-						WHEN (CAST(weight AS FLOAT) / POWER(CAST(length_patient AS FLOAT)/100, 2)) BETWEEN 18.5 AND 24.9 THEN 'طبيعي'
-						WHEN (CAST(weight AS FLOAT) / POWER(CAST(length_patient AS FLOAT)/100, 2)) BETWEEN 25 AND 29.9 THEN 'زيادة وزن'
+						WHEN (CAST(wight AS FLOAT) / POWER(CAST(length_patient AS FLOAT)/100, 2)) < 18.5 THEN 'نحيف'
+						WHEN (CAST(wight AS FLOAT) / POWER(CAST(length_patient AS FLOAT)/100, 2)) BETWEEN 18.5 AND 24.9 THEN 'طبيعي'
+						WHEN (CAST(wight AS FLOAT) / POWER(CAST(length_patient AS FLOAT)/100, 2)) BETWEEN 25 AND 29.9 THEN 'زيادة وزن'
 						ELSE 'سمنة'
 					END
 				ELSE 'غير معروف'
 			END AS bmi_category,
 			COUNT(*) AS total
 		FROM patients
-		WHERE weight IS NOT NULL
+		WHERE wight IS NOT NULL
 		  AND length_patient IS NOT NULL
-		  AND weight != ''
+		  AND wight != ''
 		  AND length_patient != ''
 		  AND center_id = $1
 		GROUP BY sugarType, bmi_category
