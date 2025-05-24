@@ -466,25 +466,26 @@ func (s *Store) GetTotalPatientsInSystem() (int, error) {
 }
 
 func (s *Store) GetSugarTypeAgeRangeStats(centerID int) ([]*types.SugarAgeRangeStat, error) {
-	query := `
-	SELECT
-		sugarType,
-		CASE
-			WHEN CAST(age AS INTEGER) BETWEEN 0 AND 18 THEN '0-18'
-			WHEN CAST(age AS INTEGER) BETWEEN 19 AND 35 THEN '19-35'
-			WHEN CAST(age AS INTEGER) BETWEEN 36 AND 50 THEN '36-50'
-			WHEN CAST(age AS INTEGER) > 50 THEN '51+'
-			ELSE 'غير معروف'
-		END AS age_range,
-		COUNT(*) AS total
-	FROM patients
-	WHERE sugarType IS NOT NULL 
-	  AND age IS NOT NULL 
-	  AND age != ''
-	  AND center_id = $1
-	GROUP BY sugarType, age_range
-	ORDER BY sugarType, total DESC;
-	`
+query := `
+SELECT
+	sugarType,
+	CASE
+		WHEN EXTRACT(YEAR FROM AGE(CURRENT_DATE, TO_DATE(date, 'DD-MM-YYYY'))) BETWEEN 0 AND 18 THEN '0-18'
+		WHEN EXTRACT(YEAR FROM AGE(CURRENT_DATE, TO_DATE(date, 'DD-MM-YYYY'))) BETWEEN 19 AND 35 THEN '19-35'
+		WHEN EXTRACT(YEAR FROM AGE(CURRENT_DATE, TO_DATE(date, 'DD-MM-YYYY'))) BETWEEN 36 AND 50 THEN '36-50'
+		WHEN EXTRACT(YEAR FROM AGE(CURRENT_DATE, TO_DATE(date, 'DD-MM-YYYY'))) > 50 THEN '51+'
+		ELSE 'غير معروف'
+	END AS age_range,
+	COUNT(*) AS total
+FROM patients
+WHERE sugarType IS NOT NULL 
+  AND date IS NOT NULL 
+  AND date != ''
+  AND date ~ '^\d{2}-\d{2}-\d{4}$'
+  AND center_id = $1
+GROUP BY sugarType, age_range
+ORDER BY sugarType, total DESC;
+`
 
 	rows, err := s.db.Query(query, centerID)
 	if err != nil {
@@ -514,22 +515,24 @@ func (s *Store) GetSugarTypeAgeRangeStats(centerID int) ([]*types.SugarAgeRangeS
 
 func (s *Store) GetSugarTypeAgeRangeStatsAllSystem() ([]*types.SugarAgeRangeStat, error) {
 	query := `
-	SELECT
-		sugarType,
-		CASE
-			WHEN CAST(age AS INTEGER) BETWEEN 0 AND 18 THEN '0-18'
-			WHEN CAST(age AS INTEGER) BETWEEN 19 AND 35 THEN '19-35'
-			WHEN CAST(age AS INTEGER) BETWEEN 36 AND 50 THEN '36-50'
-			WHEN CAST(age AS INTEGER) > 50 THEN '51+'
-			ELSE 'غير معروف'
-		END AS age_range,
-		COUNT(*) AS total
-	FROM patients
-	WHERE sugarType IS NOT NULL 
-	  AND age IS NOT NULL 
-	  AND age != ''
-	GROUP BY sugarType, age_range
-	ORDER BY sugarType, total DESC;
+SELECT
+	sugarType,
+	CASE
+		WHEN EXTRACT(YEAR FROM AGE(CURRENT_DATE, TO_DATE(date, 'DD-MM-YYYY'))) BETWEEN 0 AND 18 THEN '0-18'
+		WHEN EXTRACT(YEAR FROM AGE(CURRENT_DATE, TO_DATE(date, 'DD-MM-YYYY'))) BETWEEN 19 AND 35 THEN '19-35'
+		WHEN EXTRACT(YEAR FROM AGE(CURRENT_DATE, TO_DATE(date, 'DD-MM-YYYY'))) BETWEEN 36 AND 50 THEN '36-50'
+		WHEN EXTRACT(YEAR FROM AGE(CURRENT_DATE, TO_DATE(date, 'DD-MM-YYYY'))) > 50 THEN '51+'
+		ELSE 'غير معروف'
+	END AS age_range,
+	COUNT(*) AS total
+FROM patients
+WHERE sugarType IS NOT NULL 
+  AND date IS NOT NULL 
+  AND date != ''
+  AND date ~ '^\d{2}-\d{2}-\d{4}$'
+GROUP BY sugarType, age_range
+ORDER BY sugarType, total DESC;
+
 	`
 
 	rows, err := s.db.Query(query)
