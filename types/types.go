@@ -25,6 +25,7 @@ type PatientStore interface {
 	GetSugarTypeAgeRangeStatsAllSystem() ([]*SugarAgeRangeStat, error)
     GetBMIStats(centerID int) ([]*BMIStat, error)
 	GetCityStats() ([]*CityStat, error)
+   
 }
 
 type Patient struct {
@@ -222,6 +223,15 @@ type CenterStore interface {
 	DeleteCenterAndReassignPatients(centerID int, newCenterID int) error
 	CenterUpdateCenterProfile(centerUpdate CenterUpdateProfilePayload) error 
      GetCenterUpdateCenterProfile(id int)(*GetCenterUpdateProfile , error)
+	InsertReview(reviewdata Reviwe)  (int, error)
+    InsertClinicEye(data Clinic_Eye) error
+	InsertClinicHeart(data Clinic_heart) error 
+	InsertClinicNerve(data Clinic__nerve) error
+	InsertClinicBone(data Clinic__bone) error 
+	InsertClinicUrinary(data Clinic__urinary) error 
+	InsertTreatment(data TreatmentInsert) (int, error)
+	FindOrCreateDrugByName(name string) (int, error) 
+	InsertTreatmentDrug(td TreatmentDrug) error 
 }
 
 type Center struct {
@@ -368,3 +378,198 @@ type SugarStatsResponse struct {
 	CityStats      []*CityStat           `json:"cityStats"`
 }
 
+
+
+
+
+// reiwes .......
+
+// ..........................................
+
+
+// ............................................................
+type Drug struct {
+	Name              string     `json:"name"`
+	Units             string     `json:"units"`
+	Dosage_per_day    string     `json:"dosage_per_day"`
+
+}
+
+type Treatment struct {
+	Type      string       	`json:"type"`
+    Speed     string       	`json:"speed"`
+	Drugs     []Drug        `json:"druges"`
+}
+
+
+type AddReviwePayload struct {
+	
+	PatientID		                    int		     `json:"patient_id"`
+
+
+
+	Address           					string       `json:"title"`
+	Weight            					string       `json:"weight"`
+	LengthPatient     					string       `json:"length_patient"`
+	SugarType         					string       `json:"sugarType"`
+    OtherDisease      					string       `json:"otherDisease"`
+    HistoryOfFamilyDisease  			string       `json:"historyOfFamilyDisease"`
+    HistoryOfDiseaseDetection           string       `json:"historyOfdiseaseDetection"`
+    Gender                              string       `json:"gender"`
+    Hemoglobin                          string       `json:"hemoglobin"`
+    Grease                              string       `json:"grease"`
+    UrineAcid                           string       `json:"urineAcid"`
+    BloodPressure                       string       `json:"bloodPressure"`
+    Cholesterol                         string       `json:"cholesterol"`
+    LDL                                 string       `json:"ldl"`
+    HDL                                 string       `json:"hdl"`
+	Creatine                            string       `json:"creatine"`
+	Normal_Glocose                      string       `json:"normal_glocose"`
+    Glocose_after_Meal                  string       `json:"Glocose_after_Meal"`
+    Triple_Grease                       string       `json:"triple_grease"`
+	Hba1c                               string       `json:"hba1c"`
+	Coments                             string       `json:"coments"` 
+
+ 
+	Treatments                           Treatment   `json:"treatments"`
+
+
+	Has_a_eye_disease                   bool         `json:"has_a_eye_disease"`
+	In_kind_disease                     string       `json:"in_kind_disease"`
+	Relationship_eyes_with_diabetes     string       `json:"relationship_eyes_with_diabetes"`
+	Comments_eyes_clinic                string       `json:"Comments_eyes_clinic"`
+
+
+	Has_a_heart_disease                 bool         `json:"Has_a_heart_disease"`
+	Heart_disease                       string       `json:"Heart_disease"`
+	Relationship_heart_with_diabetes    string       `json:"relationship_heart_with_diabetes"`
+    Comments_heart_clinic               string       `json:"Comments_heart_clinic"`
+
+
+
+    Has_a_nerve_disease                  bool         `json:"Has_a_nerve_disease"`
+    Nerve_disease                        string       `json:"nerve_disease"`
+	Relationship_nerve_with_diabetes     string       `json:"relationship_nerve_with_diabetes"`
+    Comments_nerve_clinic                string       `json:"Comments_nerve_clinic"`
+
+
+
+
+    Has_a_bone_disease                   bool        `json:"Has_a_bone_disease"`
+    Bone_disease                        string       `json:"bone_disease"`
+	Relationship_bone_with_diabetes     string       `json:"relationship_bone_with_diabetes"`
+    Comments_bone_clinic                string       `json:"Comments_bone_clinic"`
+
+
+
+
+
+    Has_a_urinary_disease                  bool        `json:"Has_a_urinary_disease"`
+    Urinary_disease                        string       `json:"urinary_disease"`
+	Relationship_urinary_with_diabetes     string       `json:"relationship_urinary_with_diabetes"`
+    Comments_urinary_clinic                string       `json:"Comments_urinary_clinic"`
+
+
+
+}
+
+
+
+
+
+type Reviwe struct {
+	PatientID		                    int		     
+	Address           					string       
+	Weight            					string       
+	LengthPatient     					string      
+	SugarType         					string       
+    OtherDisease      					string      
+    HistoryOfFamilyDisease  			string       
+    HistoryOfDiseaseDetection           string      
+    Gender                              string      
+    Hemoglobin                          string     
+    Grease                              string       
+    UrineAcid                           string       
+    BloodPressure                       string     
+    Cholesterol                         string      
+    LDL                                 string   
+    HDL                                 string     
+	Creatine                            string      
+	Normal_Glocose                      string       
+    Glocose_after_Meal                  string       
+    Triple_Grease                       string       
+	Hba1c                               string       
+	Coments                             string       
+
+}
+
+type Clinic_Eye struct {
+ 
+	ReviewID                            int
+	Has_a_eye_disease                   bool         
+	In_kind_disease                     string      
+	Relationship_eyes_with_diabetes     string     
+	Comments_eyes_clinic                string 
+
+}
+
+type Clinic_heart struct  {
+
+	ReviewID                            int
+	Has_a_heart_disease                 bool         
+	Heart_disease                       string       
+	Relationship_heart_with_diabetes    string      
+    Comments_heart_clinic               string      
+
+}
+
+type Clinic__nerve struct  {
+	
+	ReviewID                            int
+    Has_a_nerve_disease                  bool        
+    Nerve_disease                        string 
+	Relationship_nerve_with_diabetes     string       
+    Comments_nerve_clinic                string       
+
+}
+
+type Clinic__bone struct  {
+
+	ReviewID                            int
+    Has_a_bone_disease                   bool       
+    Bone_disease                        string    
+	Relationship_bone_with_diabetes     string    
+    Comments_bone_clinic                string   
+
+}
+
+
+type Clinic__urinary struct  {
+
+	ReviewID                               int
+    Has_a_urinary_disease                  bool        
+    Urinary_disease                        string  
+	Relationship_urinary_with_diabetes     string      
+    Comments_urinary_clinic                string     
+
+}
+
+
+type TreatmentInsert struct {
+	ReviewID  int
+	Type      string       
+    Speed     string      
+}
+
+
+type DrugsName struct {
+	
+     Name              string 
+}
+
+type TreatmentDrug struct {
+	TreatmentID   int
+	DrugID        int
+	DosagePerDay  string
+	Units         string
+}

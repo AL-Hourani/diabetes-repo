@@ -41,6 +41,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/deletePatient/{id}", auth.WithJWTAuth(h.handleDeletePatient)).Methods(http.MethodDelete)
 	router.HandleFunc("/logout",auth.WithJWTAuth(h.Logout)).Methods("POST")
 	router.HandleFunc("/deleteCenter",h.handleDeleteCenter).Methods(http.MethodDelete)
+	router.HandleFunc("/addReviewe",h.handleAddReviewe).Methods("POST")
 
 }
 
@@ -346,3 +347,224 @@ func (h *Handler) handleUpdateCenterProfile(w http.ResponseWriter, r *http.Reque
 
 
 // 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// handle with reviws
+func (h *Handler) handleAddReviewe (w http.ResponseWriter, r *http.Request) { 
+    var  AddReviewsPayload types.AddReviwePayload
+
+
+	if err := utils.ParseJSON(r , &AddReviewsPayload); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+		return
+	}
+
+
+
+	newReviewe := types.Reviwe{
+		PatientID: AddReviewsPayload.PatientID,
+		Address: AddReviewsPayload.Address,
+		Weight: AddReviewsPayload.Weight,
+		LengthPatient: AddReviewsPayload.LengthPatient,
+		SugarType: AddReviewsPayload.SugarType,
+		OtherDisease: AddReviewsPayload.OtherDisease,
+		HistoryOfFamilyDisease: AddReviewsPayload.HistoryOfFamilyDisease,
+		HistoryOfDiseaseDetection: AddReviewsPayload.HistoryOfDiseaseDetection,
+		Gender: AddReviewsPayload.Gender,
+		Hemoglobin: AddReviewsPayload.Hemoglobin,
+		Grease: AddReviewsPayload.Grease,
+		UrineAcid: AddReviewsPayload.UrineAcid,
+		BloodPressure: AddReviewsPayload.BloodPressure,
+		Cholesterol: AddReviewsPayload.Cholesterol,
+		LDL: AddReviewsPayload.LDL,
+		HDL: AddReviewsPayload.HDL,
+		Creatine: AddReviewsPayload.Creatine,
+		Normal_Glocose: AddReviewsPayload.Normal_Glocose,
+		Glocose_after_Meal: AddReviewsPayload.Glocose_after_Meal,
+		Triple_Grease: AddReviewsPayload.Triple_Grease,
+		Hba1c: AddReviewsPayload.Hba1c,
+		Coments: AddReviewsPayload.Coments,
+		
+	}
+
+	// add review 
+	Review_id , err := h.store.InsertReview(newReviewe)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding review info"))
+		return
+	}
+
+
+	// get id for this review
+
+
+	// add treatment
+	newTreatment := types.TreatmentInsert {
+	    ReviewID: Review_id,
+		Type: AddReviewsPayload.Treatments.Type,
+		Speed: AddReviewsPayload.Treatments.Speed,
+
+	}
+	treatmentID ,err := h.store.InsertTreatment(newTreatment)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding Tratment"))
+		return
+	}
+
+
+	for _, drug := range AddReviewsPayload.Treatments.Drugs {
+	drugID, err := h.store.FindOrCreateDrugByName(drug.Name)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("failed to add/find drug: %w", err))
+		return
+	}
+
+	// ربط الدواء بالعلاج
+	err = h.store.InsertTreatmentDrug(types.TreatmentDrug{
+		TreatmentID:   treatmentID,
+		DrugID:        drugID,
+		DosagePerDay:  drug.Dosage_per_day,
+		Units:         drug.Units,
+	})
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("failed to insert treatment-drug: %w", err))
+		return
+	}
+}
+
+
+
+
+	if AddReviewsPayload.Has_a_eye_disease {
+
+      newClininEyeInfo := types.Clinic_Eye {
+		ReviewID: Review_id,
+        Has_a_eye_disease: AddReviewsPayload.Has_a_eye_disease,
+		In_kind_disease: AddReviewsPayload.In_kind_disease,
+		Relationship_eyes_with_diabetes: AddReviewsPayload.Relationship_eyes_with_diabetes,
+		Comments_eyes_clinic: AddReviewsPayload.Comments_eyes_clinic,
+	  }
+
+	  	err := h.store.InsertClinicEye(newClininEyeInfo)
+			if err != nil {
+				utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding clinic eye info"))
+				return
+			}
+	}
+
+	// 2
+
+	if AddReviewsPayload.Has_a_heart_disease {
+		
+      newClininHeartInfo := types.Clinic_heart {
+		ReviewID: Review_id,
+		Has_a_heart_disease: AddReviewsPayload.Has_a_heart_disease,
+		Heart_disease: AddReviewsPayload.Heart_disease,
+		Relationship_heart_with_diabetes: AddReviewsPayload.Relationship_heart_with_diabetes,
+		Comments_heart_clinic: AddReviewsPayload.Comments_heart_clinic,
+	  }
+	  	  	err := h.store.InsertClinicHeart(newClininHeartInfo)
+			if err != nil {
+				utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding clinic heart info"))
+				return
+			}
+
+	}
+
+
+
+	// 3
+
+	if AddReviewsPayload.Has_a_nerve_disease {
+				
+      newClininNerveInfo := types.Clinic__nerve {
+		ReviewID: Review_id,
+		Has_a_nerve_disease: AddReviewsPayload.Has_a_nerve_disease,
+		Nerve_disease: AddReviewsPayload.Nerve_disease,
+		Relationship_nerve_with_diabetes: AddReviewsPayload.Relationship_nerve_with_diabetes,
+		Comments_nerve_clinic: AddReviewsPayload.Comments_nerve_clinic,
+	  }
+	  	  	err := h.store.InsertClinicNerve(newClininNerveInfo)
+			if err != nil {
+				utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding clinic nerve info"))
+				return
+			}
+
+	}
+
+
+	// 4
+	
+	if AddReviewsPayload.Has_a_bone_disease {
+				
+      newClininBoneInfo := types.Clinic__bone {
+		ReviewID: Review_id,
+	    Has_a_bone_disease: AddReviewsPayload.Has_a_bone_disease,
+		Bone_disease: AddReviewsPayload.Bone_disease,
+		Relationship_bone_with_diabetes: AddReviewsPayload.Relationship_bone_with_diabetes,
+		Comments_bone_clinic: AddReviewsPayload.Comments_bone_clinic,
+	  }
+	  	  	err := h.store.InsertClinicBone(newClininBoneInfo)
+			if err != nil {
+				utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding clinic bone info"))
+				return
+			}
+
+	}
+
+	// 5
+
+		
+	if AddReviewsPayload.Has_a_urinary_disease {
+				
+      newClininUrinaryInfo := types.Clinic__urinary {
+		ReviewID: Review_id,
+		Has_a_urinary_disease: AddReviewsPayload.Has_a_urinary_disease,
+		Urinary_disease: AddReviewsPayload.Urinary_disease,
+		Relationship_urinary_with_diabetes: AddReviewsPayload.Relationship_urinary_with_diabetes,
+		Comments_urinary_clinic: AddReviewsPayload.Comments_urinary_clinic,
+	  }
+	  	  	err := h.store.InsertClinicUrinary(newClininUrinaryInfo)
+			if err != nil {
+				utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding clinic urinary info"))
+				return
+			}
+
+	}
+
+
+
+
+	utils.WriteJSON(w , http.StatusOK , map[string]string{
+		"message": "Review added successfully",
+	})
+
+
+
+}

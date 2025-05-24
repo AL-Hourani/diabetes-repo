@@ -17,3 +17,9 @@ migrate-up:
 
 migrate-down:
 	@go run migrate/main.go down
+
+
+
+
+migrate-force:
+	@go run migrate/main.go force $(version)

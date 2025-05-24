@@ -502,3 +502,261 @@ func (s *Store) GetCenterUpdateCenterProfile(id int)(*types.GetCenterUpdateProfi
 	return cenetrProfile , nil
 	
 }
+
+
+func  (s *Store)  InsertReview(reviewdata types.Reviwe) (int, error) {
+    query := `
+        INSERT INTO reviews (
+            patient_id, address_patient, wight, length_patient, sugarType,
+            otherDisease, historyOfFamilyDisease, diseaseDetection, gender,
+            hemoglobin, grease, urineAcid, bloodPressure, cholesterol, LDL,
+            HDL, creatine, normal_clucose, clucose_after_meal,
+            triple_grease, hba1c, comments
+        ) VALUES (
+            $1, $2, $3, $4, $5,
+            $6, $7, $8, $9,
+            $10, $11, $12, $13, $14, $15,
+            $16, $17, $18, $19,
+            $20, $21, $22
+        )
+		  RETURNING id
+    `
+
+	var reviewID int
+    err := s.db.QueryRow(query,
+        reviewdata.PatientID,
+        reviewdata.Address,
+        reviewdata.Weight,
+        reviewdata.LengthPatient,
+        reviewdata.SugarType,
+        reviewdata.OtherDisease,
+        reviewdata.HistoryOfFamilyDisease,
+        reviewdata.HistoryOfDiseaseDetection,
+        reviewdata.Gender,
+        reviewdata.Hemoglobin,
+        reviewdata.Grease,
+        reviewdata.UrineAcid,
+        reviewdata.BloodPressure,
+        reviewdata.Cholesterol,
+        reviewdata.LDL,
+        reviewdata.HDL,
+        reviewdata.Creatine,
+        reviewdata.Normal_Glocose,
+        reviewdata.Glocose_after_Meal,
+        reviewdata.Triple_Grease,
+        reviewdata.Hba1c,
+        reviewdata.Coments,
+    ).Scan(&reviewID)
+
+    if err != nil {
+        return 0 ,fmt.Errorf("failed to insert review: %w", err)
+    }
+
+    return reviewID , nil
+}
+
+func  (s *Store)  InsertClinicEye(data types.Clinic_Eye) error { 
+	    query := `
+        INSERT INTO eyes_clinic (
+		review_id , has_a_eye_disease , in_kind_disease,
+		relationship_with_diabetes , comments
+        ) VALUES (
+            $1, $2, $3, $4, $5
+        )
+    `
+	
+    _, err := s.db.Exec(query,
+		data.ReviewID,
+		data.Has_a_eye_disease,
+		data.In_kind_disease,
+		data.Relationship_eyes_with_diabetes,
+		data.Comments_eyes_clinic,
+    )
+
+    if err != nil {
+        return fmt.Errorf("failed to insert clinic info eye: %w", err)
+    }
+
+    return nil
+
+}
+
+func  (s *Store)  InsertClinicHeart(data types.Clinic_heart) error { 
+	    query := `
+        INSERT INTO heart_clinic (
+		review_id , has_a_heart_disease , heart_disease,
+		relationship_with_diabetes , comments
+        ) VALUES (
+            $1, $2, $3, $4, $5
+        )
+    `
+	
+    _, err := s.db.Exec(query,
+		data.ReviewID,
+		data.Has_a_heart_disease,
+		data.Heart_disease,
+		data.Relationship_heart_with_diabetes,
+		data.Comments_heart_clinic,
+    )
+
+    if err != nil {
+        return fmt.Errorf("failed to insert clinic info herat: %w", err)
+    }
+
+    return nil
+
+}
+
+func  (s *Store)  InsertClinicNerve(data types.Clinic__nerve) error { 
+	    query := `
+        INSERT INTO nerve_clinic (
+		review_id , has_a_nerve_disease , nervous_disease,
+		relationship_with_diabetes , comments
+        ) VALUES (
+            $1, $2, $3, $4, $5
+        )
+    `
+	
+    _, err := s.db.Exec(query,
+		data.ReviewID,
+		data.Has_a_nerve_disease,
+		data.Nerve_disease,
+		data.Relationship_nerve_with_diabetes,
+		data.Comments_nerve_clinic,
+    )
+
+    if err != nil {
+        return fmt.Errorf("failed to insert clinic info nerve: %w", err)
+    }
+
+    return nil
+
+}
+
+func  (s *Store)  InsertClinicBone(data types.Clinic__bone) error { 
+	    query := `
+        INSERT INTO bone_clinic (
+		review_id , has_a_bone_disease , nervous_disease,
+		relationship_with_diabetes , comments
+        ) VALUES (
+            $1, $2, $3, $4, $5
+        )
+    `
+	
+    _, err := s.db.Exec(query,
+		data.ReviewID,
+		data.Has_a_bone_disease,
+		data.Bone_disease,
+		data.Relationship_bone_with_diabetes,
+		data.Comments_bone_clinic,
+    )
+
+    if err != nil {
+        return fmt.Errorf("failed to insert clinic info bone: %w", err)
+    }
+
+    return nil
+
+}
+
+func  (s *Store)  InsertClinicUrinary(data types.Clinic__urinary) error { 
+	    query := `
+        INSERT INTO urinary_clinic (
+		review_id , has_a_urinary_disease , nervous_disease,
+		relationship_with_diabetes , comments
+        ) VALUES (
+            $1, $2, $3, $4, $5
+        )
+    `
+	
+    _, err := s.db.Exec(query,
+		data.ReviewID,
+		data.Has_a_urinary_disease,
+		data.Urinary_disease,
+		data.Relationship_urinary_with_diabetes,
+		data.Comments_urinary_clinic,
+    )
+
+    if err != nil {
+        return fmt.Errorf("failed to insert clinic info urinary: %w", err)
+    }
+
+    return nil
+
+}
+
+
+
+func  (s *Store)  InsertTreatment(data types.TreatmentInsert) (int , error) { 
+	    query := `
+        INSERT INTO treatments (
+		review_id , treatment_type , treatment_speed
+		
+        ) VALUES (
+            $1, $2, $3
+        )
+		RETURNING id
+    `
+	var id int
+    err := s.db.QueryRow(query,
+       data.ReviewID,
+	   data.Type,
+	   data.Speed,
+    ).Scan(&id)
+
+    if err != nil {
+        return 0 ,  fmt.Errorf("failed to insert treatment: %w", err)
+    }
+
+    return id , nil
+
+}
+
+func (s *Store) FindOrCreateDrugByName(name string) (int, error) {
+	var id int
+	err := s.db.QueryRow("SELECT id FROM drugs WHERE name = $1", name).Scan(&id)
+	if err == sql.ErrNoRows {
+		err = s.db.QueryRow("INSERT INTO drugs (name) VALUES ($1) RETURNING id", name).Scan(&id)
+	}
+	if err != nil {
+		return 0, fmt.Errorf("error finding/creating drug: %w", err)
+	}
+	return id, nil
+}
+
+
+func (s *Store) InsertTreatmentDrug(td types.TreatmentDrug) error {
+	query := `
+		INSERT INTO treatment_drugs (treatment_id, drug_id, dosage_per_day, units)
+		VALUES ($1, $2, $3, $4)
+	`
+	_, err := s.db.Exec(query, td.TreatmentID, td.DrugID, td.DosagePerDay, td.Units)
+	return err
+}
+
+
+
+
+
+
+func  (s *Store)  AddDrugNaame(data types.DrugsName) error { 
+	    query := `
+        INSERT INTO drugs (
+		name
+		
+        ) VALUES (
+            $1
+        )
+    `
+	
+    _, err := s.db.Exec(query,
+       data.Name,
+    )
+
+    if err != nil {
+        return fmt.Errorf("failed to insert drug name: %w", err)
+    }
+
+    return nil
+
+}
