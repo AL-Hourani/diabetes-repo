@@ -42,6 +42,8 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/logout",auth.WithJWTAuth(h.Logout)).Methods("POST")
 	router.HandleFunc("/deleteCenter",h.handleDeleteCenter).Methods(http.MethodDelete)
 	router.HandleFunc("/addReviewe",h.handleAddReviewe).Methods("POST")
+	router.HandleFunc("/reviewdelete/{id}", h.handleDeleteReview).Methods("DELETE")
+
 
 }
 
@@ -567,4 +569,41 @@ func (h *Handler) handleAddReviewe (w http.ResponseWriter, r *http.Request) {
 
 
 
+}
+
+
+
+
+
+
+
+
+
+
+func (h *Handler) handleDeleteReview(w http.ResponseWriter, r *http.Request) {
+	
+	vars := mux.Vars(r)
+	idStr, ok := vars["id"]
+	if !ok {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("review ID is required"))
+		return
+	}
+
+	// تحويل ID من نص إلى عدد صحيح
+	reviewID, err := strconv.Atoi(idStr)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid review ID"))
+		return
+	}
+
+	// تنفيذ عملية الحذف
+	err = h.store.DeleteReviewByID(reviewID)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("failed to delete review: %v", err))
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, map[string]string{
+		"message": "Review deleted successfully",
+	})
 }

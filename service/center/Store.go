@@ -134,7 +134,7 @@ func (s *Store) GetReviewsByPatientID(patientID int) ([]types.Review, error) {
 		SELECT id, date_review
 		FROM reviews
 		WHERE patient_id = $1
-		ORDER BY created_at DESC
+		ORDER BY date_review DESC
 	`
 
 	rows, err := s.db.Query(query, patientID)

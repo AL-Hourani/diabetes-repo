@@ -233,6 +233,7 @@ type CenterStore interface {
 	FindOrCreateDrugByName(name string) (int, error) 
 	InsertTreatmentDrug(td TreatmentDrug) error 
 	GetReviewsByPatientID(patientID int) ([]Review, error)
+	DeleteReviewByID(reviewID int) error 
 }
 
 type Center struct {
