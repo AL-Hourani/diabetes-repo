@@ -416,7 +416,7 @@ func (h *Handler) handleAddReviewe (w http.ResponseWriter, r *http.Request) {
 	// add review 
 	Review_id , err := h.store.InsertReview(newReviewe)
 	if err != nil {
-		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding review info"))
+		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding review info : %v" , err))
 		return
 	}
 

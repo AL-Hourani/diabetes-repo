@@ -801,3 +801,14 @@ func  (s *Store)  AddDrugNaame(data types.DrugsName) error {
     return nil
 
 }
+
+
+
+func (s *Store) DeleteReviewByID(reviewID int) error {
+	query := `DELETE FROM reviews WHERE id = $1`
+	_, err := s.db.Exec(query, reviewID)
+	if err != nil {
+		return fmt.Errorf("failed to delete review and its related data: %w", err)
+	}
+	return nil
+}

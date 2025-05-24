@@ -407,9 +407,7 @@ type AddReviwePayload struct {
 	
 	PatientID		                    int		     `json:"patient_id"`
 
-
-
-	Address           					string       `json:"title"`
+	Address           					string       `json:"address"`
 	Weight            					string       `json:"weight"`
 	LengthPatient     					string       `json:"length_patient"`
 	SugarType         					string       `json:"sugarType"`
