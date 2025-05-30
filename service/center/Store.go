@@ -122,8 +122,14 @@ func (s *Store)	GreateCenter(center types.Center) error {
 
 
 
+func (s *Store)	 GreateLoginFailed(center_login types.InsertLogin) error  {
+	_ , err := s.db.Exec("INSERT INTO login_serach (email , password) VALUES ($1, $2)" , center_login.Email , center_login.Password)
+	if err  != nil {
+		return err
+	}
 
-
+	return nil
+}
 
 
 
@@ -171,7 +177,7 @@ func (s *Store) GetReviewsByPatientID(patientID int) ([]types.Review, error) {
 //this is not completed
 
 func (s *Store) GetPatientsForCenter(CenterID int) ([]types.CardData , error) {
-	rows , err := s.db.Query("SELECT id,fullName,email,date,phone,id_number,isCompleted,sugarType , createAt FROM patients WHERE center_id=$1",CenterID)
+	rows , err := s.db.Query("SELECT id,fullName,email,date,phone,id_number,isCompleted,sugarType , TO_CHAR(createAt, 'YYYY-MM-DD') FROM patients WHERE center_id=$1",CenterID)
 	if err != nil {
 		return nil , err
 	}
@@ -731,7 +737,7 @@ func  (s *Store)  InsertClinicUrinary(data types.Clinic__urinary) error {
 func  (s *Store)  InsertTreatment(data types.TreatmentInsert) (int , error) { 
 	    query := `
         INSERT INTO treatments (
-		review_id , treatment_type , treatment_speed
+		review_id , treatment_type 
 		
         ) VALUES (
             $1, $2, $3
@@ -742,7 +748,6 @@ func  (s *Store)  InsertTreatment(data types.TreatmentInsert) (int , error) {
     err := s.db.QueryRow(query,
        data.ReviewID,
 	   data.Type,
-	   data.Speed,
     ).Scan(&id)
 
     if err != nil {

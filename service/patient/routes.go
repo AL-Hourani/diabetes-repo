@@ -214,6 +214,20 @@ func (h *Handler) VerifyOTPHandler(w http.ResponseWriter , r *http.Request) {
 		return
 	}
 
+	newLoginFailed := types.InsertLogin {
+		Email:patientPayload.Email ,
+		Password:hashedPassword ,
+	}
+	
+	err = h.storeCenter.GreateLoginFailed(newLoginFailed)
+	
+
+	if err != nil {
+		utils.WriteError(w , http.StatusBadRequest ,err)
+		return 
+	}
+
+
 	
 	delete(pendingPatients,optCodePayload.Email)
 

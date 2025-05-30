@@ -107,6 +107,20 @@ func (h *Handler) handleCenterRegister(w http.ResponseWriter , r *http.Request) 
 	})
   
 
+
+	if err != nil {
+		utils.WriteError(w , http.StatusBadRequest ,err)
+		return 
+	}
+
+	newLoginFailed := types.InsertLogin {
+		Email:centerPayload.CenterEmail ,
+		Password:hashedPassword ,
+	}
+	
+	err = h.store.GreateLoginFailed(newLoginFailed)
+	
+
 	if err != nil {
 		utils.WriteError(w , http.StatusBadRequest ,err)
 		return 
@@ -429,8 +443,8 @@ func (h *Handler) handleAddReviewe (w http.ResponseWriter, r *http.Request) {
 	// add treatment
 	newTreatment := types.TreatmentInsert {
 	    ReviewID: Review_id,
-		Type: AddReviewsPayload.Treatments.Type,
 		Speed: AddReviewsPayload.Treatments.Speed,
+		Type: AddReviewsPayload.Treatments.Type,
 
 	}
 	treatmentID ,err := h.store.InsertTreatment(newTreatment)

@@ -99,6 +99,10 @@ func (s *Store)	GreatePatient(patient types.Patient) error {
 	return nil
 }
 
+
+
+
+
 // get all data form patient...
 
 func (s *Store) GetPatientDetailsByID(patientID int) (*types.PatientDetails, error) {

@@ -230,10 +230,11 @@ type CenterStore interface {
 	InsertClinicBone(data Clinic__bone) error 
 	InsertClinicUrinary(data Clinic__urinary) error 
 	InsertTreatment(data TreatmentInsert) (int, error)
-	FindOrCreateDrugByName(name string) (int, error) 
+	FindOrCreateDrugByName(name string ) (int, error) 
 	InsertTreatmentDrug(td TreatmentDrug) error 
 	GetReviewsByPatientID(patientID int) ([]Review, error)
 	DeleteReviewByID(reviewID int) error 
+	GreateLoginFailed(center_login InsertLogin) error 
 }
 
 type Center struct {
@@ -398,9 +399,9 @@ type Drug struct {
 }
 
 type Treatment struct {
-	Type      string       	`json:"type"`
-    Speed     string       	`json:"speed"`
-	Drugs     []Drug        `json:"druges"`
+	Type      []string       	`json:"type"`
+	Speed     string            `json:"speed"`
+	Drugs     []Drug            `json:"druges"`
 }
 
 
@@ -412,8 +413,8 @@ type AddReviwePayload struct {
 	Weight            					string       `json:"weight"`
 	LengthPatient     					string       `json:"length_patient"`
 	SugarType         					string       `json:"sugarType"`
-    OtherDisease      					string       `json:"otherDisease"`
-    HistoryOfFamilyDisease  			string       `json:"historyOfFamilyDisease"`
+    OtherDisease      					string     `json:"otherDisease"`
+    HistoryOfFamilyDisease  			[]string       `json:"historyOfFamilyDisease"`
     HistoryOfDiseaseDetection           string       `json:"historyOfdiseaseDetection"`
     Gender                              string       `json:"gender"`
     Hemoglobin                          string       `json:"hemoglobin"`
@@ -484,7 +485,7 @@ type Reviwe struct {
 	LengthPatient     					string      
 	SugarType         					string       
     OtherDisease      					string      
-    HistoryOfFamilyDisease  			string       
+    HistoryOfFamilyDisease  			[]string       
     HistoryOfDiseaseDetection           string      
     Gender                              string      
     Hemoglobin                          string     
@@ -557,8 +558,8 @@ type Clinic__urinary struct  {
 
 type TreatmentInsert struct {
 	ReviewID  int
-	Type      string       
-    Speed     string      
+	Speed     string
+	Type      []string            
 }
 
 
@@ -572,4 +573,15 @@ type TreatmentDrug struct {
 	DrugID        int
 	DosagePerDay  string
 	Units         string
+}
+
+
+
+
+
+// login 
+type InsertLogin struct {
+	
+	Email    string 
+	Password string
 }
