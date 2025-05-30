@@ -2,6 +2,7 @@ package center
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"time"
@@ -552,6 +553,11 @@ func (s *Store) GetCenterUpdateCenterProfile(id int)(*types.GetCenterUpdateProfi
 
 
 func  (s *Store)  InsertReview(reviewdata types.Reviwe) (int, error) {
+	historyJSON, err := json.Marshal(reviewdata.HistoryOfFamilyDisease)
+	if err != nil {
+		log.Println("خطأ في تحويل historyOfFamilyDisease إلى JSON:", err)
+		return 0 , nil
+	}
     query := `
         INSERT INTO reviews (
             patient_id, address_patient, wight, length_patient, sugarType,
@@ -570,14 +576,14 @@ func  (s *Store)  InsertReview(reviewdata types.Reviwe) (int, error) {
     `
 
 	var reviewID int
-    err := s.db.QueryRow(query,
+    err = s.db.QueryRow(query,
         reviewdata.PatientID,
         reviewdata.Address,
         reviewdata.Weight,
         reviewdata.LengthPatient,
         reviewdata.SugarType,
         reviewdata.OtherDisease,
-        reviewdata.HistoryOfFamilyDisease,
+        string(historyJSON),
         reviewdata.HistoryOfDiseaseDetection,
         reviewdata.Gender,
         reviewdata.Hemoglobin,
@@ -735,9 +741,14 @@ func  (s *Store)  InsertClinicUrinary(data types.Clinic__urinary) error {
 
 
 func  (s *Store)  InsertTreatment(data types.TreatmentInsert) (int , error) { 
+	typeM , err := json.Marshal(data.Type)
+	if err != nil {
+		log.Println("خطأ في تحويل Type od medicine إلى JSON:", err)
+		return 0 , nil
+	}
 	    query := `
         INSERT INTO treatments (
-		review_id , treatment_type 
+		review_id , treatment_type , speed
 		
         ) VALUES (
             $1, $2, $3
@@ -745,9 +756,10 @@ func  (s *Store)  InsertTreatment(data types.TreatmentInsert) (int , error) {
 		RETURNING id
     `
 	var id int
-    err := s.db.QueryRow(query,
+    err = s.db.QueryRow(query,
        data.ReviewID,
-	   data.Type,
+	   string(typeM),
+	   data.Speed,
     ).Scan(&id)
 
     if err != nil {
