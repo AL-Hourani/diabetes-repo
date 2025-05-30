@@ -441,14 +441,14 @@ type AddReviwePayload struct {
 	Comments_eyes_clinic                string       `json:"Comments_eyes_clinic"`
 
 
-	Has_a_heart_disease                 bool         `json:"Has_a_heart_disease"`
+	Has_a_heart_disease                 bool         `json:"has_a_heart_disease"`
 	Heart_disease                       string       `json:"Heart_disease"`
 	Relationship_heart_with_diabetes    string       `json:"relationship_heart_with_diabetes"`
     Comments_heart_clinic               string       `json:"Comments_heart_clinic"`
 
 
 
-    Has_a_nerve_disease                  bool         `json:"Has_a_nerve_disease"`
+    Has_a_nerve_disease                  bool         `json:"has_a_nerve_disease"`
     Nerve_disease                        string       `json:"nerve_disease"`
 	Relationship_nerve_with_diabetes     string       `json:"relationship_nerve_with_diabetes"`
     Comments_nerve_clinic                string       `json:"Comments_nerve_clinic"`
@@ -456,7 +456,7 @@ type AddReviwePayload struct {
 
 
 
-    Has_a_bone_disease                   bool        `json:"Has_a_bone_disease"`
+    Has_a_bone_disease                   bool        `json:"has_a_bone_disease"`
     Bone_disease                        string       `json:"bone_disease"`
 	Relationship_bone_with_diabetes     string       `json:"relationship_bone_with_diabetes"`
     Comments_bone_clinic                string       `json:"Comments_bone_clinic"`
@@ -465,7 +465,7 @@ type AddReviwePayload struct {
 
 
 
-    Has_a_urinary_disease                  bool        `json:"Has_a_urinary_disease"`
+    Has_a_urinary_disease                  bool        `json:"has_a_urinary_disease"`
     Urinary_disease                        string       `json:"urinary_disease"`
 	Relationship_urinary_with_diabetes     string       `json:"relationship_urinary_with_diabetes"`
     Comments_urinary_clinic                string       `json:"Comments_urinary_clinic"`
