@@ -437,20 +437,20 @@ type AddReviwePayload struct {
 
 	Has_a_eye_disease                   bool         `json:"has_a_eye_disease"`
 	In_kind_disease                     string       `json:"in_kind_disease"`
-	Relationship_eyes_with_diabetes     string       `json:"relationship_eyes_with_diabetes"`
+	Relationship_eyes_with_diabetes     bool       `json:"relationship_eyes_with_diabetes"`
 	Comments_eyes_clinic                string       `json:"Comments_eyes_clinic"`
 
 
 	Has_a_heart_disease                 bool         `json:"has_a_heart_disease"`
 	Heart_disease                       string       `json:"Heart_disease"`
-	Relationship_heart_with_diabetes    string       `json:"relationship_heart_with_diabetes"`
+	Relationship_heart_with_diabetes    bool       `json:"relationship_heart_with_diabetes"`
     Comments_heart_clinic               string       `json:"Comments_heart_clinic"`
 
 
 
     Has_a_nerve_disease                  bool         `json:"has_a_nerve_disease"`
     Nerve_disease                        string       `json:"nerve_disease"`
-	Relationship_nerve_with_diabetes     string       `json:"relationship_nerve_with_diabetes"`
+	Relationship_nerve_with_diabetes     bool       `json:"relationship_nerve_with_diabetes"`
     Comments_nerve_clinic                string       `json:"Comments_nerve_clinic"`
 
 
@@ -458,7 +458,7 @@ type AddReviwePayload struct {
 
     Has_a_bone_disease                   bool        `json:"has_a_bone_disease"`
     Bone_disease                        string       `json:"bone_disease"`
-	Relationship_bone_with_diabetes     string       `json:"relationship_bone_with_diabetes"`
+	Relationship_bone_with_diabetes     bool       `json:"relationship_bone_with_diabetes"`
     Comments_bone_clinic                string       `json:"Comments_bone_clinic"`
 
 
@@ -467,7 +467,7 @@ type AddReviwePayload struct {
 
     Has_a_urinary_disease                  bool        `json:"has_a_urinary_disease"`
     Urinary_disease                        string       `json:"urinary_disease"`
-	Relationship_urinary_with_diabetes     string       `json:"relationship_urinary_with_diabetes"`
+	Relationship_urinary_with_diabetes     bool       `json:"relationship_urinary_with_diabetes"`
     Comments_urinary_clinic                string       `json:"Comments_urinary_clinic"`
 
 
@@ -509,7 +509,7 @@ type Clinic_Eye struct {
 	ReviewID                            int
 	Has_a_eye_disease                   bool         
 	In_kind_disease                     string      
-	Relationship_eyes_with_diabetes     string     
+	Relationship_eyes_with_diabetes     bool     
 	Comments_eyes_clinic                string 
 
 }
@@ -519,7 +519,7 @@ type Clinic_heart struct  {
 	ReviewID                            int
 	Has_a_heart_disease                 bool         
 	Heart_disease                       string       
-	Relationship_heart_with_diabetes    string      
+	Relationship_heart_with_diabetes    bool      
     Comments_heart_clinic               string      
 
 }
@@ -529,7 +529,7 @@ type Clinic__nerve struct  {
 	ReviewID                            int
     Has_a_nerve_disease                  bool        
     Nerve_disease                        string 
-	Relationship_nerve_with_diabetes     string       
+	Relationship_nerve_with_diabetes     bool       
     Comments_nerve_clinic                string       
 
 }
@@ -539,7 +539,7 @@ type Clinic__bone struct  {
 	ReviewID                            int
     Has_a_bone_disease                   bool       
     Bone_disease                        string    
-	Relationship_bone_with_diabetes     string    
+	Relationship_bone_with_diabetes     bool    
     Comments_bone_clinic                string   
 
 }
@@ -550,7 +550,7 @@ type Clinic__urinary struct  {
 	ReviewID                               int
     Has_a_urinary_disease                  bool        
     Urinary_disease                        string  
-	Relationship_urinary_with_diabetes     string      
+	Relationship_urinary_with_diabetes     bool      
     Comments_urinary_clinic                string     
 
 }
@@ -584,4 +584,53 @@ type InsertLogin struct {
 	
 	Email    string 
 	Password string
+}
+
+
+type GetReviwe struct {
+    ReviewID                            int
+	Address           					string       
+	Weight            					string       
+	LengthPatient     					string      
+	SugarType         					string       
+    OtherDisease      					string      
+    HistoryOfFamilyDisease  			[]string       
+    HistoryOfDiseaseDetection           string      
+    Gender                              string      
+    Hemoglobin                          string     
+    Grease                              string       
+    UrineAcid                           string       
+    BloodPressure                       string     
+    Cholesterol                         string      
+    LDL                                 string   
+    HDL                                 string     
+	Creatine                            string      
+	Normal_Glocose                      string       
+    Glocose_after_Meal                  string       
+    Triple_Grease                       string       
+	Hba1c                               string       
+	Coments                             string     
+	Has_a_eye_disease                   bool         
+	In_kind_disease                     string      
+	Relationship_eyes_with_diabetes     string     
+	Comments_eyes_clinic                string 
+	Has_a_heart_disease                 bool         
+	Heart_disease                       string       
+	Relationship_heart_with_diabetes    string      
+    Comments_heart_clinic               string  
+	Has_a_nerve_disease                  bool        
+    Nerve_disease                        string 
+	Relationship_nerve_with_diabetes     string       
+    Comments_nerve_clinic                string   
+	Has_a_bone_disease                   bool       
+    Bone_disease                        string    
+	Relationship_bone_with_diabetes     string    
+    Comments_bone_clinic                string
+	Has_a_urinary_disease                  bool        
+    Urinary_disease                        string  
+	Relationship_urinary_with_diabetes     string      
+    Comments_urinary_clinic                string  
+	Speed     string
+	Type      []string      
+
 }

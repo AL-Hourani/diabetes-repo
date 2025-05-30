@@ -43,7 +43,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/deleteCenter",h.handleDeleteCenter).Methods(http.MethodDelete)
 	router.HandleFunc("/addReviewe",h.handleAddReviewe).Methods("POST")
 	router.HandleFunc("/reviewdelete/{id}", h.handleDeleteReview).Methods("DELETE")
-
+    // router.HandleFunc("/getRevieweData/{id}", h.handleGetRevieweData).Methods("GET")
 
 }
 
@@ -621,3 +621,23 @@ func (h *Handler) handleDeleteReview(w http.ResponseWriter, r *http.Request) {
 		"message": "Review deleted successfully",
 	})
 }
+
+
+
+
+
+
+
+
+
+// func (h *Handler) handleGetRevieweData(w http.ResponseWriter, r *http.Request) {
+	
+// 	vars := mux.Vars(r)
+// 	idStr, ok := vars["id"]
+// 	if !ok {
+// 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("review ID is required"))
+// 		return
+// 	}
+
+
+// }

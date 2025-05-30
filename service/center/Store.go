@@ -829,3 +829,15 @@ func (s *Store) DeleteReviewByID(reviewID int) error {
 	}
 	return nil
 }
+
+
+
+// func (s *Store) GetAllReviewsData(reviewID int) *types.GetReviwe {
+
+// 	rows , err := s.db.Query("SELECT * FROM centers WHERE centerCity=$1" , cityName)
+// 	if err != nil {
+// 		return nil
+// 	}
+
+// 	defer rows.Close()
+// }
