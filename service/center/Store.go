@@ -832,12 +832,80 @@ func (s *Store) DeleteReviewByID(reviewID int) error {
 
 
 
-// func (s *Store) GetAllReviewsData(reviewID int) *types.GetReviwe {
 
-// 	rows , err := s.db.Query("SELECT * FROM centers WHERE centerCity=$1" , cityName)
-// 	if err != nil {
-// 		return nil
-// 	}
+func (s *Store) GetReviewByID(reviewID int) (*types.ReviewResponse, error) {
+	var review types.ReviewResponse
 
-// 	defer rows.Close()
-// }
+	// 1. استعلام جدول reviews
+	queryReview := `
+	SELECT 
+	    address_patient, wight, length_patient, sugarType, otherDisease,
+		historyOfFamilyDisease, diseaseDetection, gender, hemoglobin, grease,
+		urineAcid, bloodPressure, cholesterol, LDL, HDL, creatine, normal_clucose,
+		clucose_after_meal, triple_grease, hba1c, comments
+	FROM reviews WHERE id = $1
+	`
+	var historyJSON []byte
+	err := s.db.QueryRow(queryReview, reviewID).Scan(
+		&review.Address, &review.Weight, &review.LengthPatient, &review.SugarType, &review.OtherDisease,
+		&historyJSON, &review.HistoryOfDiseaseDetection, &review.Gender, &review.Hemoglobin, &review.Grease,
+		&review.UrineAcid, &review.BloodPressure, &review.Cholesterol, &review.LDL, &review.HDL,
+		&review.Creatine, &review.NormalGlocose, &review.GlocoseAfterMeal, &review.TripleGrease,
+		&review.Hba1c, &review.Coments,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get review: %w", err)
+	}
+	_ = json.Unmarshal(historyJSON, &review.HistoryOfFamilyDisease)
+
+	// 2. استعلام العيادات الفرعية (مثال: العيون)
+	s.db.QueryRow(`
+		SELECT has_a_eye_disease, in_kind_disease, relationship_with_diabetes, comments 
+		FROM eyes_clinic WHERE review_id = $1
+	`, reviewID).Scan(
+		&review.HasAEyeDisease,
+		&review.InKindDisease,
+		&review.RelationshipEyesWithDiabetes,
+		&review.CommentsEyesClinic,
+	)
+	// لا تتعامل مع الخطأ إن لم تكن النتائج موجودة لأن بعضها اختياري
+
+	// 3. استعلام باقي العيادات (نفس الطريقة):
+	s.db.QueryRow(`SELECT has_a_heart_disease, heart_disease, relationship_with_diabetes, comments FROM heart_clinic WHERE review_id = $1`,
+		reviewID).Scan(&review.HasAHeartDisease, &review.HeartDisease, &review.RelationshipHeartWithDiabetes, &review.CommentsHeartClinic)
+
+	s.db.QueryRow(`SELECT has_a_nerve_disease, nervous_disease, relationship_with_diabetes, comments FROM nerve_clinic WHERE review_id = $1`,
+		reviewID).Scan(&review.HasANerveDisease, &review.NerveDisease, &review.RelationshipNerveWithDiabetes, &review.CommentsNerveClinic)
+
+	s.db.QueryRow(`SELECT has_a_bone_disease, nervous_disease, relationship_with_diabetes, comments FROM bone_clinic WHERE review_id = $1`,
+		reviewID).Scan(&review.HasABoneDisease, &review.BoneDisease, &review.RelationshipBoneWithDiabetes, &review.CommentsBoneClinic)
+
+	s.db.QueryRow(`SELECT has_a_urinary_disease, nervous_disease, relationship_with_diabetes, comments FROM urinary_clinic WHERE review_id = $1`,
+		reviewID).Scan(&review.HasAUrinaryDisease, &review.UrinaryDisease, &review.RelationshipUrinaryWithDiabetes, &review.CommentsUrinaryClinic)
+
+	// 4. استعلام العلاج والأدوية
+	var treatmentID int
+	var treatmentTypesJSON []byte
+	err = s.db.QueryRow(`SELECT id, treatment_type, speed FROM treatments WHERE review_id = $1`, reviewID).
+		Scan(&treatmentID, &treatmentTypesJSON, &review.Treatments.Speed)
+	if err == nil {
+		_ = json.Unmarshal(treatmentTypesJSON, &review.Treatments.Type)
+
+		rows, err := s.db.Query(`
+			SELECT d.name, td.units, td.dosage_per_day 
+			FROM treatment_drugs td
+			JOIN drugs d ON td.drug_id = d.id
+			WHERE td.treatment_id = $1`, treatmentID)
+		if err == nil {
+			defer rows.Close()
+			for rows.Next() {
+				var drug types.DrugR
+				if err := rows.Scan(&drug.Name, &drug.Units, &drug.DosagePerDay); err == nil {
+					review.Treatments.Drugs = append(review.Treatments.Drugs, drug)
+				}
+			}
+		}
+	}
+
+	return &review, nil
+}

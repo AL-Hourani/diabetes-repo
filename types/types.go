@@ -235,6 +235,7 @@ type CenterStore interface {
 	GetReviewsByPatientID(patientID int) ([]Review, error)
 	DeleteReviewByID(reviewID int) error 
 	GreateLoginFailed(center_login InsertLogin) error 
+	GetReviewByID(reviewID int) (*ReviewResponse, error) 
 }
 
 type Center struct {
@@ -413,8 +414,8 @@ type AddReviwePayload struct {
 	Weight            					string       `json:"weight"`
 	LengthPatient     					string       `json:"length_patient"`
 	SugarType         					string       `json:"sugarType"`
-    OtherDisease      					string     `json:"otherDisease"`
-    HistoryOfFamilyDisease  			[]string       `json:"historyOfFamilyDisease"`
+    OtherDisease      					string       `json:"otherDisease"`
+    HistoryOfFamilyDisease  			[]string     `json:"historyOfFamilyDisease"`
     HistoryOfDiseaseDetection           string       `json:"historyOfdiseaseDetection"`
     Gender                              string       `json:"gender"`
     Hemoglobin                          string       `json:"hemoglobin"`
@@ -469,7 +470,6 @@ type AddReviwePayload struct {
     Urinary_disease                        string       `json:"urinary_disease"`
 	Relationship_urinary_with_diabetes     bool       `json:"relationship_urinary_with_diabetes"`
     Comments_urinary_clinic                string       `json:"Comments_urinary_clinic"`
-
 
 
 }
@@ -633,4 +633,74 @@ type GetReviwe struct {
 	Speed     string
 	Type      []string      
 
+}
+
+
+
+
+
+
+
+//response review vvvv
+type DrugR struct {
+	Name           string `json:"name"`
+	Units          string `json:"units"`
+	DosagePerDay   string `json:"dosage_per_day"`
+}
+
+type TreatmentR struct {
+	Type  []string `json:"type"`
+	Speed string   `json:"speed"`
+	Drugs []DrugR   `json:"druges"`
+}
+
+type ReviewResponse struct {
+	Address                        string   `json:"address"`
+	Weight                         string   `json:"weight"`
+	LengthPatient                  string   `json:"length_patient"`
+	SugarType                      string   `json:"sugarType"`
+	OtherDisease                   string   `json:"otherDisease"`
+	HistoryOfFamilyDisease         []string `json:"historyOfFamilyDisease"`
+	HistoryOfDiseaseDetection      string   `json:"historyOfdiseaseDetection"`
+	Gender                         string   `json:"gender"`
+	Hemoglobin                     string   `json:"hemoglobin"`
+	Grease                         string   `json:"grease"`
+	UrineAcid                      string   `json:"urineAcid"`
+	BloodPressure                  string   `json:"bloodPressure"`
+	Cholesterol                    string   `json:"cholesterol"`
+	LDL                            string   `json:"ldl"`
+	HDL                            string   `json:"hdl"`
+	Creatine                       string   `json:"creatine"`
+	NormalGlocose                  string   `json:"normal_glocose"`
+	GlocoseAfterMeal               string   `json:"Glocose_after_Meal"`
+	TripleGrease                   string   `json:"triple_grease"`
+	Hba1c                          string   `json:"hba1c"`
+	Coments                        string   `json:"coments"`
+
+	Treatments                     TreatmentR `json:"treatments"`
+
+	HasAEyeDisease                 bool     `json:"has_a_eye_disease"`
+	InKindDisease                 string   `json:"in_kind_disease"`
+	RelationshipEyesWithDiabetes  bool     `json:"relationship_eyes_with_diabetes"`
+	CommentsEyesClinic            string   `json:"Comments_eyes_clinic"`
+
+	HasAHeartDisease              bool     `json:"has_a_heart_disease"`
+	HeartDisease                  string   `json:"Heart_disease"`
+	RelationshipHeartWithDiabetes bool     `json:"relationship_heart_with_diabetes"`
+	CommentsHeartClinic           string   `json:"Comments_heart_clinic"`
+
+	HasANerveDisease              bool     `json:"has_a_nerve_disease"`
+	NerveDisease                  string   `json:"nerve_disease"`
+	RelationshipNerveWithDiabetes bool     `json:"relationship_nerve_with_diabetes"`
+	CommentsNerveClinic           string   `json:"Comments_nerve_clinic"`
+
+	HasABoneDisease               bool     `json:"has_a_bone_disease"`
+	BoneDisease                   string   `json:"bone_disease"`
+	RelationshipBoneWithDiabetes  bool     `json:"relationship_bone_with_diabetes"`
+	CommentsBoneClinic            string   `json:"Comments_bone_clinic"`
+
+	HasAUrinaryDisease            bool     `json:"has_a_urinary_disease"`
+	UrinaryDisease                string   `json:"urinary_disease"`
+	RelationshipUrinaryWithDiabetes bool   `json:"relationship_urinary_with_diabetes"`
+	CommentsUrinaryClinic         string   `json:"Comments_urinary_clinic"`
 }

@@ -43,7 +43,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/deleteCenter",h.handleDeleteCenter).Methods(http.MethodDelete)
 	router.HandleFunc("/addReviewe",h.handleAddReviewe).Methods("POST")
 	router.HandleFunc("/reviewdelete/{id}", h.handleDeleteReview).Methods("DELETE")
-    // router.HandleFunc("/getRevieweData/{id}", h.handleGetRevieweData).Methods("GET")
+    router.HandleFunc("/getRevieweData/{id}", h.handleGetRevieweData).Methods("GET")
 
 }
 
@@ -630,14 +630,28 @@ func (h *Handler) handleDeleteReview(w http.ResponseWriter, r *http.Request) {
 
 
 
-// func (h *Handler) handleGetRevieweData(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) handleGetRevieweData(w http.ResponseWriter, r *http.Request) {
 	
-// 	vars := mux.Vars(r)
-// 	idStr, ok := vars["id"]
-// 	if !ok {
-// 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("review ID is required"))
-// 		return
-// 	}
+	vars := mux.Vars(r)
+	idStr, ok := vars["id"]
+	if !ok {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("review ID is required"))
+		return
+	}
+	reviewID, err := strconv.Atoi(idStr)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid review ID"))
+		return
+	}
 
 
-// }
+
+	reviweData , err := h.store.GetReviewByID(reviewID)
+    if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("error Get Reviwe Data"))
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK,reviweData )
+
+}
