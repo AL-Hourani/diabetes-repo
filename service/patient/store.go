@@ -236,6 +236,33 @@ func (s *Store) GetUserByEmail(email string) (*types.UserLoginData, error) {
 }
 
 
+func (s *Store) GetUserByID(id int) (*types.UserLoginData, error) {
+
+	query := "SELECT * FROM login_serach  WHERE id = $1;"
+
+
+    row := s.db.QueryRow(query, id)
+	
+	user := new(types.UserLoginData)
+
+	err := row.Scan(
+		&user.ID,
+		&user.Email,
+		&user.Password,
+		&user.Role,
+
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("user not found")
+		}
+		return nil, err
+	}
+
+	return user , nil
+}
+
+
 
 
 

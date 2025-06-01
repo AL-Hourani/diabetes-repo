@@ -27,6 +27,7 @@ type PatientStore interface {
 	GetCityStats() ([]*CityStat, error)
 	 GetUserByEmailRestPassword(email string) error 
 	  UpdatePasswordByEmail(email, newPassword string) error 
+    GetUserByID(id int) (*UserLoginData, error) 
    
 }
 
