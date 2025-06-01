@@ -576,6 +576,17 @@ func (h *Handler) handleAddReviewe (w http.ResponseWriter, r *http.Request) {
 
 
 
+	newConfirmAccount := types.ConfirmAccount {
+		ID: AddReviewsPayload.PatientID,
+		IsCompleted: true,
+	}
+	err = h.store.UpdateIsCompletedPatientField(newConfirmAccount)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest ,err)
+	}
+
+
+
 
 	utils.WriteJSON(w , http.StatusOK , map[string]string{
 		"message": "Review added successfully",

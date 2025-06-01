@@ -1,63 +1,37 @@
 package mail
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"net/http"
+	"log"
 
-	"github.com/AL-Hourani/care-center/config"
-	"github.com/AL-Hourani/care-center/types"
+	"github.com/AL-Hourani/care-center/service/auth"
+	"github.com/resend/resend-go/v2"
 )
 
+func Mailer(email string , name string) error {
 
-func SendOTP(ToEmail, otpCode string , companyName string , userName string) error {
+    apiKey := "re_Mqmq3x92_4y5ZSCrJh8bGX9xJV4MSMPV1"
 
-	apiKey :=config.GetEnv("SENDGRID_API_KEY" , "")
-	url := "https://api.brevo.com/v3/smtp/email"
+    client := resend.NewClient(apiKey)
 
-	emailRequest := types.EmailRequest{
-		Sender: types.SenderInfo{
-			Name: companyName,
-			Email: "diabetes.care.center.syria@gmail.com",
-		},
-		To: []types.Recipient{
-			{Email:ToEmail, Name: userName},
-		},
-		Subject:     "Hello from center!",
-		HTMLContent: fmt.Sprintf("<h1>Hello, this is your otp code is : %s !</h1>",otpCode),
-	}
-
-
-	payload, err := json.Marshal(emailRequest)
+	//generate api ........
+	otp , err  := auth.GenerateOTP(email)
+	subject := fmt.Sprintf("مرحبًا %s، هذا رمز التحقق الخاص بك", name)
 	if err != nil {
-		return err
+		log.Fatal("error generate otp")
 	}
 
+    params := &resend.SendEmailRequest{
+        From:    "diabetes-care-centers.gmail.com",
+        To:      []string{email},
+        Subject: subject,
+        Html:    fmt.Sprintf("<h2>رمز التحقق الخاص بك هو: <strong>%s</strong></h2>", otp),
+    }
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
+    _ , err = client.Emails.Send(params)
 	if err != nil {
-		return err
-	}
+        log.Fatalf("فشل الإرسال: %v", err)
+    }
 
-	// تعيين الرؤوس المطلوبة
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("api-key", apiKey)
-
-	// إرسال الطلب
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Println("Error in sending otp", err)
-		return err
-	}
-	defer resp.Body.Close()
-
-	
-	if resp.StatusCode == http.StatusCreated {
-		return nil
-	} 
-
-	return nil
-
+	return err
 }
