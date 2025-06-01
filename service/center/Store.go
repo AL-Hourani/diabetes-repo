@@ -178,7 +178,7 @@ func (s *Store) GetReviewsByPatientID(patientID int) ([]types.Review, error) {
 //this is not completed
 
 func (s *Store) GetPatientsForCenter(CenterID int) ([]types.CardData , error) {
-	rows , err := s.db.Query("SELECT id,fullName,email,date,phone,id_number,isCompleted,sugarType , TO_CHAR(createAt, 'YYYY-MM-DD') FROM patients WHERE center_id=$1",CenterID)
+	rows , err := s.db.Query("SELECT id,fullName,email,date,phone,id_number,isCompleted,sugarType , TO_CHAR(createAt, 'DD-MM-YYYY') FROM patients WHERE center_id=$1",CenterID)
 	if err != nil {
 		return nil , err
 	}
