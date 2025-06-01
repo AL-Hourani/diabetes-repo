@@ -7,6 +7,7 @@ import (
 
 	"github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/service/auth"
+	"github.com/AL-Hourani/care-center/service/session"
 	"github.com/AL-Hourani/care-center/types"
 	"github.com/AL-Hourani/care-center/utils"
 	"github.com/golang-jwt/jwt/v5"
@@ -18,12 +19,14 @@ import (
 type Handler struct {
 	store types.CenterStore
     pStore types.PatientStore
+	SessionManager *session.Manager
 }
 
-func NewHandler(store types.CenterStore , patientStore types.PatientStore) *Handler {
+func NewHandler(store types.CenterStore , patientStore types.PatientStore , sessionManager session.Manager) *Handler {
 	return &Handler {
 		store: store,
 		pStore: patientStore,
+		SessionManager: &sessionManager,
 	}
 }
 
@@ -118,9 +121,8 @@ func (h *Handler) handleCenterRegister(w http.ResponseWriter , r *http.Request) 
 		Password:hashedPassword ,
 	}
 	
-	err = h.store.GreateLoginFailed(newLoginFailed)
+	err = h.store.GreateLoginFailedCenter(newLoginFailed)
 	
-
 	if err != nil {
 		utils.WriteError(w , http.StatusBadRequest ,err)
 		return 

@@ -25,6 +25,8 @@ type PatientStore interface {
 	GetSugarTypeAgeRangeStatsAllSystem() ([]*SugarAgeRangeStat, error)
     GetBMIStats(centerID int) ([]*BMIStat, error)
 	GetCityStats() ([]*CityStat, error)
+	 GetUserByEmailRestPassword(email string) error 
+	  UpdatePasswordByEmail(email, newPassword string) error 
    
 }
 
@@ -156,12 +158,10 @@ type LoginPayload struct {
 
 //البيانات المشتركة 
 type UserLoginData struct {
-	Role       string  `json:"role"`
-	ID         int     `json:"id"`
-	Name       string  `json:"name"`
+    ID         int
 	Email      string  `json:"email"`
 	Password   string  `json:"-"`
-	CenterName *string `json:"centerName,omitempty"`
+	Role       string  `json:"role"`
 }
 
 
@@ -236,6 +236,7 @@ type CenterStore interface {
 	DeleteReviewByID(reviewID int) error 
 	GreateLoginFailed(center_login InsertLogin) error 
 	GetReviewByID(reviewID int) (*ReviewResponse, error) 
+	GreateLoginFailedCenter(center_login InsertLogin) error 
 }
 
 type Center struct {
@@ -703,4 +704,28 @@ type ReviewResponse struct {
 	UrinaryDisease                string   `json:"urinary_disease"`
 	RelationshipUrinaryWithDiabetes bool   `json:"relationship_urinary_with_diabetes"`
 	CommentsUrinaryClinic         string   `json:"Comments_urinary_clinic"`
+}
+
+
+
+
+
+
+
+
+
+
+// resetpassword 
+
+
+
+type Email struct {
+	Email      string    `json:"email"`
+}
+
+type OTPResetPass struct {
+   OTP         string    `json:"otp"`
+}
+type ResetPassword struct {
+   NewPassword         string    `json:"newPassword"`
 }

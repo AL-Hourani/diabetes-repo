@@ -1,0 +1,2 @@
+ALTER TABLE login_serach 
+ADD COLUMN role VARCHAR(50) DEFAULT 'patient' NOT NULL;

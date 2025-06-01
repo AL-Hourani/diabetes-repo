@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-
+	"github.com/AL-Hourani/care-center/service/auth"
 	"github.com/AL-Hourani/care-center/types"
 )
 
@@ -210,32 +210,20 @@ func scanRowIntoPatientDeatials(rows *sql.Row) (*types.PatientDetails , error ){
 
 
 func (s *Store) GetUserByEmail(email string) (*types.UserLoginData, error) {
-	query := `
-	(
-		SELECT 'patient' AS role, id, fullName AS name, email, password, NULL AS centerName
-		FROM patients
-		WHERE email = $1
-	)
-	UNION 
-	(
-		SELECT 'center' AS role, id, centerName AS name, centerEmail AS email, centerPassword AS password, centerName
-		FROM centers
-		WHERE centerEmail = $2
-	)
-	ORDER BY role
-	LIMIT 1`
 
-    row := s.db.QueryRow(query, email, email)
+	query := "SELECT * FROM login_serach  WHERE email = $1;"
+
+
+    row := s.db.QueryRow(query, email)
 	
 	user := new(types.UserLoginData)
 
 	err := row.Scan(
-		&user.Role,
 		&user.ID,
-		&user.Name,
 		&user.Email,
 		&user.Password,
-		&user.CenterName,
+		&user.Role,
+
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -682,4 +670,63 @@ func (s *Store) GetUpdatePatientProfile(id int) (*types.GetPatientUpdateProfile 
 	}
 
 	return patientProfile , nil
+}
+
+
+
+
+
+
+//reset password 
+
+func  (s *Store) GetUserByEmailRestPassword(email string) error {
+	rows , err := s.db.Query("SELECT email FROM login_serach WHERE email=$1",email)
+	if err != nil {
+		return  err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		_ , err = scanRowIntoUsertabele(rows)
+		if err != nil {
+			return  err
+		}
+	}
+
+
+	return nil
+}
+
+func scanRowIntoUsertabele(rows *sql.Rows) (*types.Email , error ){
+	email := new(types.Email)
+
+	err := rows.Scan(
+		&email.Email,
+	)
+	
+	if err  != nil {
+		return nil , err
+	}
+
+	return email , nil
+}
+
+
+
+
+func (s *Store) UpdatePasswordByEmail(email, newPassword string) error {
+    // تشفير كلمة المرور الجديدة
+ 	hashedPassword , err := auth.HashPassword(newPassword)
+	if err != nil {
+	   return err
+	}
+
+    // تحديث كلمة المرور في قاعدة البيانات
+    _, err = s.db.Exec(`
+        UPDATE login_serach  
+        SET password = $1 
+        WHERE email = $2
+    `, string(hashedPassword), email)
+
+    return err
 }

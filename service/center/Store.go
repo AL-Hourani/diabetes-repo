@@ -134,6 +134,17 @@ func (s *Store)	 GreateLoginFailed(center_login types.InsertLogin) error  {
 
 
 
+func (s *Store)	 GreateLoginFailedCenter(center_login types.InsertLogin) error  {
+	_ , err := s.db.Exec("INSERT INTO login_serach (email , password , role) VALUES ($1, $2 ,$3 )" , center_login.Email , center_login.Password , "center")
+	if err  != nil {
+		return err
+	}
+
+	return nil
+}
+
+
+
 
 
 func (s *Store) GetReviewsByPatientID(patientID int) ([]types.Review, error) {

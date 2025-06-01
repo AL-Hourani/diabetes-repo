@@ -9,6 +9,7 @@ import (
 	"github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/mail"
 	"github.com/AL-Hourani/care-center/service/auth"
+	"github.com/AL-Hourani/care-center/service/session"
 
 	// "github.com/AL-Hourani/care-center/service/patient"
 	"github.com/AL-Hourani/care-center/types"
@@ -20,10 +21,11 @@ import (
 type Handler struct {
 	store types.PatientStore
 	storeCenter types.CenterStore
+	SessionManager *session.Manager
 }
 
-func NewHandler(store types.PatientStore , centerStore types.CenterStore ) *Handler {
-	return &Handler{store: store , storeCenter: centerStore }
+func NewHandler(store types.PatientStore , centerStore types.CenterStore , sessionManager session.Manager) *Handler {
+	return &Handler{store: store , storeCenter: centerStore , SessionManager: &sessionManager }
 }
 
 func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
@@ -36,6 +38,10 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/verifyOtp", h.VerifyOTPHandler).Methods("POST")
 	router.HandleFunc("/updatePatientProfile", h.handleUpdatePatientProfile).Methods(http.MethodPatch)
 	router.HandleFunc("/CenterStatistics/{id}",h.handleStatisticsSugerType).Methods("GET")
+	router.HandleFunc("/sendEmail",h.handleVerifyEmail).Methods("POST")
+	router.HandleFunc("/verfiyOTPResetPassword",h.handleVerifyOTP).Methods("POST")
+	router.HandleFunc("/resetPassword",h.handleResetPassword).Methods("POST")
+
 
 }
 
@@ -84,24 +90,35 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 			return
 		}
 
+
 		if user.Role == "patient" {
+		   patient , err  := h.store.GetPatientByEmail(user.Email)
+		   if err != nil {
+			   utils.WriteError(w, http.StatusInternalServerError, err)
+			   return
+		   }
 			returnLoggingData := types.ReturnLoggingData{
-				ID:          user.ID,
-				Name:        user.Name,
+				ID:          patient.ID,
+				Name:        patient.FullName,
 				Email:       user.Email,
-				Role:        "patient",
+				Role:        user.Role,
 				IsCompletes:  false,
 				Token:        token,
 			}
 			utils.WriteJSON(w, http.StatusOK, returnLoggingData)
 		} else {
 
+		  center , err  := h.storeCenter.GetCenterByEmail(user.Email)
+		   if err != nil {
+			   utils.WriteError(w, http.StatusInternalServerError, err)
+			   return
+		   }
 	
 			returnLoggingData := types.ReturnLoggingCenterData{
-			    ID:      user.ID,      
-				Name:    user.Name,
+			    ID:      center.ID,      
+				Name:    center.CenterName,
 				Email:   user.Email,
-				Role:    "center",
+				Role:    user.Role,
 				Token:   token,
 			}
 			utils.WriteJSON(w, http.StatusOK, returnLoggingData)
@@ -486,5 +503,105 @@ func (h *Handler) handleStatisticsSugerType(w http.ResponseWriter , r *http.Requ
 	}
 
 	utils.WriteJSON(w, http.StatusOK, response)
+
+}
+
+
+
+
+
+//reste password
+
+func (h *Handler) handleVerifyEmail(w http.ResponseWriter , r *http.Request) {
+	var emailPayload types.Email
+	if err := utils.ParseJSON(r , &emailPayload); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+		return
+	}
+
+	err := h.store.GetUserByEmailRestPassword(emailPayload.Email)
+	if err != nil {
+		utils.WriteError(w , http.StatusNotFound , err)
+	}
+
+	// send otp 
+
+
+	err = h.SessionManager.SetValue(w, r, "reset-session", "resetEmail", emailPayload.Email)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+
+	utils.WriteJSON(w, http.StatusAccepted, map[string]string{
+		"message": "OTP sent. Please verify to complete Reset Password.",
+	})
+
+
+}
+
+func (h *Handler) handleVerifyOTP(w http.ResponseWriter , r *http.Request) {
+	var otpPayload types.OTPResetPass
+	if err := utils.ParseJSON(r , &otpPayload); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+		return
+	}
+
+	if otpPayload.OTP != "666666" {
+		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("invalid otp"))
+		return
+	}
+
+
+	// send otp 
+
+	utils.WriteJSON(w, http.StatusAccepted, map[string]string{
+		"message": "OTP verify successfully  ('_')",
+	})
+
+
+}
+func (h *Handler) handleResetPassword(w http.ResponseWriter , r *http.Request) {
+	var resetPasswordPayload types.ResetPassword
+	if err := utils.ParseJSON(r , &resetPasswordPayload); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+		return
+	}
+
+
+	    // استرجاع الإيميل من الجلسة
+    val, ok := h.SessionManager.GetValue(r, "reset-session", "resetEmail")
+    if !ok {
+        utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("no email found in session"))
+        return
+    }
+
+    email, ok := val.(string)
+    if !ok || email == "" {
+        utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("invalid email in session"))
+        return
+    }
+
+
+	// rest password......
+	err := h.store.UpdatePasswordByEmail(email, resetPasswordPayload.NewPassword)
+    if err != nil {
+        utils.WriteError(w, http.StatusInternalServerError, err)
+        return
+    }
+
+
+	    // بعد التحديث احذف الجلسة (اختياري لكن مستحسن)
+    err = h.SessionManager.ClearSession(w, r, "reset-session")
+    if err != nil {
+        utils.WriteError(w, http.StatusInternalServerError, err)
+        return
+    }
+
+    utils.WriteJSON(w, http.StatusOK, map[string]string{
+        "message": "Password updated successfully.",
+    })
+
 
 }
