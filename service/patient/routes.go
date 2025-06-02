@@ -570,35 +570,16 @@ func (h *Handler) handleResetPassword(w http.ResponseWriter , r *http.Request) {
 	}
 
 
-	    // استرجاع الإيميل من الجلسة
-    val, ok := h.SessionManager.GetValue(r, "reset-session", "resetEmail")
-    if !ok {
-        utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("no email found in session"))
-        return
-    }
-
-    email, ok := val.(string)
-    if !ok || email == "" {
-        utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("invalid email in session"))
-        return
-    }
-
-
 	// rest password......
-	err := h.store.UpdatePasswordByEmail(email, resetPasswordPayload.NewPassword)
+	err := h.store.UpdatePasswordByEmail(resetPasswordPayload.Email, resetPasswordPayload.NewPassword)
     if err != nil {
         utils.WriteError(w, http.StatusInternalServerError, err)
         return
     }
 
 
-	    // بعد التحديث احذف الجلسة (اختياري لكن مستحسن)
-    err = h.SessionManager.ClearSession(w, r, "reset-session")
-    if err != nil {
-        utils.WriteError(w, http.StatusInternalServerError, err)
-        return
-    }
-
+	
+   
     utils.WriteJSON(w, http.StatusOK, map[string]string{
         "message": "Password updated successfully.",
     })

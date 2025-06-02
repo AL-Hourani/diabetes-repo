@@ -728,5 +728,6 @@ type OTPResetPass struct {
    OTP         string    `json:"otp"`
 }
 type ResetPassword struct {
+   Email               string    `json:"email"`
    NewPassword         string    `json:"newPassword"`
 }
