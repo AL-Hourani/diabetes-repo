@@ -17,7 +17,7 @@ func NewStore(db *sql.DB) *Store {
 	return &Store{db: db}
 }
 func  (s *Store) GetPatientByEmail(email string) (*types.Patient , error) {
-	rows , err := s.db.Query("SELECT id,fullName,email,password,phone,date,id_number,isCompleted,createAt FROM patients WHERE email=$1",email)
+	rows , err := s.db.Query("SELECT id,fullName,email,password,phone,date,id_number,isCompleted,center_id,createAt FROM patients WHERE email=$1",email)
 	if err != nil {
 		return nil , err
 	}
