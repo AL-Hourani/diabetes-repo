@@ -19,7 +19,7 @@ func Mailer(email string, name string) error {
     smtpHost := "smtp.mailersend.net"
     smtpPort := "587"
     smtpUser := config.Envs.MAILERSEND_SMTP_USER   
-    smtpPassword :=config.Envs.MAILERSEND_SMTP_USER
+    smtpPassword :=config.Envs.MAILERSEND_SMTP_PASS
 
     // محتوى الرسالة
     from := smtpUser
