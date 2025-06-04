@@ -22,7 +22,7 @@ func Mailer(email string , name string) error {
 	}
 
     params := &resend.SendEmailRequest{
-        From:    "onboarding@resend.dev",
+        From:    "Acme <onboarding@resend.dev>",
         To:      []string{email},
         Subject: subject,
         Html:    fmt.Sprintf("<h2>رمز التحقق الخاص بك هو: <strong>%s</strong></h2>", otp),

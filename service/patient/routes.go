@@ -106,6 +106,7 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 				Token:        token,
 			}
 			utils.WriteJSON(w, http.StatusOK, returnLoggingData)
+			return 
 		} else {
 
 		  center , err  := h.storeCenter.GetCenterByEmail(user.Email)
