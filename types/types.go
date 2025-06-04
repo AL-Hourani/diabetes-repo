@@ -28,6 +28,7 @@ type PatientStore interface {
 	 GetUserByEmailRestPassword(email string) error 
 	  UpdatePasswordByEmail(email, newPassword string) error 
     GetUserByID(id int) (*UserLoginData, error) 
+	GetReviewsByPatientID(patientID int) ([]ReviewResponseForPatient, error) 
    
 }
 
@@ -730,4 +731,56 @@ type OTPResetPass struct {
 type ResetPassword struct {
    Email               string    `json:"email"`
    NewPassword         string    `json:"newPassword"`
+}
+
+
+
+
+
+
+// patient app---------------------------------------------------------------------------
+// =========================================================================================
+//---------------------------------------------------------end -------------------------------
+
+type ChartData struct {
+	LDL             string       `json:"ldl"`
+	HDL             string       `json:"hdl"`
+	NormalGlocose   string       `json:"normal_glocose"`
+}
+
+type GetPatientHomeData struct {
+
+	FullName		string		 `json:"fullname"`
+	Age             string		 `json:"age"`
+	IDNumber		string       `json:"id_number"`
+	ChartData       []ChartData  `json:"chartData"`
+	IsCompleted     string       `json:"isCompleted"`
+	NextReview      string       `json:"nextReview"`
+	MyReviews       []Review     `json:"myReviews"`
+
+}
+
+type ReviewResponseForPatient struct {
+	ID                             int      `json:"id"`
+	Address                        string   `json:"address"`
+	Weight                         string   `json:"weight"`
+	LengthPatient                  string   `json:"length_patient"`
+	SugarType                      string   `json:"sugarType"`
+	OtherDisease                   string   `json:"otherDisease"`
+	HistoryOfFamilyDisease         []string `json:"historyOfFamilyDisease"`
+	HistoryOfDiseaseDetection      string   `json:"historyOfdiseaseDetection"`
+	Gender                         string   `json:"gender"`
+	Hemoglobin                     string   `json:"hemoglobin"`
+	Grease                         string   `json:"grease"`
+	UrineAcid                      string   `json:"urineAcid"`
+	BloodPressure                  string   `json:"bloodPressure"`
+	Cholesterol                    string   `json:"cholesterol"`
+	LDL                            string   `json:"ldl"`
+	HDL                            string   `json:"hdl"`
+	Creatine                       string   `json:"creatine"`
+	NormalGlocose                  string   `json:"normal_glocose"`
+	GlocoseAfterMeal               string   `json:"Glocose_after_Meal"`
+	TripleGrease                   string   `json:"triple_grease"`
+	Hba1c                          string   `json:"hba1c"`
+	DateReview                     time.Time    `json:"date_review"`
 }

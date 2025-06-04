@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/AL-Hourani/care-center/config"
+	"github.com/golang-jwt/jwt/v5"
 	// "github.com/AL-Hourani/care-center/mail"
 	"github.com/AL-Hourani/care-center/service/auth"
 	"github.com/AL-Hourani/care-center/service/session"
@@ -41,6 +42,7 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/sendEmail",h.handleVerifyEmail).Methods("POST")
 	router.HandleFunc("/verfiyOTPResetPassword",h.handleVerifyOTP).Methods("POST")
 	router.HandleFunc("/resetPassword",h.handleResetPassword).Methods("POST")
+	router.HandleFunc("/gethomePatient" , h.handleGethomePatient).Methods("GET")
 
 
 }
@@ -568,6 +570,7 @@ func (h *Handler) handleVerifyOTP(w http.ResponseWriter , r *http.Request) {
 
 
 }
+
 func (h *Handler) handleResetPassword(w http.ResponseWriter , r *http.Request) {
 	var resetPasswordPayload types.ResetPassword
 	if err := utils.ParseJSON(r , &resetPasswordPayload); err != nil {
@@ -591,4 +594,85 @@ func (h *Handler) handleResetPassword(w http.ResponseWriter , r *http.Request) {
     })
 
 
+}
+
+
+
+
+
+
+// patient page app ...
+
+
+func (h *Handler) handleGethomePatient(w http.ResponseWriter , r *http.Request) {
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	id, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	patient , err  := h.store.GetPatientById(id)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		 return
+	}
+    
+
+	reviews , err := h.store.GetReviewsByPatientID(id)
+
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		 return
+	}
+
+	var chartData []types.ChartData
+    var myReviews []types.Review
+	for _, r := range reviews {
+	// 1. تعبئة ChartData
+	chartData = append(chartData, types.ChartData{
+		LDL:           r.LDL,
+		HDL:           r.HDL,
+		NormalGlocose: r.NormalGlocose,
+	})
+
+	// 2. تعبئة MyReviews
+	myReviews = append(myReviews, types.Review{
+		Id:   r.ID,
+		Date: r.DateReview.Format("02-01-2006"),
+	})
+}
+
+
+
+    var next_Reviwe string
+    var oldest string
+	if len(reviews) > 0 {
+		// نأخذ أول مراجعة (يفترض أنها مرتبة تنازليًا)
+		latest := reviews[0].DateReview
+		next_Reviwe = latest.AddDate(0, 1, 0).Format("02-01-2006")
+		oldest = reviews[len(reviews)-1].DateReview.Format("02-01-2006")
+	}
+
+
+
+	newGetPatientHomeData := types.GetPatientHomeData {
+		FullName: patient.FullName,
+		Age: patient.Age,
+		IDNumber: patient.IDNumber,
+		IsCompleted: oldest,
+		ChartData: chartData,
+		NextReview: next_Reviwe ,
+		MyReviews:myReviews,
+
+	}
+
+
+
+		utils.WriteJSON(w, http.StatusOK, newGetPatientHomeData)
 }

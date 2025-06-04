@@ -2,6 +2,7 @@ package patient
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 
 	"github.com/AL-Hourani/care-center/service/auth"
@@ -757,4 +758,56 @@ func (s *Store) UpdatePasswordByEmail(email, newPassword string) error {
     `, string(hashedPassword), email)
 
     return err
+}
+
+
+
+
+
+
+
+
+
+// app patirnt..............
+func (s *Store) GetReviewsByPatientID(patientID int) ([]types.ReviewResponseForPatient, error) {
+	var reviews []types.ReviewResponseForPatient
+
+	// 1. استعلام كل مراجعات هذا المريض من جدول reviews
+	rows, err := s.db.Query(`
+		SELECT 
+			id, address_patient, wight, length_patient, sugarType, otherDisease,
+			historyOfFamilyDisease, diseaseDetection, gender, hemoglobin, grease,
+			urineAcid, bloodPressure, cholesterol, LDL, HDL, creatine, normal_clucose,
+			clucose_after_meal, triple_grease, hba1c ,date_review 
+		FROM reviews 
+		WHERE patient_id = $1
+		ORDER BY date_review DESC
+	`, patientID)
+	if err != nil {
+		return nil, fmt.Errorf("query reviews failed: %w", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var review types.ReviewResponseForPatient
+		var historyJSON []byte
+		err := rows.Scan(
+			&review.ID, &review.Address, &review.Weight, &review.LengthPatient, &review.SugarType, &review.OtherDisease,
+			&historyJSON, &review.HistoryOfDiseaseDetection, &review.Gender, &review.Hemoglobin, &review.Grease,
+			&review.UrineAcid, &review.BloodPressure, &review.Cholesterol, &review.LDL, &review.HDL,
+			&review.Creatine, &review.NormalGlocose, &review.GlocoseAfterMeal, &review.TripleGrease,
+			&review.Hba1c,&review.DateReview,
+		)
+		if err != nil {
+			continue // يمكن تسجيل الخطأ
+		}
+		_ = json.Unmarshal(historyJSON, &review.HistoryOfFamilyDisease)
+
+		// (اختياري) استدعِ باقي العيادات أو العلاجات باستخدام review.ID
+		// ويمكنك هنا إما تجاهلها أو بناء استعلامات أخرى لجلب تفاصيل كل مراجعة.
+
+		reviews = append(reviews, review)
+	}
+
+	return reviews, nil
 }
