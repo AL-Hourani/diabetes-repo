@@ -146,19 +146,19 @@ func (h *Handler) handleGetPatients(w http.ResponseWriter , r *http.Request) {
 	}
 
 
-    user  , err := h.pStore.GetUserByID(id)
-	if err != nil {
-		http.Error(w, "error get user", http.StatusUnauthorized)
-		return
-	}
+    // user  , err := h.pStore.GetUserByID(id)
+	// if err != nil {
+	// 	http.Error(w, "error get user", http.StatusUnauthorized)
+	// 	return
+	// }
 
-	center , err := h.store.GetCenterByEmail(user.Email)
-	if err != nil {
-		http.Error(w, "error get center for patient", http.StatusUnauthorized)
-		return
-	}
+	// center , err := h.store.GetCenterByEmail(user.Email)
+	// if err != nil {
+	// 	http.Error(w, "error get center for patient", http.StatusUnauthorized)
+	// 	return
+	// }
 
-	patientsList , err := h.store.GetPatientsForCenter(center.ID)
+	patientsList , err := h.store.GetPatientsForCenter(id)
 	if err != nil {
 		utils.WriteError(w , http.StatusInternalServerError , err)
 		return
