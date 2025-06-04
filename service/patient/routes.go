@@ -42,7 +42,7 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/sendEmail",h.handleVerifyEmail).Methods("POST")
 	router.HandleFunc("/verfiyOTPResetPassword",h.handleVerifyOTP).Methods("POST")
 	router.HandleFunc("/resetPassword",h.handleResetPassword).Methods("POST")
-	router.HandleFunc("/gethomePatient" , h.handleGethomePatient).Methods("GET")
+	router.HandleFunc("/gethomePatient" ,  auth.WithJWTAuth(h.handleGethomePatient)).Methods("GET")
 
 
 }
