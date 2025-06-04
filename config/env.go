@@ -22,6 +22,8 @@ type Config struct {
 	DBSSL      string
 	JWTExpirationInSecond int64
 	JWTSecret  string
+	MAILERSEND_SMTP_USER string
+	MAILERSEND_SMTP_PASS  string
 }
 
 var Envs = initConfig()
@@ -41,6 +43,8 @@ func initConfig() Config {
 		DBName: GetEnv("DB_NAME",""),
 		DBSSL:GetEnv("SSL_MODE" , ""),
 		JWTSecret: GetEnv("JWT_SECRET",""),
+		MAILERSEND_SMTP_USER:GetEnv("MAILERSEND_SMTP_USER" , ""),
+		MAILERSEND_SMTP_PASS:GetEnv("MAILERSEND_SMTP_PASS" , ""),
 		JWTExpirationInSecond: getEnvAsInt("JWT_EXP", 3600 * 24 * 7),
 	}
 }
