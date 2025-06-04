@@ -84,13 +84,6 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 			return
 		}
 
-		// إنشاء JWT Token
-		secret := []byte(config.Envs.JWTSecret)
-		token, err := auth.CreateJWT(secret, user.ID)
-		if err != nil {
-			utils.WriteError(w, http.StatusInternalServerError, err)
-			return
-		}
 
 
 		if user.Role == "patient" {
@@ -99,6 +92,15 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 			   utils.WriteError(w, http.StatusInternalServerError, err)
 			   return
 		   }
+		   
+				// إنشاء JWT Token
+				secret := []byte(config.Envs.JWTSecret)
+				token, err := auth.CreateJWT(secret, patient.ID)
+				if err != nil {
+					utils.WriteError(w, http.StatusInternalServerError, err)
+					return
+				}
+
 			returnLoggingData := types.ReturnLoggingData{
 				ID:          patient.ID,
 				Name:        patient.FullName,
@@ -116,6 +118,14 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 			   utils.WriteError(w, http.StatusInternalServerError, err)
 			   return
 		   }
+		   			// إنشاء JWT Token
+				secret := []byte(config.Envs.JWTSecret)
+				token, err := auth.CreateJWT(secret, center.ID)
+				if err != nil {
+					utils.WriteError(w, http.StatusInternalServerError, err)
+					return
+				}
+
 	
 			returnLoggingData := types.ReturnLoggingCenterData{
 			    ID:      center.ID,      
