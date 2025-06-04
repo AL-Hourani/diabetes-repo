@@ -17,7 +17,7 @@ func NewStore(db *sql.DB) *Store {
 	return &Store{db: db}
 }
 func  (s *Store) GetPatientByEmail(email string) (*types.Patient , error) {
-	rows , err := s.db.Query("SELECT id,fullName,email,password,phone,date,id_number,isCompleted,center_id,createAt FROM patients WHERE email=$1",email)
+	rows , err := s.db.Query("SELECT id,fullName,email,password,phone,date,id_number,isCompleted,center_id,createAt,city FROM patients WHERE email=$1",email)
 	if err != nil {
 		return nil , err
 	}
@@ -41,7 +41,7 @@ func  (s *Store) GetPatientByEmail(email string) (*types.Patient , error) {
 
 
 func  (s *Store) GetPatientById(id int) (*types.Patient , error) {
-	rows , err := s.db.Query("SELECT id,fullName,email,password,phone,date,id_number,isCompleted,center_id,createAt FROM patients WHERE id=$1",id)
+	rows , err := s.db.Query("SELECT id,fullName,email,password,phone,date,id_number,isCompleted,center_id,createAt,city FROM patients WHERE id=$1",id)
 	if err != nil {
 		return nil , err
 	}
@@ -77,6 +77,7 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 		&patient.IsCompleted,
 		&patient.CenterID,
 		&patient.CreateAt,
+		&patient.City,
 	)
 	
 	if err  != nil {

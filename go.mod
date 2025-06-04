@@ -18,6 +18,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/golang-migrate/migrate/v4 v4.18.2 // indirect
+	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/gorilla/handlers v1.5.2 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/gorilla/sessions v1.4.0 // indirect
@@ -35,6 +36,7 @@ require (
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lib/pq v1.10.9 // indirect
+	github.com/mailersend/mailersend-go v1.6.1 // indirect
 	github.com/otiai10/gosseract/v2 v2.4.1 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/resend/resend-go/v2 v2.20.0 // indirect
