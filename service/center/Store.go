@@ -95,8 +95,8 @@ func scanRowIntoCenterByEmail(rows *sql.Rows) (*types.Center , error ){
 		&center.CenterName,
 		&center.CenterPassword,
 		&center.CenterEmail,
-		&center.CreateAt,
 		&center.CenterCity,
+		&center.CreateAt,
 	)
 	
 	if err  != nil {
