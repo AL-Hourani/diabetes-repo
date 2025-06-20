@@ -443,8 +443,8 @@ func (s *Store) GetCenterProfile(id int) (*types.CenterProfile, error) {
 		&center.CenterName,
 		&center.CenterPassword,
 		&center.CenterEmail,
-		&center.CreateAt,
 		&center.CenterCity,
+		&center.CreateAt,
 	)
 
 	if err != nil {
