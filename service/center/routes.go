@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/service/auth"
@@ -502,6 +503,7 @@ func (h *Handler) handleAddReviewe (w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var drugNames []string
 
 	for _, drug := range AddReviewsPayload.Treatments.Drugs {
 	drugID, err := h.store.FindOrCreateDrugByName(drug.Name)
@@ -509,6 +511,8 @@ func (h *Handler) handleAddReviewe (w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("failed to add/find drug: %w", err))
 		return
 	}
+
+	 drugNames = append(drugNames, drug.Name)
 
 	// ربط الدواء بالعلاج
 	err = h.store.InsertTreatmentDrug(types.TreatmentDrug{
@@ -635,6 +639,15 @@ func (h *Handler) handleAddReviewe (w http.ResponseWriter, r *http.Request) {
 	}
 
 
+
+
+	message := fmt.Sprintf("🩺 تمت إضافة مراجعة جديدة لك، وتشمل الأدوية التالية: %s", strings.Join(drugNames, "، "))
+
+	h.NotifHub.Broadcast <- notifications.Notification{
+    SenderID:   0, 
+    ReceiverID: AddReviewsPayload.PatientID,
+    Message:    message,
+   }
 
 
 	utils.WriteJSON(w , http.StatusOK , map[string]string{
@@ -1105,13 +1118,13 @@ func (h *Handler) handleGetAllVideos(w http.ResponseWriter, r *http.Request) {
 	}
 
 
-	articles , err := h.store.GetAllActivities(id)
+	videos , err := h.store.GetAllVideos(id)
 	if err != nil {
 			utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("failed to return  all activities: %v", err))
 			return
 	}
 
-	utils.WriteJSON(w , http.StatusOK ,  articles)
+	utils.WriteJSON(w , http.StatusOK ,  videos)
 
 
 }

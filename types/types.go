@@ -29,6 +29,7 @@ type PatientStore interface {
 	  UpdatePasswordByEmail(email, newPassword string) error 
     GetUserByID(id int) (*UserLoginData, error) 
 	GetReviewsByPatientID(patientID int) ([]ReviewResponseForPatient, error) 
+
    
 }
 
@@ -249,6 +250,7 @@ type CenterStore interface {
 
 	Addvideo(video Video) error
 	GetVideoForCenter(centerID int) ([]GetVideos , error)
+	GetAllVideos(centerID int) ([]ReturnAllvideo , error)
 }
 
 type Center struct {

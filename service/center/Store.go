@@ -1272,7 +1272,7 @@ func scanRowIntoVideo(rows *sql.Rows) (*types.GetVideos , error ){
 
 
 
-func (s *Store) GetAllVideos() ([]types.ReturnAllvideo , error) {
+func (s *Store) GetAllVideos(centerID int) ([]types.ReturnAllvideo , error) {
 	rows , err := s.db.Query("SELECT center_id ,  title  , TO_CHAR(createAt, 'DD-MM-YYYY') , video_url , short_text FROM videos ")
 	if err != nil {
 		return nil , err
