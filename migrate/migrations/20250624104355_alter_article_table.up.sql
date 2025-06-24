@@ -1,0 +1,8 @@
+ALTER TABLE articles 
+ADD COLUMN  IF NOT EXISTS image_url TEXT NOT NULL;
+
+
+ALTER TABLE articles 
+ADD COLUMN  IF NOT EXISTS short_text TEXT NOT NULL;
+
+

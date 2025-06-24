@@ -731,6 +731,8 @@ func (h *Handler) handleAddArticle(w http.ResponseWriter, r *http.Request) {
 		CenterID: id,
 		Title: articlePaylaod.Title,
 		Desc: articlePaylaod.Desc,
+		ImageURL: articlePaylaod.ImageURL,
+		ShortText: articlePaylaod.ShortText,
 	}
 
 	err = h.store.AddArticle(newArticles)

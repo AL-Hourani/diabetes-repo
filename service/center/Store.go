@@ -960,10 +960,10 @@ func (s *Store) GetReviewByID(reviewID int) (*types.ReviewResponse, error) {
 
 func (s *Store) AddArticle(article types.Article) error {
 	query := `
-		INSERT INTO articles (center_id, title, descr)
-		VALUES ($1, $2, $3)
+		INSERT INTO articles (center_id, title, descr , image_url , short_text)
+		VALUES ($1, $2, $3 , $4 , $5)
 	`
-	_, err := s.db.Exec(query, article.CenterID , article.Title , article.Desc)
+	_, err := s.db.Exec(query, article.CenterID , article.Title , article.Desc , article.ImageURL , article.ImageURL)
 	return err
 }
 
@@ -973,7 +973,7 @@ func (s *Store) AddArticle(article types.Article) error {
 
 
 func (s *Store) GetArticlesForCenter(centerID int) ([]types.GetArticles , error) {
-	rows , err := s.db.Query("SELECT title , descr , TO_CHAR(createAt, 'DD-MM-YYYY') FROM articles WHERE center_id=$1" , centerID)
+	rows , err := s.db.Query("SELECT title , descr , TO_CHAR(createAt, 'DD-MM-YYYY') ,  image_url , short_text FROM articles WHERE center_id=$1" , centerID)
 	if err != nil {
 		return nil , err
 	}
@@ -999,6 +999,9 @@ func scanRowIntoArticle(rows *sql.Rows) (*types.GetArticles , error ){
 		&article.Title,
 		&article.Desc,
 		&article.CreateAt,
+		&article.ImageURL,
+		&article.ShortText,
+
 	)
 	
 	if err  != nil {
@@ -1010,7 +1013,7 @@ func scanRowIntoArticle(rows *sql.Rows) (*types.GetArticles , error ){
 
 
 func (s *Store) GetAllArticles(centerID int) ([]types.ReturnAllArticle , error) {
-	rows , err := s.db.Query("SELECT center_id ,  title , descr , TO_CHAR(createAt, 'DD-MM-YYYY') FROM articles WHERE center_id=$1" , centerID)
+	rows , err := s.db.Query("SELECT center_id ,  title , descr , TO_CHAR(createAt, 'DD-MM-YYYY') , image_url , short_text FROM articles WHERE center_id=$1" , centerID)
 	if err != nil {
 		return nil , err
 	}
@@ -1033,6 +1036,8 @@ func (s *Store) GetAllArticles(centerID int) ([]types.ReturnAllArticle , error) 
 				Title: p.Title,
 				Desc: p.Desc,
 				CreateAt: p.CreateAt,
+				ImageURL: p.ImageURL,
+				ShortText: p.ShortText,
 			}
 
 		articles = append(articles, newReturnArticles)
@@ -1052,6 +1057,8 @@ func scanRowIntoAllArticle(rows *sql.Rows) (*types.AllArticles , error ){
 		&article.Title,
 		&article.Desc,
 		&article.CreateAt,
+		&article.ImageURL,
+		&article.ShortText,
 	)
 	
 	if err  != nil {

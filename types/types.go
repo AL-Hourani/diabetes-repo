@@ -809,46 +809,42 @@ type ReviewResponseForPatient struct {
 // articles 
 type ArticlePayload struct {
 	Title     string		 `json:"title"`
+	ShortText string         `json:"shortText"` 
 	Desc      string         `json:"desc"`
+	ImageURL  string         `json:"imageURL"` 
 }
+
 type Article struct {
 	CenterID  int
 	Title     string		 
-	Desc      string         
+	Desc      string     
+	ImageURL  string         
+	ShortText string          
 }
 type GetArticles struct {
 	Title     string		 `json:"title"`
 	Desc      string         `json:"desc"`
 	CreateAt  string         `json:"createAt"`
+	ImageURL  string         `json:"imageURL"` 
+	ShortText string         `json:"shortText"` 
 }
 type AllArticles struct {
 	CenterID  int
 	Title     string		 
 	Desc      string         
-	CreateAt  string         
+	CreateAt  string   
+	ImageURL  string         
+	ShortText string          
+
 }
 type ReturnAllArticle struct {
 	CenterName string        `json:"centerName"`
 	Title      string		 `json:"title"`
 	Desc       string         `json:"desc"`
 	CreateAt   string         `json:"createAt"`
+	ImageURL  string         `json:"imageURL"` 
+	ShortText string         `json:"shortText"` 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
