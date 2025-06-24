@@ -220,7 +220,8 @@ func (s *Store) GetReviewsByPatientID(patientID int) ([]types.Review, error) {
 func (s *Store) GetSugarTypeByReviewID(reviewID int) (string, error) {
     var sugarType sql.NullString
 
-    query := `SELECT sugarType FROM reviews WHERE id = $1`
+    query := `SELECT sugarType FROM reviews WHERE id = $1 ORDER BY date_review ASC, id ASC
+        LIMIT 1`
     err := s.db.QueryRow(query, reviewID).Scan(&sugarType)
     if err != nil {
         if errors.Is(err, sql.ErrNoRows) {
