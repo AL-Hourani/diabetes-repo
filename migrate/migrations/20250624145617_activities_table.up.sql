@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS activites (
+    id SERIAL PRIMARY KEY,
+    center_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL UNIQUE,
+    short_text TEXT NOT NULL,
+    descr TEXT NOT NULL,
+    image_url TEXT NOT NULL,
+
+    createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_center FOREIGN KEY (center_id) REFERENCES centers(id) ON DELETE CASCADE
+);

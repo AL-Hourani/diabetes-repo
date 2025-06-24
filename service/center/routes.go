@@ -56,6 +56,17 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/createArticle",auth.WithJWTAuth(h.handleAddArticle)).Methods("POST")
 	router.HandleFunc("/getArticleForCenter",auth.WithJWTAuth(h.handleGetArticleForCenter)).Methods("GET")
 	router.HandleFunc("/getAllArticles",auth.WithJWTAuth(h.handleGetAllArticles)).Methods("GET")
+
+
+	// activities 
+	router.HandleFunc("/createActivity",auth.WithJWTAuth(h.handleAddActivity)).Methods("POST")
+	router.HandleFunc("/getActivitiesForCenter",auth.WithJWTAuth(h.handleGetActivityForCenter)).Methods("GET")
+	router.HandleFunc("/getAllActivities",auth.WithJWTAuth(h.handleGetAllActivities)).Methods("GET")
+
+
+
+
+
     router.HandleFunc("/ws/notifications", h.NotifHub.HandleWS)
 
 	router.HandleFunc("/sendNotification", auth.WithJWTAuth(h.handleSendNotification)).Methods("POST")
@@ -792,7 +803,7 @@ func (h *Handler) handleGetAllArticles(w http.ResponseWriter, r *http.Request) {
 
 	articles , err := h.store.GetAllArticles(id)
 	if err != nil {
-			utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("failed to return  article for the center: %v", err))
+			utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("failed to return  all articles : %v", err))
 			return
 	}
 
@@ -850,3 +861,124 @@ func (h *Handler) handleSendNotification(w http.ResponseWriter, r *http.Request)
 	utils.WriteJSON(w , http.StatusOK ,  map[string]string{"message":"ok send"})
 
 }
+
+
+
+
+
+
+// handleAddActivity
+
+
+// activity 
+
+
+
+
+func (h *Handler) handleAddActivity(w http.ResponseWriter, r *http.Request) {
+	var articlePaylaod types.ArticlePayload
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	id, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	if err := utils.ParseJSON(r , &articlePaylaod); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+		return
+	}
+
+	newActivity := types.Article {
+		CenterID: id,
+		Title: articlePaylaod.Title,
+		Desc: articlePaylaod.Desc,
+		ImageURL: articlePaylaod.ImageURL,
+		ShortText: articlePaylaod.ShortText,
+	}
+
+	err = h.store.AddActivity(newActivity)
+	if err != nil {
+			utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("failed to add article: %v", err))
+			return
+	}
+
+	utils.WriteJSON(w , http.StatusOK ,  map[string]string{"message":"successfully  Add Activity"})
+
+
+}
+
+
+
+
+
+
+
+
+func (h *Handler) handleGetActivityForCenter(w http.ResponseWriter, r *http.Request) {
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	id, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+
+	activities, err := h.store.GetActivitiesForCenter(id)
+	if err != nil {
+			utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("failed to return  activity for the center: %v", err))
+	}
+
+	utils.WriteJSON(w , http.StatusOK ,  activities)
+
+
+}
+
+
+
+
+
+
+
+func (h *Handler) handleGetAllActivities(w http.ResponseWriter, r *http.Request) {
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	id, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+
+	articles , err := h.store.GetAllActivities(id)
+	if err != nil {
+			utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("failed to return  all activities: %v", err))
+			return
+	}
+
+	utils.WriteJSON(w , http.StatusOK ,  articles)
+
+
+}
+
+
+
+
+
+
+
+

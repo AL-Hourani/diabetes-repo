@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/AL-Hourani/care-center/service/auth"
@@ -16,28 +15,40 @@ func Mailer(email string, name string) error {
     if err != nil {
         return fmt.Errorf("failed to generate OTP: %v", err)
     }
+url := "https://api.emailjs.com/api/v1.0/email/send"
 
-        body := map[string]string{
-        "from":    "noreply@onresend.com",
-        "to":      email,
-        "subject": "رمز التحقق الخاص بك",
-        "html":     "<p>مرحبًا " + name + " </p><p><strong>رمز التحقق هو: " + otp + "</strong></p>",
+    data := map[string]interface{}{
+        "service_id":  "service_cruvhkn",
+        "template_id": "template_cugk7wr",
+        "user_id":     "ytF93swbS8Hw5negh", // هذا هو api key
+        "template_params": map[string]string{
+            "name":     name,
+            "otp":      otp,
+            "to_email": email,
+        },
     }
 
-    jsonData, _ := json.Marshal(body)
+    jsonData, err := json.Marshal(data)
+    if err != nil {
+        return err
+    }
 
-    req, _ := http.NewRequest("POST", "https://api.resend.com/emails", bytes.NewBuffer(jsonData))
-    req.Header.Set("Authorization", "Bearer  re_hxapdzCX_LvfsU4bqcsBjT54J8d4C8Ftr")
+    req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+    if err != nil {
+        return err
+    }
     req.Header.Set("Content-Type", "application/json")
 
     client := &http.Client{}
     resp, err := client.Do(req)
     if err != nil {
-        log.Println("فشل الإرسال:", err)
         return err
     }
     defer resp.Body.Close()
-    log.Println("تم إرسال OTP إلى:", email)
+
+    if resp.StatusCode != http.StatusOK {
+        return fmt.Errorf("failed to send email, status code: %d", resp.StatusCode)
+    }
 
     return nil
 

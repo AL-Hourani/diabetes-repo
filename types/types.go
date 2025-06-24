@@ -242,7 +242,10 @@ type CenterStore interface {
 	GreateLoginFailedCenter(center_login InsertLogin) error 
 	AddArticle(article Article) error 
 	GetArticlesForCenter(centerID int) ([]GetArticles , error)
-	 GetAllArticles(centerID int) ([]ReturnAllArticle , error)
+	GetAllArticles(centerID int) ([]ReturnAllArticle , error)
+	AddActivity(article Article) error
+	GetActivitiesForCenter(centerID int) ([]GetArticles , error)
+	GetAllActivities(centerID int) ([]ReturnAllArticle , error)
 }
 
 type Center struct {
@@ -865,3 +868,4 @@ type NotificationPayload struct {
     ReceiverID int    `json:"receiver_id"`
     Message    string `json:"message"`
 }
+

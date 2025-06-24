@@ -1069,3 +1069,139 @@ func scanRowIntoAllArticle(rows *sql.Rows) (*types.AllArticles , error ){
 
 	return article, nil
 }
+
+
+
+
+
+
+
+
+
+
+// activity
+
+
+
+func (s *Store) AddActivity(article types.Article) error {
+	query := `
+		INSERT INTO activites (center_id, title, descr , image_url , short_text)
+		VALUES ($1, $2, $3 , $4 , $5)
+	`
+	_, err := s.db.Exec(query, article.CenterID , article.Title , article.Desc , article.ImageURL , article.ShortText)
+	return err
+}
+
+
+
+
+
+
+
+func (s *Store) GetActivitiesForCenter(centerID int) ([]types.GetArticles , error) {
+	rows , err := s.db.Query("SELECT title , descr , TO_CHAR(createAt, 'DD-MM-YYYY') ,  image_url , short_text FROM activites WHERE center_id=$1" , centerID)
+	if err != nil {
+		return nil , err
+	}
+    
+	defer rows.Close()
+	articles := make([]types.GetArticles , 0)
+	for rows.Next() {
+		p , err := scanRowIntoActivity(rows)
+		if err != nil {
+			return nil , err
+		}
+		articles = append(articles, *p)
+	}
+
+	return articles , err
+
+}
+
+
+func scanRowIntoActivity(rows *sql.Rows) (*types.GetArticles , error ){
+	article := new(types.GetArticles)
+
+	err := rows.Scan(
+		&article.Title,
+		&article.Desc,
+		&article.CreateAt,
+		&article.ImageURL,
+		&article.ShortText,
+
+	)
+	
+	if err  != nil {
+		return nil , err
+	}
+
+	return article, nil
+}
+
+
+
+
+func (s *Store) GetAllActivities(centerID int) ([]types.ReturnAllArticle , error) {
+	rows , err := s.db.Query("SELECT center_id ,  title , descr , TO_CHAR(createAt, 'DD-MM-YYYY') , image_url , short_text FROM activites WHERE center_id=$1" , centerID)
+	if err != nil {
+		return nil , err
+	}
+    
+	defer rows.Close()
+	articles := make([]types.ReturnAllArticle , 0)
+	for rows.Next() {
+		p , err := scanRowIntoAllAcivity(rows)
+		if err != nil {
+			return nil , err
+		}
+
+			center , err := s.GetCenterByID(p.CenterID)
+			if err != nil {
+				return nil , err
+			}
+
+			newReturnArticles := types.ReturnAllArticle {
+				CenterName: center.CenterName,
+				Title: p.Title,
+				Desc: p.Desc,
+				CreateAt: p.CreateAt,
+				ImageURL: p.ImageURL,
+				ShortText: p.ShortText,
+			}
+
+		articles = append(articles, newReturnArticles)
+	}
+
+	return articles , err
+
+}
+
+
+
+func scanRowIntoAllAcivity(rows *sql.Rows) (*types.AllArticles , error ){
+	article := new(types.AllArticles)
+
+	err := rows.Scan(
+		&article.CenterID,
+		&article.Title,
+		&article.Desc,
+		&article.CreateAt,
+		&article.ImageURL,
+		&article.ShortText,
+	)
+	
+	if err  != nil {
+		return nil , err
+	}
+
+
+
+	return article, nil
+}
+
+
+
+
+
+
+
