@@ -960,7 +960,7 @@ func (s *Store) GetReviewByID(reviewID int) (*types.ReviewResponse, error) {
 
 func (s *Store) AddArticle(article types.Article) error {
 	query := `
-		INSERT INTO articles (center_id, title, , descr)
+		INSERT INTO articles (center_id, title, descr)
 		VALUES ($1, $2, $3)
 	`
 	_, err := s.db.Exec(query, article.CenterID , article.Title , article.Desc)
