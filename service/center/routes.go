@@ -7,6 +7,7 @@ import (
 
 	"github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/service/auth"
+	"github.com/AL-Hourani/care-center/service/notifications"
 	"github.com/AL-Hourani/care-center/service/session"
 	"github.com/AL-Hourani/care-center/types"
 	"github.com/AL-Hourani/care-center/utils"
@@ -20,15 +21,20 @@ type Handler struct {
 	store types.CenterStore
     pStore types.PatientStore
 	SessionManager *session.Manager
+	NotifHub      *notifications.Hub
 }
 
-func NewHandler(store types.CenterStore , patientStore types.PatientStore , sessionManager session.Manager) *Handler {
+func NewHandler(store types.CenterStore , patientStore types.PatientStore , sessionManager session.Manager ,  notifHub *notifications.Hub) *Handler {
 	return &Handler {
 		store: store,
 		pStore: patientStore,
 		SessionManager: &sessionManager,
+		NotifHub:       notifHub,
 	}
 }
+
+
+
 
 func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	// router.HandleFunc("/centerLogin", h.handleCenterLogin).Methods("POST")
@@ -50,6 +56,12 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/createArticle",auth.WithJWTAuth(h.handleAddArticle)).Methods("POST")
 	router.HandleFunc("/getArticleForCenter",auth.WithJWTAuth(h.handleGetArticleForCenter)).Methods("GET")
 	router.HandleFunc("/getAllArticles",auth.WithJWTAuth(h.handleGetAllArticles)).Methods("GET")
+    router.HandleFunc("/ws/notifications", h.NotifHub.HandleWS)
+
+	router.HandleFunc("/sendNotification", auth.WithJWTAuth(h.handleSendNotification)).Methods("POST")
+
+
+
 
 }
 
@@ -784,5 +796,55 @@ func (h *Handler) handleGetAllArticles(w http.ResponseWriter, r *http.Request) {
 
 	utils.WriteJSON(w , http.StatusOK ,  articles)
 
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// notifiactions 
+
+// في ملف center/handler.go مثلاً:
+func (h *Handler) handleSendNotification(w http.ResponseWriter, r *http.Request) {
+	var notificarionPayload types.NotificationPayload
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	id, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	if err := utils.ParseJSON(r , &notificarionPayload); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+		return
+	}
+
+
+
+    
+    h.NotifHub.Broadcast <- notifications.Notification{
+        SenderID:   id, // ID المركز المرسل، حط الرقم المناسب هنا
+        ReceiverID: notificarionPayload.ReceiverID,
+        Message:    notificarionPayload.Message,
+    }
+
+	utils.WriteJSON(w , http.StatusOK ,  map[string]string{"message":"ok send"})
 
 }

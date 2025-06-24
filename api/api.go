@@ -9,6 +9,7 @@ import (
 	"github.com/AL-Hourani/care-center/service/patient"
 	"github.com/AL-Hourani/care-center/service/readimage"
 	"github.com/AL-Hourani/care-center/service/session"
+	"github.com/AL-Hourani/care-center/service/notifications"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
@@ -28,6 +29,10 @@ func CreateNewAPIServer(addr string  , db *sql.DB) *APIServer {
 
 
 func (s *APIServer) Run() error {
+	var notifHub = notifications.NewHub()
+	go notifHub.Run()
+
+
 	sessionManager := session.NewManager([]byte("fgfggfgfDDggjg$#jjrjr8733DDdffkfjf6363hhhdhddhddhd"))
 	router := mux.NewRouter()
 	subrouter := router.PathPrefix("/api/v1/").Subrouter()
@@ -37,7 +42,7 @@ func (s *APIServer) Run() error {
 	centerStore := center.NewStore(s.db)
 	patientStore := patient.NewStore(s.db)
 
-	centerHandler := center.NewHandler(centerStore ,patientStore , *sessionManager)
+	centerHandler := center.NewHandler(centerStore ,patientStore , *sessionManager , notifHub)
 	centerHandler.RegisterCenterRoutes(subrouter)
 	// patients ....
 

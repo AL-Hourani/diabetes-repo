@@ -833,3 +833,36 @@ type ReturnAllArticle struct {
 	Desc       string         `json:"desc"`
 	CreateAt   string         `json:"createAt"`
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Notification
+
+type Notification struct {
+	SenderID   int    `json:"sender_id"`
+	ReceiverID int    `json:"receiver_id"`
+	Message    string `json:"message"`
+}
+
+type NotificationPayload struct {
+	
+    ReceiverID int    `json:"receiver_id"`
+    Message    string `json:"message"`
+}
