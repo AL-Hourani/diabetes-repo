@@ -963,7 +963,7 @@ func (s *Store) AddArticle(article types.Article) error {
 		INSERT INTO articles (center_id, title, descr , image_url , short_text)
 		VALUES ($1, $2, $3 , $4 , $5)
 	`
-	_, err := s.db.Exec(query, article.CenterID , article.Title , article.Desc , article.ImageURL , article.ImageURL)
+	_, err := s.db.Exec(query, article.CenterID , article.Title , article.Desc , article.ImageURL , article.ShortText)
 	return err
 }
 
