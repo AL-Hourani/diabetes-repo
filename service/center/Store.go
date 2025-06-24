@@ -1215,7 +1215,7 @@ func scanRowIntoAllAcivity(rows *sql.Rows) (*types.AllArticles , error ){
 func (s *Store) Addvideo(video types.Video) error {
 	query := `
 		INSERT INTO videos (center_id, title , video_url , short_text)
-		VALUES ($1, $2, $3 , $4 , $5)
+		VALUES ($1, $2, $3 , $4 )
 	`
 	_, err := s.db.Exec(query, video.CenterID , video.Title  , video.VideoURL , video.ShortText)
 	return err
