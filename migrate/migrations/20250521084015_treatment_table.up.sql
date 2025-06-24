@@ -1,4 +1,4 @@
-CREATE TABLE treatments (
+CREATE TABLE IF NOT EXISTS treatments (
     id SERIAL PRIMARY KEY,
     review_id INT NOT NULL,
     treatment_type JSONB DEFAULT '[]',

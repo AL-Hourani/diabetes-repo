@@ -239,6 +239,8 @@ type CenterStore interface {
 	GreateLoginFailed(center_login InsertLogin) error 
 	GetReviewByID(reviewID int) (*ReviewResponse, error) 
 	GreateLoginFailedCenter(center_login InsertLogin) error 
+	AddArticle(article Article) error 
+	GetArticlesForCenter(centerID int) ([]GetArticles , error)
 }
 
 type Center struct {
@@ -783,4 +785,50 @@ type ReviewResponseForPatient struct {
 	TripleGrease                   string   `json:"triple_grease"`
 	Hba1c                          string   `json:"hba1c"`
 	DateReview                     time.Time    `json:"date_review"`
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// articles 
+type ArticlePayload struct {
+	Title     string		 `json:"title"`
+	Desc      string         `json:"desc"`
+}
+type Article struct {
+	CenterID  int
+	Title     string		 
+	Desc      string         
+}
+type GetArticles struct {
+	Title     string		 `json:"title"`
+	Desc      string         `json:"desc"`
+	CreateAt  string         `json:"createAt"`
+}
+type AllArticles struct {
+	CenterID  int
+	Title     string		 
+	Desc      string         
+	CreateAt  string         
+}
+type ReturnAllArticle struct {
+	CenterName string        `json:"centerName"`
+	Title      string		 `json:"title"`
+	Desc       string         `json:"desc"`
+	CreateAt   string         `json:"createAt"`
 }

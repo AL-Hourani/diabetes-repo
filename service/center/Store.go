@@ -43,6 +43,34 @@ defer rows.Close()
 }
 
 
+
+
+
+
+func (s *Store) GetCenterByID(id int) (*types.Center , error) {
+	rows , err := s.db.Query("SELECT * FROM centers WHERE id=$1",id)
+	if err != nil {
+		return nil , err
+	}
+    
+defer rows.Close()
+
+	c := new(types.Center)
+	for rows.Next() {
+		c , err = scanRowIntoCenter(rows)
+		if err != nil {
+			return nil , err
+		}
+	}
+
+	if c.ID == 0 {
+		return nil , fmt.Errorf("center not found")
+	}
+
+	return c , nil
+}
+
+
 func scanRowIntoCenter(rows *sql.Rows) (*types.Center , error ){
 	center := new(types.Center)
 
@@ -535,8 +563,8 @@ func (s *Store) GetCenterUpdateCenterProfile(id int)(*types.GetCenterUpdateProfi
 		&center.CenterName,
 		&center.CenterPassword,
 		&center.CenterEmail,
-		&center.CreateAt,
 		&center.CenterCity,
+		&center.CreateAt,
 	)
 	
 	if err != nil {
@@ -919,4 +947,118 @@ func (s *Store) GetReviewByID(reviewID int) (*types.ReviewResponse, error) {
 	}
 
 	return &review, nil
+}
+
+
+
+
+
+
+
+// articles 
+
+
+func (s *Store) AddArticle(article types.Article) error {
+	query := `
+		INSERT INTO articles (center_id, title, , descr)
+		VALUES ($1, $2, $3)
+	`
+	_, err := s.db.Exec(query, article.CenterID , article.Title , article.Desc)
+	return err
+}
+
+
+
+
+
+
+func (s *Store) GetArticlesForCenter(centerID int) ([]types.GetArticles , error) {
+	rows , err := s.db.Query("SELECT title , descr , createAt FROM articles WHERE center_id=$1" , centerID)
+	if err != nil {
+		return nil , err
+	}
+    
+	defer rows.Close()
+	articles := make([]types.GetArticles , 0)
+	for rows.Next() {
+		p , err := scanRowIntoArticle(rows)
+		if err != nil {
+			return nil , err
+		}
+		articles = append(articles, *p)
+	}
+
+	return articles , err
+
+}
+
+func scanRowIntoArticle(rows *sql.Rows) (*types.GetArticles , error ){
+	article := new(types.GetArticles)
+
+	err := rows.Scan(
+		article.Title,
+		article.Desc,
+		article.CreateAt,
+	)
+	
+	if err  != nil {
+		return nil , err
+	}
+
+	return article, nil
+}
+
+
+func (s *Store) GetAllArticles(centerID int) ([]types.ReturnAllArticle , error) {
+	rows , err := s.db.Query("SELECT center_id ,  title , descr , createAt FROM articles WHERE center_id=$1" , centerID)
+	if err != nil {
+		return nil , err
+	}
+    
+	defer rows.Close()
+	articles := make([]types.ReturnAllArticle , 0)
+	for rows.Next() {
+		p , err := scanRowIntoAllArticle(rows)
+		if err != nil {
+			return nil , err
+		}
+
+			center , err := s.GetCenterByID(p.CenterID)
+			if err != nil {
+				return nil , err
+			}
+
+			newReturnArticles := types.ReturnAllArticle {
+				CenterName: center.CenterName,
+				Title: p.Title,
+				Desc: p.Desc,
+				CreateAt: p.CreateAt,
+			}
+
+		articles = append(articles, newReturnArticles)
+	}
+
+	return articles , err
+
+}
+
+
+
+func scanRowIntoAllArticle(rows *sql.Rows) (*types.AllArticles , error ){
+	article := new(types.AllArticles)
+
+	err := rows.Scan(
+		article.CenterID,
+		article.Title,
+		article.Desc,
+		article.CreateAt,
+	)
+	
+	if err  != nil {
+		return nil , err
+	}
+
+
+
+	return article, nil
 }

@@ -1,4 +1,4 @@
-CREATE TABLE treatment_drugs (
+CREATE TABLE IF NOT EXISTS  treatment_drugs (
   id SERIAL PRIMARY KEY,
     treatment_id INT NOT NULL,
     drug_id INT NOT NULL,

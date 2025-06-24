@@ -47,6 +47,9 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/addReviewe",h.handleAddReviewe).Methods("POST")
 	router.HandleFunc("/reviewdelete/{id}", h.handleDeleteReview).Methods("DELETE")
     router.HandleFunc("/getRevieweData/{id}", h.handleGetRevieweData).Methods("GET")
+	router.HandleFunc("/createArticle",auth.WithJWTAuth(h.handleAddArticle)).Methods("POST")
+	router.HandleFunc("/getArticleForCenter",auth.WithJWTAuth(h.handleGetArticleForCenter)).Methods("GET")
+	router.HandleFunc("/getAllArticles",auth.WithJWTAuth(h.handleGetAllArticles)).Methods("GET")
 
 }
 
@@ -684,5 +687,100 @@ func (h *Handler) handleGetRevieweData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteJSON(w, http.StatusOK,reviweData )
+
+}
+
+
+
+
+
+// get Articles
+
+func (h *Handler) handleAddArticle(w http.ResponseWriter, r *http.Request) {
+	var articlePaylaod types.ArticlePayload
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	id, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	if err := utils.ParseJSON(r , &articlePaylaod); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+		return
+	}
+
+	newArticles := types.Article {
+		CenterID: id,
+		Title: articlePaylaod.Title,
+		Desc: articlePaylaod.Desc,
+	}
+
+	err = h.store.AddArticle(newArticles)
+	if err != nil {
+			utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("failed to add article: %v", err))
+	}
+
+	utils.WriteJSON(w , http.StatusOK ,  map[string]string{"message":"successfully  Add Articles"})
+
+
+}
+
+
+
+
+func (h *Handler) handleGetArticleForCenter(w http.ResponseWriter, r *http.Request) {
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	id, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+
+	articles , err := h.store.GetArticlesForCenter(id)
+	if err != nil {
+			utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("failed to return  article for the center: %v", err))
+	}
+
+	utils.WriteJSON(w , http.StatusOK ,  articles)
+
+
+}
+
+
+
+
+func (h *Handler) handleGetAllArticles(w http.ResponseWriter, r *http.Request) {
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	id, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+
+	articles , err := h.store.GetArticlesForCenter(id)
+	if err != nil {
+			utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("failed to return  article for the center: %v", err))
+	}
+
+	utils.WriteJSON(w , http.StatusOK ,  articles)
+
 
 }
