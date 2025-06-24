@@ -212,6 +212,7 @@ type CardData struct {
 type CenterStore interface {
 	GetCenterByName(centerName string) (*Center , error) 
 	GetCenterByEmail(centerEmail string) (*Center , error)
+	 GetCenterByID(id int) (*Center , error)
 	GreateCenter(Center) error
 	GetCentersByCity(cityName string)([]Center , error)
 	DeletePatient(id int) error
@@ -756,9 +757,11 @@ type GetPatientHomeData struct {
 	FullName		string		 `json:"fullname"`
 	Age             string		 `json:"age"`
 	IDNumber		string       `json:"id_number"`
+	FirstReviewDate string       `json:"firstReviewDate"`
 	ChartData       []ChartData  `json:"chartData"`
-	IsCompleted     string       `json:"isCompleted"`
+	MyCenter        string       `json:"center_name"`
 	NextReview      string       `json:"nextReview"`
+
 	MyReviews       []Review     `json:"myReviews"`
 
 }

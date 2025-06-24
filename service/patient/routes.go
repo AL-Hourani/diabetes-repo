@@ -3,11 +3,13 @@ package patient
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"strconv"
 
 	"github.com/AL-Hourani/care-center/config"
 	"github.com/golang-jwt/jwt/v5"
+
 	// "github.com/AL-Hourani/care-center/mail"
 	"github.com/AL-Hourani/care-center/service/auth"
 	"github.com/AL-Hourani/care-center/service/session"
@@ -661,22 +663,35 @@ func (h *Handler) handleGethomePatient(w http.ResponseWriter , r *http.Request) 
 
 
     var next_Reviwe string
-    var oldest string
+    var first_Reviwe string
 	if len(reviews) > 0 {
 		// نأخذ أول مراجعة (يفترض أنها مرتبة تنازليًا)
+		first_Reviwe =  reviews[0].DateReview.Format("02-01-2006")
 		latest := reviews[0].DateReview
 		next_Reviwe = latest.AddDate(0, 1, 0).Format("02-01-2006")
-		oldest = reviews[len(reviews)-1].DateReview.Format("02-01-2006")
-	}
+		
+	} else {
+    // لا توجد مراجعات، نستخدم تاريخ اليوم
+    first_Reviwe = "لا يوجد اي مراجعة يرجى زيازة المركز  لاكمال الحساب"
+    next_Reviwe = time.Now().Format("02-01-2006")
+  
+}
 
+
+    center , err := h.storeCenter.GetCenterByID(patient.CenterID)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		 return
+	}
 
 
 	newGetPatientHomeData := types.GetPatientHomeData {
 		FullName: patient.FullName,
 		Age: patient.Age,
 		IDNumber: patient.IDNumber,
-		IsCompleted: oldest,
+		FirstReviewDate: first_Reviwe,
 		ChartData: chartData,
+		MyCenter: center.CenterName ,
 		NextReview: next_Reviwe ,
 		MyReviews:myReviews,
 
