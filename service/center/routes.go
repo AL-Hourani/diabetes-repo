@@ -776,9 +776,10 @@ func (h *Handler) handleGetAllArticles(w http.ResponseWriter, r *http.Request) {
 	}
 
 
-	articles , err := h.store.GetArticlesForCenter(id)
+	articles , err := h.store.GetAllArticles(id)
 	if err != nil {
 			utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("failed to return  article for the center: %v", err))
+			return
 	}
 
 	utils.WriteJSON(w , http.StatusOK ,  articles)

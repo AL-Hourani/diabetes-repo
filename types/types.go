@@ -241,6 +241,7 @@ type CenterStore interface {
 	GreateLoginFailedCenter(center_login InsertLogin) error 
 	AddArticle(article Article) error 
 	GetArticlesForCenter(centerID int) ([]GetArticles , error)
+	 GetAllArticles(centerID int) ([]ReturnAllArticle , error)
 }
 
 type Center struct {
