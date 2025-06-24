@@ -973,7 +973,7 @@ func (s *Store) AddArticle(article types.Article) error {
 
 
 func (s *Store) GetArticlesForCenter(centerID int) ([]types.GetArticles , error) {
-	rows , err := s.db.Query("SELECT title , descr , createAt FROM articles WHERE center_id=$1" , centerID)
+	rows , err := s.db.Query("SELECT title , descr , TO_CHAR(createAt, 'DD-MM-YYYY') FROM articles WHERE center_id=$1" , centerID)
 	if err != nil {
 		return nil , err
 	}
@@ -996,9 +996,9 @@ func scanRowIntoArticle(rows *sql.Rows) (*types.GetArticles , error ){
 	article := new(types.GetArticles)
 
 	err := rows.Scan(
-		article.Title,
-		article.Desc,
-		article.CreateAt,
+		&article.Title,
+		&article.Desc,
+		&article.CreateAt,
 	)
 	
 	if err  != nil {
@@ -1010,7 +1010,7 @@ func scanRowIntoArticle(rows *sql.Rows) (*types.GetArticles , error ){
 
 
 func (s *Store) GetAllArticles(centerID int) ([]types.ReturnAllArticle , error) {
-	rows , err := s.db.Query("SELECT center_id ,  title , descr , createAt FROM articles WHERE center_id=$1" , centerID)
+	rows , err := s.db.Query("SELECT center_id ,  title , descr , TO_CHAR(createAt, 'DD-MM-YYYY') FROM articles WHERE center_id=$1" , centerID)
 	if err != nil {
 		return nil , err
 	}
@@ -1048,10 +1048,10 @@ func scanRowIntoAllArticle(rows *sql.Rows) (*types.AllArticles , error ){
 	article := new(types.AllArticles)
 
 	err := rows.Scan(
-		article.CenterID,
-		article.Title,
-		article.Desc,
-		article.CreateAt,
+		&article.CenterID,
+		&article.Title,
+		&article.Desc,
+		&article.CreateAt,
 	)
 	
 	if err  != nil {

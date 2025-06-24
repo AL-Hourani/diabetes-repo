@@ -724,6 +724,7 @@ func (h *Handler) handleAddArticle(w http.ResponseWriter, r *http.Request) {
 	err = h.store.AddArticle(newArticles)
 	if err != nil {
 			utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("failed to add article: %v", err))
+			return
 	}
 
 	utils.WriteJSON(w , http.StatusOK ,  map[string]string{"message":"successfully  Add Articles"})
