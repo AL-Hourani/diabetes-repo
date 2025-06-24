@@ -246,6 +246,9 @@ type CenterStore interface {
 	AddActivity(article Article) error
 	GetActivitiesForCenter(centerID int) ([]GetArticles , error)
 	GetAllActivities(centerID int) ([]ReturnAllArticle , error)
+
+	Addvideo(video Video) error
+	GetVideoForCenter(centerID int) ([]GetVideos , error)
 }
 
 type Center struct {
@@ -851,6 +854,54 @@ type ReturnAllArticle struct {
 	ImageURL  string         `json:"imageURL"` 
 	ShortText string         `json:"shortText"` 
 }
+
+
+
+
+
+
+type VideoPayload struct {
+	Title     string		 `json:"title"`
+	ShortText string         `json:"shortText"` 
+	VideoURL  string         `json:"videoURL"` 
+}
+
+
+type Video struct {
+	CenterID  int
+	Title     string		    
+	ShortText string          
+	VideoURL  string         
+}
+
+type GetVideos struct {
+	Title     string		 `json:"title"`
+	CreateAt  string         `json:"createAt"`
+	VideoURL  string         `json:"videoURL"` 
+	ShortText string         `json:"shortText"` 
+}
+
+
+type AllVideos struct {
+	CenterID  int
+	Title     string		        
+	CreateAt  string   
+	VideoURL  string         
+	ShortText string          
+
+}
+type ReturnAllvideo struct {
+	CenterName string        `json:"centerName"`
+	Title      string		 `json:"title"`
+	CreateAt   string         `json:"createAt"`
+	VideoURL  string         `json:"videoURL"` 
+	ShortText string         `json:"shortText"` 
+}
+
+
+
+
+
 
 
 

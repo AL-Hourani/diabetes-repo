@@ -1205,3 +1205,126 @@ func scanRowIntoAllAcivity(rows *sql.Rows) (*types.AllArticles , error ){
 
 
 
+
+
+//video
+
+
+
+
+func (s *Store) Addvideo(video types.Video) error {
+	query := `
+		INSERT INTO videos (center_id, title , video_url , short_text)
+		VALUES ($1, $2, $3 , $4 , $5)
+	`
+	_, err := s.db.Exec(query, video.CenterID , video.Title  , video.VideoURL , video.ShortText)
+	return err
+}
+
+
+
+
+
+
+
+
+func (s *Store) GetVideoForCenter(centerID int) ([]types.GetVideos , error) {
+	rows , err := s.db.Query("SELECT title  , TO_CHAR(createAt, 'DD-MM-YYYY') ,  video_url , short_text FROM videos WHERE center_id=$1" , centerID)
+	if err != nil {
+		return nil , err
+	}
+    
+	defer rows.Close()
+	articles := make([]types.GetVideos , 0)
+	for rows.Next() {
+		p , err := scanRowIntoVideo(rows)
+		if err != nil {
+			return nil , err
+		}
+		articles = append(articles, *p)
+	}
+
+	return articles , err
+
+}
+
+
+func scanRowIntoVideo(rows *sql.Rows) (*types.GetVideos , error ){
+	video := new(types.GetVideos)
+
+	err := rows.Scan(
+		&video.Title,
+		&video.CreateAt,
+		&video.VideoURL,
+		&video.ShortText,
+
+	)
+	
+	if err  != nil {
+		return nil , err
+	}
+
+	return video, nil
+}
+
+
+
+
+
+
+func (s *Store) GetAllVideos() ([]types.ReturnAllvideo , error) {
+	rows , err := s.db.Query("SELECT center_id ,  title  , TO_CHAR(createAt, 'DD-MM-YYYY') , video_url , short_text FROM videos ")
+	if err != nil {
+		return nil , err
+	}
+    
+	defer rows.Close()
+	videos := make([]types.ReturnAllvideo , 0)
+	for rows.Next() {
+		p , err := scanRowIntoAllvideos(rows)
+		if err != nil {
+			return nil , err
+		}
+
+			center , err := s.GetCenterByID(p.CenterID)
+			if err != nil {
+				return nil , err
+			}
+
+			newReturnvideo := types.ReturnAllvideo {
+				CenterName: center.CenterName,
+				Title: p.Title,
+				CreateAt: p.CreateAt,
+				VideoURL: p.VideoURL,
+				ShortText: p.ShortText,
+			}
+
+		videos = append(videos, newReturnvideo)
+	}
+
+	return videos , err
+
+}
+
+
+
+func scanRowIntoAllvideos(rows *sql.Rows) (*types.AllVideos , error ){
+	video := new(types.AllVideos)
+
+	err := rows.Scan(
+		&video.CenterID,
+		&video.Title,
+		&video.CreateAt,
+		&video.VideoURL,
+		&video.ShortText,
+	)
+	
+	if err  != nil {
+		return nil , err
+	}
+
+
+
+	return video, nil
+}
+

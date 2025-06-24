@@ -63,7 +63,10 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/getActivitiesForCenter",auth.WithJWTAuth(h.handleGetActivityForCenter)).Methods("GET")
 	router.HandleFunc("/getAllActivities",auth.WithJWTAuth(h.handleGetAllActivities)).Methods("GET")
 
-
+	//video
+	router.HandleFunc("/addVideo",auth.WithJWTAuth(h.handleAddVideo)).Methods("POST")
+	router.HandleFunc("/getVideoForCenter",auth.WithJWTAuth(h.handleGetVideoForCenter)).Methods("GET")
+    	router.HandleFunc("/getAllVideos",auth.WithJWTAuth(h.handleGetAllVideos)).Methods("GET")
 
 
 
@@ -981,4 +984,135 @@ func (h *Handler) handleGetAllActivities(w http.ResponseWriter, r *http.Request)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// video 
+
+
+
+
+func (h *Handler) handleAddVideo(w http.ResponseWriter, r *http.Request) {
+	var videoPaylaod types.VideoPayload
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	id, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	if err := utils.ParseJSON(r , &videoPaylaod); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+		return
+	}
+
+	newVideo := types.Video {
+		CenterID: id,
+		Title: videoPaylaod.Title,
+		ShortText: videoPaylaod.ShortText,
+		VideoURL: videoPaylaod.VideoURL,
+	}
+
+	err = h.store.Addvideo(newVideo)
+	if err != nil {
+			utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("failed to add video: %v", err))
+			return
+	}
+
+	utils.WriteJSON(w , http.StatusOK ,  map[string]string{"message":"successfully  Add video"})
+
+
+}
+
+
+
+
+
+
+
+
+
+func (h *Handler) handleGetVideoForCenter(w http.ResponseWriter, r *http.Request) {
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	id, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+
+	videos, err := h.store.GetVideoForCenter(id)
+	if err != nil {
+			utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("failed to return  video for the center: %v", err))
+	}
+
+	utils.WriteJSON(w , http.StatusOK ,  videos)
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+func (h *Handler) handleGetAllVideos(w http.ResponseWriter, r *http.Request) {
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	id, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+
+	articles , err := h.store.GetAllActivities(id)
+	if err != nil {
+			utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("failed to return  all activities: %v", err))
+			return
+	}
+
+	utils.WriteJSON(w , http.StatusOK ,  articles)
+
+
+}
 
