@@ -216,8 +216,20 @@ func (s *Store) GetReviewsByPatientID(patientID int) ([]types.Review, error) {
 
 //this is not completed
 
+func (s *Store) GetSugarTypeByReviewID(patient_id int) (string, error) {
+    var sugarType string
+
+    query := `SELECT sugarType FROM reviews WHERE patient_id = $1`
+    err := s.db.QueryRow(query, patient_id).Scan(&sugarType)
+    if err != nil {
+        return "", fmt.Errorf("failed to get sugarType: %w", err)
+    }
+
+    return sugarType, nil
+}
+
 func (s *Store) GetPatientsForCenter(CenterID int) ([]types.CardData , error) {
-	rows , err := s.db.Query("SELECT id,fullName,email,date,phone,id_number,isCompleted,sugarType , TO_CHAR(createAt, 'DD-MM-YYYY') FROM patients WHERE center_id=$1",CenterID)
+	rows , err := s.db.Query("SELECT id,fullName,email,date,phone,id_number,isCompleted , TO_CHAR(createAt, 'DD-MM-YYYY') FROM patients WHERE center_id=$1",CenterID)
 	if err != nil {
 		return nil , err
 	}
@@ -233,25 +245,32 @@ func (s *Store) GetPatientsForCenter(CenterID int) ([]types.CardData , error) {
 		if err != nil {
 			return nil, fmt.Errorf("error getting reviews for patient %d: %w", cardd.ID, err)
 		}
+
+		sugerType , err := s.GetSugarTypeByReviewID(cardd.ID)
+		if err != nil {
+			return nil, fmt.Errorf("error getting sugertypes for patient %d: %w", cardd.ID, err)
+		}
+
+
 		cardd.Reviews = reviews
+		cardd.SugarType = sugerType
 		cardData = append(cardData, *cardd)
 	}
 
 	return cardData , nil
 
 }
-func convertNullStringToPointer(ns sql.NullString) *string {
-	if ns.Valid {
-		return &ns.String
-	}
-	return nil
-}
+// func convertNullStringToPointer(ns sql.NullString) *string {
+// 	if ns.Valid {
+// 		return &ns.String
+// 	}
+// 	return nil
+// }
 
 
 func scanRowIntoPatientsCard(rows *sql.Rows) (*types.CardData , error ){
 	patient := new(types.CardData)
 
-    var sugarType     sql.NullString
 	err := rows.Scan(
 		&patient.ID,
 		&patient.FullName,
@@ -260,7 +279,6 @@ func scanRowIntoPatientsCard(rows *sql.Rows) (*types.CardData , error ){
 		&patient.Phone,
 		&patient.IDNumber,
 		&patient.IsCompleted,
-		&sugarType,
 		&patient.CreateAt,
 	)
 
@@ -268,7 +286,7 @@ func scanRowIntoPatientsCard(rows *sql.Rows) (*types.CardData , error ){
 	if err  != nil {
 		return nil , err
 	}
-	patient.SugarType = convertNullStringToPointer(sugarType)
+	
 
 	return patient , nil
 }
