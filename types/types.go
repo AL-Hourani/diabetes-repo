@@ -252,6 +252,9 @@ type CenterStore interface {
 	Addvideo(video Video) error
 	GetVideoForCenter(centerID int) ([]GetVideos , error)
 	GetAllVideos(centerID int) ([]ReturnAllvideo , error)
+	DeleteArticleByID(id int) error
+	DeleteActivityByID(id int) error
+	DeleteVidoeByID(id int) error 
 }
 
 type Center struct {

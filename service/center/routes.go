@@ -54,21 +54,23 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/addReviewe",h.handleAddReviewe).Methods("POST")
 	router.HandleFunc("/reviewdelete/{id}", h.handleDeleteReview).Methods("DELETE")
     router.HandleFunc("/getRevieweData/{id}", h.handleGetRevieweData).Methods("GET")
+
+
 	router.HandleFunc("/createArticle",auth.WithJWTAuth(h.handleAddArticle)).Methods("POST")
 	router.HandleFunc("/getArticleForCenter",auth.WithJWTAuth(h.handleGetArticleForCenter)).Methods("GET")
 	router.HandleFunc("/getAllArticles",auth.WithJWTAuth(h.handleGetAllArticles)).Methods("GET")
-
+    router.HandleFunc("/articleDelete/{id}", h.handleDeleteArcticle).Methods("DELETE")
 
 	// activities 
 	router.HandleFunc("/createActivity",auth.WithJWTAuth(h.handleAddActivity)).Methods("POST")
 	router.HandleFunc("/getActivitiesForCenter",auth.WithJWTAuth(h.handleGetActivityForCenter)).Methods("GET")
 	router.HandleFunc("/getAllActivities",auth.WithJWTAuth(h.handleGetAllActivities)).Methods("GET")
-
+    router.HandleFunc("/activityDelete/{id}", h.handleDeleteActivity).Methods("DELETE")
 	//video
 	router.HandleFunc("/addVideo",auth.WithJWTAuth(h.handleAddVideo)).Methods("POST")
 	router.HandleFunc("/getVideoForCenter",auth.WithJWTAuth(h.handleGetVideoForCenter)).Methods("GET")
-    	router.HandleFunc("/getAllVideos",auth.WithJWTAuth(h.handleGetAllVideos)).Methods("GET")
-
+    router.HandleFunc("/getAllVideos",auth.WithJWTAuth(h.handleGetAllVideos)).Methods("GET")
+    router.HandleFunc("/videoDelete/{id}", h.handleDeleteVideo).Methods("DELETE")
 
 
     router.HandleFunc("/ws/notifications", h.NotifHub.HandleWS)
@@ -1126,6 +1128,141 @@ func (h *Handler) handleGetAllVideos(w http.ResponseWriter, r *http.Request) {
 
 	utils.WriteJSON(w , http.StatusOK ,  videos)
 
+
+}
+
+
+
+
+
+
+// handleDeleteArcticle
+// delete
+
+
+
+
+
+
+func (h *Handler) handleDeleteArcticle(w http.ResponseWriter, r *http.Request) {
+	_, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+
+	vars := mux.Vars(r)
+	idStr, ok := vars["id"]
+	if !ok {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("article ID is required"))
+		return
+	}
+
+	// تحويل ID من نص إلى عدد صحيح
+	id , err := strconv.Atoi(idStr)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid article ID"))
+		return
+	}
+
+
+    err = h.store.DeleteArticleByID(id)
+    if err != nil {
+        utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("failed to delete article: %w", err))
+        return
+    }
+
+    utils.WriteJSON(w, http.StatusOK, map[string]string{
+        "message": "Article deleted successfully",
+    })
+
+}
+
+
+
+
+
+
+
+
+
+
+func (h *Handler) handleDeleteActivity(w http.ResponseWriter, r *http.Request) {
+	_, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+
+	vars := mux.Vars(r)
+	idStr, ok := vars["id"]
+	if !ok {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("activity ID is required"))
+		return
+	}
+
+	// تحويل ID من نص إلى عدد صحيح
+	id , err := strconv.Atoi(idStr)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid activity ID"))
+		return
+	}
+
+
+    err = h.store.DeleteActivityByID(id)
+    if err != nil {
+        utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("failed to delete activity: %w", err))
+        return
+    }
+
+    utils.WriteJSON(w, http.StatusOK, map[string]string{
+        "message": "activity deleted successfully",
+    })
+
+}
+
+
+
+
+
+
+
+
+
+func (h *Handler) handleDeleteVideo(w http.ResponseWriter, r *http.Request) {
+	_, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+
+	vars := mux.Vars(r)
+	idStr, ok := vars["id"]
+	if !ok {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("video ID is required"))
+		return
+	}
+
+	// تحويل ID من نص إلى عدد صحيح
+	id , err := strconv.Atoi(idStr)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid video ID"))
+		return
+	}
+
+
+    err = h.store.DeleteVidoeByID(id)
+    if err != nil {
+        utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("failed to delete video: %w", err))
+        return
+    }
+
+    utils.WriteJSON(w, http.StatusOK, map[string]string{
+        "message": "video deleted successfully",
+    })
 
 }
 

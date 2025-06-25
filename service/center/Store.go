@@ -1105,6 +1105,74 @@ func scanRowIntoAllArticle(rows *sql.Rows) (*types.AllArticles , error ){
 
 
 
+// delete 
+
+
+func (s *Store) DeleteArticleByID(id int) error {
+    query := `DELETE FROM articles WHERE id = $1`
+    result, err := s.db.Exec(query, id)
+    if err != nil {
+        return err
+    }
+
+    rowsAffected, err := result.RowsAffected()
+    if err != nil {
+        return err
+    }
+
+    if rowsAffected == 0 {
+        return fmt.Errorf("no article found with ID %d", id)
+    }
+
+    return nil
+}
+
+
+
+func (s *Store) DeleteActivityByID(id int) error {
+    query := `DELETE FROM activites WHERE id = $1`
+    result, err := s.db.Exec(query, id)
+    if err != nil {
+        return err
+    }
+
+    rowsAffected, err := result.RowsAffected()
+    if err != nil {
+        return err
+    }
+
+    if rowsAffected == 0 {
+        return fmt.Errorf("no activites found with ID %d", id)
+    }
+
+    return nil
+}
+
+
+
+
+
+func (s *Store) DeleteVidoeByID(id int) error {
+    query := `DELETE FROM videos WHERE id = $1`
+    result, err := s.db.Exec(query, id)
+    if err != nil {
+        return err
+    }
+
+    rowsAffected, err := result.RowsAffected()
+    if err != nil {
+        return err
+    }
+
+    if rowsAffected == 0 {
+        return fmt.Errorf("no activites found with ID %d", id)
+    }
+
+    return nil
+}
+
+
+
 
 
 
