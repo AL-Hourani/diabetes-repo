@@ -59,18 +59,18 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/createArticle",auth.WithJWTAuth(h.handleAddArticle)).Methods("POST")
 	router.HandleFunc("/getArticleForCenter",auth.WithJWTAuth(h.handleGetArticleForCenter)).Methods("GET")
 	router.HandleFunc("/getAllArticles",auth.WithJWTAuth(h.handleGetAllArticles)).Methods("GET")
-    router.HandleFunc("/articleDelete/{id}", h.handleDeleteArcticle).Methods("DELETE")
+    router.HandleFunc("/articleDelete/{id}",auth.WithJWTAuth( h.handleDeleteArcticle)).Methods("DELETE")
 
 	// activities 
 	router.HandleFunc("/createActivity",auth.WithJWTAuth(h.handleAddActivity)).Methods("POST")
 	router.HandleFunc("/getActivitiesForCenter",auth.WithJWTAuth(h.handleGetActivityForCenter)).Methods("GET")
 	router.HandleFunc("/getAllActivities",auth.WithJWTAuth(h.handleGetAllActivities)).Methods("GET")
-    router.HandleFunc("/activityDelete/{id}", h.handleDeleteActivity).Methods("DELETE")
+    router.HandleFunc("/activityDelete/{id}", auth.WithJWTAuth(h.handleDeleteActivity)).Methods("DELETE")
 	//video
 	router.HandleFunc("/addVideo",auth.WithJWTAuth(h.handleAddVideo)).Methods("POST")
 	router.HandleFunc("/getVideoForCenter",auth.WithJWTAuth(h.handleGetVideoForCenter)).Methods("GET")
     router.HandleFunc("/getAllVideos",auth.WithJWTAuth(h.handleGetAllVideos)).Methods("GET")
-    router.HandleFunc("/videoDelete/{id}", h.handleDeleteVideo).Methods("DELETE")
+    router.HandleFunc("/videoDelete/{id}", auth.WithJWTAuth(h.handleDeleteVideo)).Methods("DELETE")
 
 
     router.HandleFunc("/ws/notifications", h.NotifHub.HandleWS)
