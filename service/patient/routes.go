@@ -48,6 +48,10 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/gethomePatient" ,  auth.WithJWTAuth(h.handleGethomePatient)).Methods("GET")
 
 
+	router.HandleFunc("/getNotifications" ,  auth.WithJWTAuth(h.handleGetPatientNotifications)).Methods("GET")
+   
+
+
 }
 
 
@@ -701,4 +705,40 @@ func (h *Handler) handleGethomePatient(w http.ResponseWriter , r *http.Request) 
 
 
 		utils.WriteJSON(w, http.StatusOK, newGetPatientHomeData)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+func (h *Handler) handleGetPatientNotifications(w http.ResponseWriter , r *http.Request) {
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	id, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+
+	notifications, err := h.store.GetNotificationsByUserID(id)
+    if err != nil {
+        utils.WriteError(w, http.StatusInternalServerError, err)
+        return
+    }
+
+    utils.WriteJSON(w, http.StatusOK, notifications)
 }

@@ -30,6 +30,8 @@ type PatientStore interface {
     GetUserByID(id int) (*UserLoginData, error) 
 	GetReviewsByPatientID(patientID int) ([]ReviewResponseForPatient, error) 
 
+	 GetNotificationsByUserID(userID int) ([]NotificationTwo, error)
+
    
 }
 
@@ -255,6 +257,9 @@ type CenterStore interface {
 	DeleteArticleByID(id int) error
 	DeleteActivityByID(id int) error
 	DeleteVidoeByID(id int) error 
+
+
+	 InsertNotification(n NotificationTwo) error
 }
 
 type Center struct {
@@ -932,3 +937,12 @@ type NotificationPayload struct {
     Message    string `json:"message"`
 }
 
+
+type NotificationTwo struct {
+    ID        int       `json:"id"`
+    SenderID  int       `json:"sender_id"`
+    ReceiverID int      `json:"receiver_id"`
+    Message   string    `json:"message"`
+    IsRead    bool      `json:"is_read"`
+    CreatedAt time.Time `json:"created_at"`
+}

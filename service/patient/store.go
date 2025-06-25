@@ -811,3 +811,46 @@ func (s *Store) GetReviewsByPatientID(patientID int) ([]types.ReviewResponseForP
 
 	return reviews, nil
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//get notifications .....
+
+func (s *Store) GetNotificationsByUserID(userID int) ([]types.NotificationTwo, error) {
+    rows, err := s.db.Query(`
+        SELECT id, sender_id, receiver_id, message, is_read, created_at
+        FROM notifications
+        WHERE receiver_id = $1
+        ORDER BY created_at DESC
+    `, userID)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var notifs []types.NotificationTwo
+    for rows.Next() {
+        var n types.NotificationTwo
+        err := rows.Scan(&n.ID, &n.SenderID, &n.ReceiverID, &n.Message, &n.IsRead, &n.CreatedAt)
+        if err != nil {
+            return nil, err
+        }
+        notifs = append(notifs, n)
+    }
+    return notifs, nil
+}

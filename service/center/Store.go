@@ -1434,3 +1434,22 @@ func scanRowIntoAllvideos(rows *sql.Rows) (*types.AllVideos , error ){
 	return video, nil
 }
 
+
+
+
+
+
+
+
+
+
+
+// notification ------------------------------
+
+func (s *Store) InsertNotification(n types.NotificationTwo) error {
+    _, err := s.db.Exec(`
+        INSERT INTO notifications (sender_id, receiver_id, message)
+        VALUES ($1, $2, $3)
+    `, n.SenderID, n.ReceiverID, n.Message)
+    return err
+}

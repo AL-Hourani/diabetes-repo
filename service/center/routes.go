@@ -51,7 +51,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/deletePatient/{id}", auth.WithJWTAuth(h.handleDeletePatient)).Methods(http.MethodDelete)
 	router.HandleFunc("/logout",auth.WithJWTAuth(h.Logout)).Methods("POST")
 	router.HandleFunc("/deleteCenter",h.handleDeleteCenter).Methods(http.MethodDelete)
-	router.HandleFunc("/addReviewe",h.handleAddReviewe).Methods("POST")
+	router.HandleFunc("/addReviewe",auth.WithJWTAuth(h.handleAddReviewe)).Methods("POST")
 	router.HandleFunc("/reviewdelete/{id}", h.handleDeleteReview).Methods("DELETE")
     router.HandleFunc("/getRevieweData/{id}", h.handleGetRevieweData).Methods("GET")
 
@@ -445,6 +445,18 @@ func (h *Handler) handleUpdateCenterProfile(w http.ResponseWriter, r *http.Reque
 
 // handle with reviws
 func (h *Handler) handleAddReviewe (w http.ResponseWriter, r *http.Request) { 
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	center_id, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
     var  AddReviewsPayload types.AddReviwePayload
 
 
@@ -646,10 +658,17 @@ func (h *Handler) handleAddReviewe (w http.ResponseWriter, r *http.Request) {
 	message := fmt.Sprintf("🩺 تمت إضافة مراجعة جديدة لك، وتشمل الأدوية التالية: %s", strings.Join(drugNames, "، "))
 
 	h.NotifHub.Broadcast <- notifications.Notification{
-    SenderID:   0, 
+    SenderID:   center_id, 
     ReceiverID: AddReviewsPayload.PatientID,
     Message:    message,
    }
+
+   _ = h.store.InsertNotification(types.NotificationTwo{
+    SenderID:   center_id,
+    ReceiverID: AddReviewsPayload.PatientID,
+    Message:    message,
+    })
+
 
 
 	utils.WriteJSON(w , http.StatusOK , map[string]string{
