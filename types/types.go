@@ -834,6 +834,7 @@ type Article struct {
 	ShortText string          
 }
 type GetArticles struct {
+	ID        int            `json:"id"`
 	Title     string		 `json:"title"`
 	Desc      string         `json:"desc"`
 	CreateAt  string         `json:"createAt"`
@@ -841,6 +842,7 @@ type GetArticles struct {
 	ShortText string         `json:"shortText"` 
 }
 type AllArticles struct {
+	ID        int           
 	CenterID  int
 	Title     string		 
 	Desc      string         
@@ -850,6 +852,7 @@ type AllArticles struct {
 
 }
 type ReturnAllArticle struct {
+	ID        int            `json:"id"`
 	CenterName string        `json:"centerName"`
 	Title      string		 `json:"title"`
 	Desc       string         `json:"desc"`
@@ -878,6 +881,7 @@ type Video struct {
 }
 
 type GetVideos struct {
+	ID        int            `json:"id"`
 	Title     string		 `json:"title"`
 	CreateAt  string         `json:"createAt"`
 	VideoURL  string         `json:"videoURL"` 
@@ -886,6 +890,7 @@ type GetVideos struct {
 
 
 type AllVideos struct {
+	ID        int       
 	CenterID  int
 	Title     string		        
 	CreateAt  string   
@@ -894,6 +899,7 @@ type AllVideos struct {
 
 }
 type ReturnAllvideo struct {
+	ID        int            `json:"id"`
 	CenterName string        `json:"centerName"`
 	Title      string		 `json:"title"`
 	CreateAt   string         `json:"createAt"`
