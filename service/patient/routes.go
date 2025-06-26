@@ -225,15 +225,15 @@ func (h *Handler) VerifyOTPHandler(w http.ResponseWriter , r *http.Request) {
 			utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("no email registered"))
 			return
 		}
-		// if !auth.VerifyOTP(optCodePayload.Email , optCodePayload.Email) {
-		// 	utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid OTP Code"))
-		// 	return
-		// }
-
-		if optCodePayload.OTPCode != "666666" {
+		if !auth.VerifyOTP(optCodePayload.Email , optCodePayload.Email) {
 			utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid OTP Code"))
 			return
 		}
+
+		// if optCodePayload.OTPCode != "666666" {
+		// 	utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid OTP Code"))
+		// 	return
+		// }
 
 
 		hashedPassword , err := auth.HashPassword(patientPayload.Password)
