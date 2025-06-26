@@ -49,6 +49,7 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 
 
 	router.HandleFunc("/getNotifications" ,  auth.WithJWTAuth(h.handleGetPatientNotifications)).Methods("GET")
+	router.HandleFunc("/notifications/mark-all-read" ,  auth.WithJWTAuth(h.MarkAllNotificationsAsRead)).Methods("PUT")
    
 
 
@@ -607,8 +608,8 @@ func (h *Handler) handleResetPassword(w http.ResponseWriter , r *http.Request) {
 	
    
     utils.WriteJSON(w, http.StatusOK, map[string]string{
-        "message": "Password updated successfully.",
-    })
+     "message": "Password updated successfully.",
+    })   
 
 
 }
@@ -742,4 +743,35 @@ func (h *Handler) handleGetPatientNotifications(w http.ResponseWriter , r *http.
     }
 
     utils.WriteJSON(w, http.StatusOK, notifications)
+}
+
+
+
+
+
+
+func (h *Handler) MarkAllNotificationsAsRead(w http.ResponseWriter , r *http.Request) {
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	id, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+
+	 err = h.store.UpdateIsReadNotifications(id)
+    if err != nil {
+        utils.WriteError(w, http.StatusInternalServerError, err)
+        return
+    }
+
+      utils.WriteJSON(w, http.StatusOK, map[string]string{
+     "message": "update success",
+    })   
+
 }

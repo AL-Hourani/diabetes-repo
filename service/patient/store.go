@@ -854,3 +854,17 @@ func (s *Store) GetNotificationsByUserID(userID int) ([]types.NotificationTwo, e
     }
     return notifs, nil
 }
+
+
+
+
+
+
+
+func (s *Store) UpdateIsReadNotifications(userID int) error {
+    query := `UPDATE notifications SET is_read = true WHERE receiver_id = $1 AND is_read = false`
+    _, err := s.db.Exec(query, userID)
+    return err 
+}
+
+

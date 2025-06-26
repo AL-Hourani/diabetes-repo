@@ -70,3 +70,37 @@ func sanitizeFilename(filename string) string {
 	re := regexp.MustCompile(`[^a-zA-Z0-9\-_\.]`)
 	return re.ReplaceAllString(filename, "_")
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// const socket = new WebSocket(`wss://diabetes-care-center-api.onrender.com/notifications/ws?patient_id=${patientId}`);
+
+// socket.onmessage = function(event) {
+//   const data = JSON.parse(event.data);
+//   console.log("نص الاشعار !!!!!!!!", data.message);
+// };

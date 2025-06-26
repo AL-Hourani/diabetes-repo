@@ -31,6 +31,7 @@ type PatientStore interface {
 	GetReviewsByPatientID(patientID int) ([]ReviewResponseForPatient, error) 
 
 	 GetNotificationsByUserID(userID int) ([]NotificationTwo, error)
+	  UpdateIsReadNotifications(userID int) error
 
    
 }
@@ -260,6 +261,7 @@ type CenterStore interface {
 
 
 	 InsertNotification(n NotificationTwo) error
+	 
 }
 
 type Center struct {
