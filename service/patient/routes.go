@@ -11,7 +11,7 @@ import (
 	
 	"github.com/golang-jwt/jwt/v5"
 
-	// "github.com/AL-Hourani/care-center/mail"
+	"github.com/AL-Hourani/care-center/mail"
 	"github.com/AL-Hourani/care-center/service/auth"
 	"github.com/AL-Hourani/care-center/service/session"
 
@@ -180,11 +180,11 @@ func (h *Handler) handlePatientRegister(w http.ResponseWriter , r *http.Request)
 	// ✅ 4. حفظ بيانات المريض مؤقتًا بانتظار التحقق من OTP
 	pendingPatients[patientPayload.Email] = patientPayload
 
-	// err = mail.Mailer(patientPayload.Email , patientPayload.FullName)
-	// 	if err != nil {
-	// 		utils.WriteError(w, http.StatusInternalServerError, err)
-	// 		return
-	// 	}
+	err = mail.Mailer(patientPayload.Email , patientPayload.FullName)
+		if err != nil {
+			utils.WriteError(w, http.StatusInternalServerError, err)
+			return
+		}
 
 	// ✅ 5. إرسال رسالة انتظار التحقق
 	utils.WriteJSON(w, http.StatusAccepted, map[string]string{

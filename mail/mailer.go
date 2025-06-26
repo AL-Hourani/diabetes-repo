@@ -1,11 +1,11 @@
 package mail
 
 import (
-	"bytes"
-	"encoding/json"
+	
 	"fmt"
 	"net/http"
-
+    "net/url"
+    "strings"
 	"github.com/AL-Hourani/care-center/service/auth"
 )
 
@@ -15,40 +15,36 @@ func Mailer(email string, name string) error {
     if err != nil {
         return fmt.Errorf("failed to generate OTP: %v", err)
     }
-url := "https://api.emailjs.com/api/v1.0/email/send"
+     
+    apiKey := "7813682AEAD1740635FBAAB6BF82A8442C9AA5831B2137C661098F50ED8524D80B6DADD51B670609ECE28FE71D104E49"
+    from := "diabetes.care.center.syria@gmail.com" // البريد الذي تحققت منه في Elastic Email
 
-    data := map[string]interface{}{
-        "service_id":  "service_cruvhkn",
-        "template_id": "template_cugk7wr",
-        "user_id":     "ytF93swbS8Hw5negh", // هذا هو api key
-        "template_params": map[string]string{
-            "name":     name,
-            "otp":      otp,
-            "to_email": email,
-        },
-    }
+    data := url.Values{}
+    data.Set("apikey", apiKey)
+    data.Set("from", from)
+    data.Set("to", email)
+    data.Set("subject", "رمز التحقق OTP")
+    data.Set("bodyText", fmt.Sprintf("مرحبًا %s، رمز التحقق الخاص بك هو: %s", name, otp))
 
-    jsonData, err := json.Marshal(data)
+    data.Set("isTransactional", "true")
+
+    req, err := http.NewRequest("POST", "https://api.elasticemail.com/v2/email/send", strings.NewReader(data.Encode()))
     if err != nil {
+        fmt.Println("Error creating request:", err)
         return err
     }
 
-    req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
-    if err != nil {
-        return err
-    }
-    req.Header.Set("Content-Type", "application/json")
+    req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
     client := &http.Client{}
     resp, err := client.Do(req)
     if err != nil {
+        fmt.Println("Error sending request:", err)
         return err
     }
     defer resp.Body.Close()
 
-    if resp.StatusCode != http.StatusOK {
-        return fmt.Errorf("failed to send email, status code: %d", resp.StatusCode)
-    }
+ 
 
     return nil
 
