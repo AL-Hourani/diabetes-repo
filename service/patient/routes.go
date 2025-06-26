@@ -47,7 +47,6 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/resetPassword",h.handleResetPassword).Methods("POST")
 	router.HandleFunc("/gethomePatient" ,  auth.WithJWTAuth(h.handleGethomePatient)).Methods("GET")
 
-
 	router.HandleFunc("/getNotifications" ,  auth.WithJWTAuth(h.handleGetPatientNotifications)).Methods("GET")
 	router.HandleFunc("/notifications/mark-all-read" ,  auth.WithJWTAuth(h.MarkAllNotificationsAsRead)).Methods("PUT")
    

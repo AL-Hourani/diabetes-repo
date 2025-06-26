@@ -73,7 +73,6 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
     router.HandleFunc("/videoDelete/{id}", auth.WithJWTAuth(h.handleDeleteVideo)).Methods("DELETE")
 
 
-    router.HandleFunc("/ws/notifications", h.NotifHub.HandleWS)
 
 	router.HandleFunc("/sendNotification", auth.WithJWTAuth(h.handleSendNotification)).Methods("POST")
 
