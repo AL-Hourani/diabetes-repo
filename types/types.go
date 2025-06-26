@@ -764,6 +764,7 @@ type ResetPassword struct {
 //---------------------------------------------------------end -------------------------------
 
 type ChartData struct {
+	Date            string       `json:"date"`
 	LDL             string       `json:"ldl"`
 	HDL             string       `json:"hdl"`
 	NormalGlocose   string       `json:"normal_glocose"`

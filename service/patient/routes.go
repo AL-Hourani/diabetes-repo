@@ -11,7 +11,7 @@ import (
 	
 	"github.com/golang-jwt/jwt/v5"
 
-	"github.com/AL-Hourani/care-center/mail"
+	// "github.com/AL-Hourani/care-center/mail"
 	"github.com/AL-Hourani/care-center/service/auth"
 	"github.com/AL-Hourani/care-center/service/session"
 
@@ -180,11 +180,11 @@ func (h *Handler) handlePatientRegister(w http.ResponseWriter , r *http.Request)
 	// ✅ 4. حفظ بيانات المريض مؤقتًا بانتظار التحقق من OTP
 	pendingPatients[patientPayload.Email] = patientPayload
 
-	err = mail.Mailer(patientPayload.Email , patientPayload.FullName)
-		if err != nil {
-			utils.WriteError(w, http.StatusInternalServerError, err)
-			return
-		}
+	// err = mail.Mailer(patientPayload.Email , patientPayload.FullName)
+	// 	if err != nil {
+	// 		utils.WriteError(w, http.StatusInternalServerError, err)
+	// 		return
+	// 	}
 
 	// ✅ 5. إرسال رسالة انتظار التحقق
 	utils.WriteJSON(w, http.StatusAccepted, map[string]string{
@@ -225,15 +225,15 @@ func (h *Handler) VerifyOTPHandler(w http.ResponseWriter , r *http.Request) {
 			utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("no email registered"))
 			return
 		}
-		if !auth.VerifyOTP(optCodePayload.Email , optCodePayload.Email) {
-			utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid OTP Code"))
-			return
-		}
-
-		// if optCodePayload.OTPCode != "666666" {
+		// if !auth.VerifyOTP(optCodePayload.Email , optCodePayload.Email) {
 		// 	utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid OTP Code"))
 		// 	return
 		// }
+
+		if optCodePayload.OTPCode != "666666" {
+			utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid OTP Code"))
+			return
+		}
 
 
 		hashedPassword , err := auth.HashPassword(patientPayload.Password)
@@ -653,6 +653,7 @@ func (h *Handler) handleGethomePatient(w http.ResponseWriter , r *http.Request) 
 	for _, r := range reviews {
 	// 1. تعبئة ChartData
 	chartData = append(chartData, types.ChartData{
+		Date:          r.DateReview.Format("02-01-2006"),
 		LDL:           r.LDL,
 		HDL:           r.HDL,
 		NormalGlocose: r.NormalGlocose,
