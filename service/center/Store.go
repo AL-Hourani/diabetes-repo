@@ -1042,7 +1042,7 @@ func scanRowIntoArticle(rows *sql.Rows) (*types.GetArticles , error ){
 }
 
 
-func (s *Store) GetAllArticles(centerID int) ([]types.ReturnAllArticle , error) {
+func (s *Store) GetAllArticles() ([]types.ReturnAllArticle , error) {
 	rows , err := s.db.Query("SELECT id , center_id ,  title , descr , TO_CHAR(createAt, 'DD-MM-YYYY') , image_url , short_text FROM articles")
 	if err != nil {
 		return nil , err
@@ -1242,7 +1242,7 @@ func scanRowIntoActivity(rows *sql.Rows) (*types.GetArticles , error ){
 
 
 
-func (s *Store) GetAllActivities(centerID int) ([]types.ReturnAllArticle , error) {
+func (s *Store) GetAllActivities() ([]types.ReturnAllArticle , error) {
 	rows , err := s.db.Query("SELECT id , center_id ,  title , descr , TO_CHAR(createAt, 'DD-MM-YYYY') , image_url , short_text FROM activites ")
 	if err != nil {
 		return nil , err
@@ -1376,7 +1376,7 @@ func scanRowIntoVideo(rows *sql.Rows) (*types.GetVideos , error ){
 
 
 
-func (s *Store) GetAllVideos(centerID int) ([]types.ReturnAllvideo , error) {
+func (s *Store) GetAllVideos() ([]types.ReturnAllvideo , error) {
 	rows , err := s.db.Query("SELECT id , center_id ,  title  , TO_CHAR(createAt, 'DD-MM-YYYY') , video_url , short_text FROM videos ")
 	if err != nil {
 		return nil , err

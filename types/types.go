@@ -246,14 +246,14 @@ type CenterStore interface {
 	GreateLoginFailedCenter(center_login InsertLogin) error 
 	AddArticle(article Article) error 
 	GetArticlesForCenter(centerID int) ([]GetArticles , error)
-	GetAllArticles(centerID int) ([]ReturnAllArticle , error)
+	GetAllArticles() ([]ReturnAllArticle , error)
 	AddActivity(article Article) error
 	GetActivitiesForCenter(centerID int) ([]GetArticles , error)
-	GetAllActivities(centerID int) ([]ReturnAllArticle , error)
+	GetAllActivities() ([]ReturnAllArticle , error)
 
 	Addvideo(video Video) error
 	GetVideoForCenter(centerID int) ([]GetVideos , error)
-	GetAllVideos(centerID int) ([]ReturnAllvideo , error)
+	GetAllVideos() ([]ReturnAllvideo , error)
 	DeleteArticleByID(id int) error
 	DeleteActivityByID(id int) error
 	DeleteVidoeByID(id int) error 

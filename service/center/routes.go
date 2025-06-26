@@ -58,18 +58,18 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 
 	router.HandleFunc("/createArticle",auth.WithJWTAuth(h.handleAddArticle)).Methods("POST")
 	router.HandleFunc("/getArticleForCenter",auth.WithJWTAuth(h.handleGetArticleForCenter)).Methods("GET")
-	router.HandleFunc("/getAllArticles",auth.WithJWTAuth(h.handleGetAllArticles)).Methods("GET")
+	router.HandleFunc("/getAllArticles",h.handleGetAllArticles).Methods("GET")
     router.HandleFunc("/articleDelete/{id}",auth.WithJWTAuth( h.handleDeleteArcticle)).Methods("DELETE")
 
 	// activities 
 	router.HandleFunc("/createActivity",auth.WithJWTAuth(h.handleAddActivity)).Methods("POST")
 	router.HandleFunc("/getActivitiesForCenter",auth.WithJWTAuth(h.handleGetActivityForCenter)).Methods("GET")
-	router.HandleFunc("/getAllActivities",auth.WithJWTAuth(h.handleGetAllActivities)).Methods("GET")
+	router.HandleFunc("/getAllActivities",h.handleGetAllActivities).Methods("GET")
     router.HandleFunc("/activityDelete/{id}", auth.WithJWTAuth(h.handleDeleteActivity)).Methods("DELETE")
 	//video
 	router.HandleFunc("/addVideo",auth.WithJWTAuth(h.handleAddVideo)).Methods("POST")
 	router.HandleFunc("/getVideoForCenter",auth.WithJWTAuth(h.handleGetVideoForCenter)).Methods("GET")
-    router.HandleFunc("/getAllVideos",auth.WithJWTAuth(h.handleGetAllVideos)).Methods("GET")
+    router.HandleFunc("/getAllVideos",h.handleGetAllVideos).Methods("GET")
     router.HandleFunc("/videoDelete/{id}", auth.WithJWTAuth(h.handleDeleteVideo)).Methods("DELETE")
 
 
@@ -825,20 +825,9 @@ func (h *Handler) handleGetArticleForCenter(w http.ResponseWriter, r *http.Reque
 
 
 func (h *Handler) handleGetAllArticles(w http.ResponseWriter, r *http.Request) {
-	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
-	if !ok {
-		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
-		return
-	}
-
-	id, err := auth.GetIDFromToken(token)
-	if err != nil {
-		http.Error(w, "Invalid token", http.StatusUnauthorized)
-		return
-	}
 
 
-	articles , err := h.store.GetAllArticles(id)
+	articles , err := h.store.GetAllArticles()
 	if err != nil {
 			utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("failed to return  all articles : %v", err))
 			return
@@ -988,20 +977,9 @@ func (h *Handler) handleGetActivityForCenter(w http.ResponseWriter, r *http.Requ
 
 
 func (h *Handler) handleGetAllActivities(w http.ResponseWriter, r *http.Request) {
-	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
-	if !ok {
-		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
-		return
-	}
-
-	id, err := auth.GetIDFromToken(token)
-	if err != nil {
-		http.Error(w, "Invalid token", http.StatusUnauthorized)
-		return
-	}
 
 
-	articles , err := h.store.GetAllActivities(id)
+	articles , err := h.store.GetAllActivities()
 	if err != nil {
 			utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("failed to return  all activities: %v", err))
 			return
@@ -1126,20 +1104,9 @@ func (h *Handler) handleGetVideoForCenter(w http.ResponseWriter, r *http.Request
 
 
 func (h *Handler) handleGetAllVideos(w http.ResponseWriter, r *http.Request) {
-	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
-	if !ok {
-		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
-		return
-	}
-
-	id, err := auth.GetIDFromToken(token)
-	if err != nil {
-		http.Error(w, "Invalid token", http.StatusUnauthorized)
-		return
-	}
 
 
-	videos , err := h.store.GetAllVideos(id)
+	videos , err := h.store.GetAllVideos()
 	if err != nil {
 			utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("failed to return  all activities: %v", err))
 			return
