@@ -663,9 +663,12 @@ func (h *Handler) handleAddReviewe (w http.ResponseWriter, r *http.Request) {
     SenderID:   center_id, 
     ReceiverID: AddReviewsPayload.PatientID,
     Message:    message,
-	CreatedAt: patient.FormatRelativeTime(time.Now()) ,
+	IsRead: false,
+	CreatedAt: patient.FormatRelativeTime(time.Now()),
+
    }
 
+   
    _ = h.store.InsertNotification(types.NotificationTwo{
     SenderID:   center_id,
     ReceiverID: AddReviewsPayload.PatientID,
