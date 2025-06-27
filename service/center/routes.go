@@ -883,6 +883,16 @@ func (h *Handler) handleSendNotification(w http.ResponseWriter, r *http.Request)
         Message:    notificarionPayload.Message,
     }
 
+	
+
+	_ = h.store.InsertNotification(types.NotificationTwo{
+    SenderID:   id,
+    ReceiverID: notificarionPayload.ReceiverID,
+    Message:    notificarionPayload.Message,
+    })
+
+
+
 	utils.WriteJSON(w , http.StatusOK ,  map[string]string{"message":"ok send"})
 
 }
