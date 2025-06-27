@@ -53,7 +53,7 @@ func (s *APIServer) Run() error {
 	imageHandler.RegisterRoutes(subrouter)
 
 	
-    router.HandleFunc("/ws/notifications", notifHub.HandleWS)
+    
    
 		// إعدادات CORS
 		cors := handlers.CORS(

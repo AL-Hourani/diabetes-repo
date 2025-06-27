@@ -71,6 +71,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/getVideoForCenter",auth.WithJWTAuth(h.handleGetVideoForCenter)).Methods("GET")
     router.HandleFunc("/getAllVideos",h.handleGetAllVideos).Methods("GET")
     router.HandleFunc("/videoDelete/{id}", auth.WithJWTAuth(h.handleDeleteVideo)).Methods("DELETE")
+    router.HandleFunc("/sse/notifications", h.NotifHub.HandleSSE)
 
 
 
@@ -81,6 +82,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 
 }
 
+// https://diabetes-care-center-api.onrender.com/api/v1/sse/notifications?patient_id=1
 
 
 
@@ -656,7 +658,7 @@ func (h *Handler) handleAddReviewe (w http.ResponseWriter, r *http.Request) {
 
 	message := fmt.Sprintf("🩺 تمت إضافة مراجعة جديدة لك، وتشمل الأدوية التالية: %s", strings.Join(drugNames, "، "))
 
-	h.NotifHub.Broadcast <- notifications.Notification{
+	h.NotifHub.Broadcast <- types.Notification{
     SenderID:   center_id, 
     ReceiverID: AddReviewsPayload.PatientID,
     Message:    message,
@@ -877,7 +879,7 @@ func (h *Handler) handleSendNotification(w http.ResponseWriter, r *http.Request)
 
 
     
-    h.NotifHub.Broadcast <- notifications.Notification{
+    h.NotifHub.Broadcast <- types.Notification{
         SenderID:   id, // ID المركز المرسل، حط الرقم المناسب هنا
         ReceiverID: notificarionPayload.ReceiverID,
         Message:    notificarionPayload.Message,
