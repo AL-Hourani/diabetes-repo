@@ -5,10 +5,12 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/service/auth"
 	"github.com/AL-Hourani/care-center/service/notifications"
+	"github.com/AL-Hourani/care-center/service/patient"
 	"github.com/AL-Hourani/care-center/service/session"
 	"github.com/AL-Hourani/care-center/types"
 	"github.com/AL-Hourani/care-center/utils"
@@ -83,7 +85,6 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 }
 
 // https://diabetes-care-center-api.onrender.com/api/v1/sse/notifications?patient_id=1
-
 
 
 func (h *Handler) handleCenterRegister(w http.ResponseWriter , r *http.Request) {
@@ -662,6 +663,7 @@ func (h *Handler) handleAddReviewe (w http.ResponseWriter, r *http.Request) {
     SenderID:   center_id, 
     ReceiverID: AddReviewsPayload.PatientID,
     Message:    message,
+	CreatedAt: patient.FormatRelativeTime(time.Now()) ,
    }
 
    _ = h.store.InsertNotification(types.NotificationTwo{

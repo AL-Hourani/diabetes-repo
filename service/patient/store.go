@@ -856,7 +856,7 @@ func (s *Store) GetNotificationsByUserID(userID int) ([]types.NotificationTwo, e
             return nil, err
         }
 
-        n.CreatedAt = formatRelativeTime(createdTime) 
+        n.CreatedAt = FormatRelativeTime(createdTime) 
         notifs = append(notifs, n)
     }
     return notifs, nil
@@ -865,7 +865,7 @@ func (s *Store) GetNotificationsByUserID(userID int) ([]types.NotificationTwo, e
 
 
 
-func formatRelativeTime(t time.Time) string {
+func  FormatRelativeTime(t time.Time) string {
     duration := time.Since(t)
 
     seconds := int(duration.Seconds())
