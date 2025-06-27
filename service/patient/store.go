@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/AL-Hourani/care-center/service/auth"
 	"github.com/AL-Hourani/care-center/types"
@@ -845,14 +846,79 @@ func (s *Store) GetNotificationsByUserID(userID int) ([]types.NotificationTwo, e
 
     var notifs []types.NotificationTwo
     for rows.Next() {
-        var n types.NotificationTwo
-        err := rows.Scan(&n.ID, &n.SenderID, &n.ReceiverID, &n.Message, &n.IsRead, &n.CreatedAt)
+        var (
+            n           types.NotificationTwo
+            createdTime time.Time
+        )
+
+        err := rows.Scan(&n.ID, &n.SenderID, &n.ReceiverID, &n.Message, &n.IsRead, &createdTime)
         if err != nil {
             return nil, err
         }
+
+        n.CreatedAt = formatRelativeTime(createdTime) 
         notifs = append(notifs, n)
     }
     return notifs, nil
+}
+
+
+
+
+func formatRelativeTime(t time.Time) string {
+    duration := time.Since(t)
+
+    seconds := int(duration.Seconds())
+    minutes := int(duration.Minutes())
+    hours := int(duration.Hours())
+    days := hours / 24
+
+    switch {
+    case seconds < 60:
+        if seconds <= 1 {
+            return "منذ ثانية واحدة"
+        } else if seconds <= 2 {
+            return "منذ ثانيتين"
+        } else if seconds < 11 {
+            return fmt.Sprintf("منذ %d ثوانٍ", seconds)
+        } else {
+            return fmt.Sprintf("منذ %d ثانية", seconds)
+        }
+
+    case minutes < 60:
+        if minutes == 1 {
+            return "منذ دقيقة واحدة"
+        } else if minutes == 2 {
+            return "منذ دقيقتين"
+        } else if minutes < 11 {
+            return fmt.Sprintf("منذ %d دقائق", minutes)
+        } else {
+            return fmt.Sprintf("منذ %d دقيقة", minutes)
+        }
+
+    case hours < 24:
+        if hours == 1 {
+            return "منذ ساعة واحدة"
+        } else if hours == 2 {
+            return "منذ ساعتين"
+        } else if hours < 11 {
+            return fmt.Sprintf("منذ %d ساعات", hours)
+        } else {
+            return fmt.Sprintf("منذ %d ساعة", hours)
+        }
+
+    case days < 7:
+        if days == 1 {
+            return "منذ يوم واحد"
+        } else if days == 2 {
+            return "منذ يومين"
+        } else {
+            return fmt.Sprintf("منذ %d أيام", days)
+        }
+
+    default:
+        return t.Format("02-01-2006") // مثل 27-06-2025
+    }
 }
 
 

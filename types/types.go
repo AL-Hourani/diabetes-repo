@@ -947,10 +947,10 @@ type NotificationTwo struct {
     ReceiverID int      `json:"receiver_id"`
     Message   string    `json:"message"`
     IsRead    bool      `json:"is_read"`
-    CreatedAt time.Time `json:"created_at"`
+    CreatedAt string `json:"created_at"`
 }
 
 
-type nothing struct {
+type V struct {
 	CreatedAt time.Time `json:"created_at"`
 }
