@@ -2,6 +2,12 @@ module github.com/AL-Hourani/care-center
 
 go 1.23.2
 
+
+
+
+
+
+
 require (
 	github.com/go-sql-driver/mysql v1.9.0
 	github.com/gorilla/mux v1.8.1

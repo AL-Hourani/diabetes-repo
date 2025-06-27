@@ -99,12 +99,12 @@ func (h *Handler) handleCenterRegister(w http.ResponseWriter , r *http.Request) 
 	   }
 
 		
-	// check if center exists
-        // _ , err := h.store.GetCenterByName(centerPayload.CenterName)
-		// if err == nil {
-		// 	utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("center with name %s already exists" , centerPayload.CenterName))
-		// 	return 
-		// }
+	// // check if center exists
+    // _ , err := h.store.GetCenterByName(centerPayload.CenterName)
+	// 	if err == nil {
+	// 		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("center with name %s already exists" , centerPayload.CenterName))
+	// 		return 
+	// 	}
 	
 	//check if the center email is uniqe 
 	 _ , err := h.store.GetCenterByEmail(centerPayload.CenterEmail)
