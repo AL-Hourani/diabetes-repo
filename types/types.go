@@ -949,3 +949,8 @@ type NotificationTwo struct {
     IsRead    bool      `json:"is_read"`
     CreatedAt time.Time `json:"created_at"`
 }
+
+
+type nothing struct {
+	CreatedAt time.Time `json:"created_at"`
+}
