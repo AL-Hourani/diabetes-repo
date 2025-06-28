@@ -46,7 +46,7 @@ func (s *APIServer) Run() error {
 	centerHandler.RegisterCenterRoutes(subrouter)
 	// patients ....
 
-	patientHandler := patient.NewHandler(patientStore , centerStore ,*sessionManager )
+	patientHandler := patient.NewHandler(patientStore , centerStore ,*sessionManager , notifHub )
 	patientHandler.RegisterPatientRoutes(subrouter)
 
 	imageHandler := readimage.NewHandler()

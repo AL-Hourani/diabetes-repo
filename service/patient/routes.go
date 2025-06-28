@@ -8,11 +8,12 @@ import (
 	"strconv"
 
 	"github.com/AL-Hourani/care-center/config"
-	
+
 	"github.com/golang-jwt/jwt/v5"
 
 	// "github.com/AL-Hourani/care-center/mail"
 	"github.com/AL-Hourani/care-center/service/auth"
+	"github.com/AL-Hourani/care-center/service/notifications"
 	"github.com/AL-Hourani/care-center/service/session"
 
 	// "github.com/AL-Hourani/care-center/service/patient"
@@ -26,10 +27,11 @@ type Handler struct {
 	store types.PatientStore
 	storeCenter types.CenterStore
 	SessionManager *session.Manager
+	NotifHub      *notifications.Hub
 }
 
-func NewHandler(store types.PatientStore , centerStore types.CenterStore , sessionManager session.Manager) *Handler {
-	return &Handler{store: store , storeCenter: centerStore , SessionManager: &sessionManager }
+func NewHandler(store types.PatientStore , centerStore types.CenterStore , sessionManager session.Manager  , notifHub *notifications.Hub) *Handler {
+	return &Handler{store: store , storeCenter: centerStore , SessionManager: &sessionManager , NotifHub:       notifHub, }
 }
 
 func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
@@ -249,7 +251,7 @@ func (h *Handler) VerifyOTPHandler(w http.ResponseWriter , r *http.Request) {
 		}
 
 	//if it dosen't we create the new user
-	err = h.store.GreatePatient(types.Patient{
+	id , err := h.store.GreatePatient(types.Patient{
 		FullName: patientPayload.FullName,
 		Email: patientPayload.Email,
 		Password: hashedPassword,
@@ -278,6 +280,25 @@ func (h *Handler) VerifyOTPHandler(w http.ResponseWriter , r *http.Request) {
 		utils.WriteError(w , http.StatusBadRequest ,err)
 		return 
 	}
+
+	message := fmt.Sprintf("مرحبًا %s، أهلًا بك في %s.\nيسعدنا انضمامك إلينا، صحتك أمانة في أعيننا. ", patientPayload.FullName, patientPayload.CenterName)
+
+		h.NotifHub.Broadcast <- types.Notification{
+		SenderID:  1  , 
+		ReceiverID: id,
+		Message:    message,
+		IsRead: false,
+		CreatedAt: FormatRelativeTime(time.Now()),
+
+	}
+
+	
+	_ = h.storeCenter.InsertNotification(types.NotificationTwo{
+		SenderID:   1,
+		ReceiverID: id,
+		Message:    message,
+		})
+
 
 
 	

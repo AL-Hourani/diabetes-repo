@@ -12,7 +12,8 @@ import (
 type PatientStore interface {
 	GetPatientByEmail(email string) (*Patient , error)
 	GetPatientById(id int) (*Patient , error)
-	GreatePatient(Patient) error
+	// GreatePatient(Patient) error
+	GreatePatient(patient Patient) (int, error)
 	GetPatientDetailsByID(patientID int) (*PatientDetails, error)
 	GetUserByEmail(email string) (*UserLoginData, error)
 	GetPatientProfile(id int)(*PatientProfile , error)
