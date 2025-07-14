@@ -1,0 +1,2 @@
+ALTER TABLE medications 
+ADD  COLUMN  IF NOT EXISTS center_id INT NOT NULL;

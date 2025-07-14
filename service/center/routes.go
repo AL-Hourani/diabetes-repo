@@ -80,6 +80,14 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/sendNotification", auth.WithJWTAuth(h.handleSendNotification)).Methods("POST")
 
 
+	// medicine
+
+	router.HandleFunc("/getMedicationStats",h.handleGetMedicationStats).Methods("GET")
+
+	router.HandleFunc("/RequestMedicine",auth.WithJWTAuth(h.handleRequestMedicine)).Methods("POST")
+	router.HandleFunc("/getMedicines",auth.WithJWTAuth(h.handleGetMedicine)).Methods("GET")
+	router.HandleFunc("/updateQuantity",auth.WithJWTAuth(h.handleUpdateNewQuantity)).Methods("POST")
+
 
 
 }
@@ -1265,6 +1273,143 @@ func (h *Handler) handleDeleteVideo(w http.ResponseWriter, r *http.Request) {
     utils.WriteJSON(w, http.StatusOK, map[string]string{
         "message": "video deleted successfully",
     })
+
+}
+
+
+
+
+func (h *Handler) handleGetMedicationStats(w http.ResponseWriter, r *http.Request) {
+
+	stats, err := h.store.GetMedicationStats()
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("error get medicationStats"))
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, stats)
+}
+
+
+func (h *Handler) handleRequestMedicine(w http.ResponseWriter, r *http.Request) {
+	var medicinePayload types.Medication
+
+
+		_, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+
+	vars := mux.Vars(r)
+	idStr, ok := vars["id"]
+	if !ok {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("video ID is required"))
+		return
+	}
+
+	// تحويل ID من نص إلى عدد صحيح
+	id , err := strconv.Atoi(idStr)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid video ID"))
+		return
+	}
+
+	if err := utils.ParseJSON(r , &medicinePayload); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+		return
+	}
+    
+	newMedicine := types.InsertMedication{
+		NameArabic: medicinePayload.NameArabic,
+		NameEnglish: medicinePayload.NameEnglish,
+		MedicationType: medicinePayload.MedicationType,
+		Dosage: medicinePayload.Dosage,
+		ExpirationDate: medicinePayload.ExpirationDate,
+		Quantity: medicinePayload.Quantity,
+		UnitsPerBox: medicinePayload.UnitsPerBox,
+		CenterID: id,
+	}
+	err = h.store.InsertMedication(newMedicine)
+    if err != nil {
+		utils.WriteError(w, http.StatusBadRequest,err)
+		return
+	}
+
+	utils.WriteJSON(w , http.StatusOK , map[string]string{
+		"message": "medicine added successfully",
+	})
+
+}
+
+
+
+
+
+func (h *Handler) handleGetMedicine(w http.ResponseWriter, r *http.Request) {
+
+
+		_, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+
+	vars := mux.Vars(r)
+	idStr, ok := vars["id"]
+	if !ok {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("video ID is required"))
+		return
+	}
+
+	// تحويل ID من نص إلى عدد صحيح
+	id , err := strconv.Atoi(idStr)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid video ID"))
+		return
+	}
+
+
+
+	medicines , err := h.store.GetAllMedications(id)
+    if err != nil {
+		utils.WriteError(w, http.StatusBadRequest,err)
+		return
+	}
+
+	utils.WriteJSON(w , http.StatusOK , medicines)
+
+}
+
+
+
+
+func (h *Handler) handleUpdateNewQuantity(w http.ResponseWriter, r *http.Request) {
+    var newQuantity types.UpdateNewQuantity
+
+		_, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+
+	if err := utils.ParseJSON(r , &newQuantity); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+		return
+	}
+
+    err := h.store.UpdateMedicationQuantity(newQuantity.ID , newQuantity.NewQuantity)
+    if err != nil {
+		utils.WriteError(w, http.StatusBadRequest,err)
+		return
+	}
+
+	utils.WriteJSON(w , http.StatusOK , map[string]string{
+		"message": "update quantity successfully",
+	})
 
 }
 

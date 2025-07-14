@@ -261,8 +261,11 @@ type CenterStore interface {
 	DeleteVidoeByID(id int) error 
 
 
-	 InsertNotification(n NotificationTwo) error
-	 
+	InsertNotification(n NotificationTwo) error
+	GetMedicationStats() (MedicationStats, error)
+	InsertMedication(m InsertMedication) error
+	GetAllMedications(centerID int) ([]GeTMedication, error)
+	UpdateMedicationQuantity(id int, newQuantity int) error
 }
 
 type Center struct {
@@ -957,4 +960,54 @@ type NotificationTwo struct {
 
 type V struct {
 	CreatedAt time.Time `json:"created_at"`
+}
+
+
+
+
+
+
+
+type Medication struct {
+    NameArabic     string    `json:"name_arabic"`
+    NameEnglish    string    `json:"name_english"`
+    MedicationType string    `json:"medication_type"`
+    Dosage         string    `json:"dosage"`
+    ExpirationDate time.Time `json:"expiration_date"`
+    Quantity       int       `json:"quantity"`
+    UnitsPerBox    int       `json:"units_per_box"`
+}
+type InsertMedication struct {
+    NameArabic     string    
+    NameEnglish    string   
+    MedicationType string   
+    Dosage         string   
+    ExpirationDate time.Time 
+    Quantity       int       
+    UnitsPerBox    int     
+	CenterID       int  
+}
+
+type GeTMedication struct {
+	ID             int       `json:"id"`
+    NameArabic     string    `json:"name_arabic"`
+    NameEnglish    string    `json:"name_english"`
+    MedicationType string    `json:"medication_type"`
+    Dosage         string    `json:"dosage"`
+    ExpirationDate time.Time `json:"expiration_date"`
+    Quantity       int    `json:"quantity"`
+    UnitsPerBox    int       `json:"units_per_box"`
+	
+}
+
+type MedicationStats struct {
+
+    TotalQuantity       int `json:"total_quantity"`         
+    TotalUniqueMedTypes int `json:"total_unique_med_types"` 
+
+}
+
+type UpdateNewQuantity struct {
+	ID          int   `json:"id"`
+	NewQuantity int   `json:"new_quantity"`
 }

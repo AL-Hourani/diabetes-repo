@@ -392,10 +392,25 @@ func (h *Handler)  VerifyTokenHandler(w http.ResponseWriter , r *http.Request) {
 		return
 	}
 
-	if !token.Valid {
-		http.Error(w, "Token expired or invalid", http.StatusUnauthorized)
+	
+	id, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
 		return
 	}
+
+	_ , err = h.store.GetPatientById(id)
+		if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	_ , err = h.storeCenter.GetCenterByID(id)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+	
 
 	utils.WriteJSON(w , http.StatusOK , "Token is Vaild")
 }

@@ -1453,3 +1453,113 @@ func (s *Store) InsertNotification(n types.NotificationTwo) error {
     `, n.SenderID, n.ReceiverID, n.Message)
     return err
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+// medicine 
+func (s *Store) InsertMedication(m types.InsertMedication) error {
+    _, err := s.db.Exec(`
+        INSERT INTO medications (
+            name_arabic,
+            name_english,
+            medication_type,
+            dosage,
+            expiration_date,
+            quantity,
+            units_per_box
+			center_id
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7 ,$8)
+    `,
+        m.NameArabic,
+        m.NameEnglish,
+        m.MedicationType,
+        m.Dosage,
+        m.ExpirationDate,
+        m.Quantity,
+        m.UnitsPerBox,
+		m.CenterID,
+    )
+    return err
+}
+
+
+
+
+
+func (s *Store) GetMedicationStats() (types.MedicationStats, error) {
+    var stats types.MedicationStats
+
+    err := s.db.QueryRow(`
+        SELECT 
+            COALESCE(SUM(quantity), 0) AS total_quantity,
+            COUNT(*) AS total_unique_med_types
+        FROM medications
+    `).Scan(&stats.TotalQuantity, &stats.TotalUniqueMedTypes)
+
+    return stats, err
+}
+
+
+
+
+
+func (s *Store) GetAllMedications(centerID int) ([]types.GeTMedication, error) {
+    rows, err := s.db.Query(`
+        SELECT id , name_arabic, name_english, medication_type, dosage,
+               expiration_date, quantity, units_per_box
+        FROM medications
+        WHERE center_id = $1
+    `, centerID)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var medications []types.GeTMedication
+
+    for rows.Next() {
+        var m types.GeTMedication
+        err := rows.Scan(
+			&m.ID,
+            &m.NameArabic,
+            &m.NameEnglish,
+            &m.MedicationType,
+            &m.Dosage,
+            &m.ExpirationDate,
+            &m.Quantity,
+            &m.UnitsPerBox,
+        )
+        if err != nil {
+            return nil, err
+        }
+        medications = append(medications, m)
+    }
+
+    if err := rows.Err(); err != nil {
+        return nil, err
+    }
+
+    return medications, nil
+}
+
+
+
+
+func (s *Store) UpdateMedicationQuantity(id int, newQuantity int) error {
+    _, err := s.db.Exec(`
+        UPDATE medications
+        SET quantity = $1
+        WHERE id = $2
+    `, newQuantity, id)
+    return err
+}
