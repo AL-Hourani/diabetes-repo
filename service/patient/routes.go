@@ -87,7 +87,7 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 		return
 	}
 
-		// التحقق من صحة كلمة المرور
+		
 		if !auth.ComparePasswords(user.Password, []byte(LoginPayload.Password)) {
 			utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("invalid email or password"))
 			return
@@ -127,7 +127,7 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 			   utils.WriteError(w, http.StatusInternalServerError, err)
 			   return
 		   }
-		   			// إنشاء JWT Token
+	   			
 				secret := []byte(config.Envs.JWTSecret)
 				token, err := auth.CreateJWT(secret, center.ID)
 				if err != nil {

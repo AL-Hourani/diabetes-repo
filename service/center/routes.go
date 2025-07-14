@@ -1294,25 +1294,16 @@ func (h *Handler) handleGetMedicationStats(w http.ResponseWriter, r *http.Reques
 func (h *Handler) handleRequestMedicine(w http.ResponseWriter, r *http.Request) {
 	var medicinePayload types.Medication
 
-
-		_, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
 	if !ok {
 		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
 		return
 	}
 
 
-	vars := mux.Vars(r)
-	idStr, ok := vars["id"]
-	if !ok {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("video ID is required"))
-		return
-	}
-
-	// تحويل ID من نص إلى عدد صحيح
-	id , err := strconv.Atoi(idStr)
+	id, err := auth.GetIDFromToken(token)
 	if err != nil {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid video ID"))
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
 		return
 	}
 
@@ -1350,27 +1341,18 @@ func (h *Handler) handleRequestMedicine(w http.ResponseWriter, r *http.Request) 
 func (h *Handler) handleGetMedicine(w http.ResponseWriter, r *http.Request) {
 
 
-		_, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
 	if !ok {
 		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
 		return
 	}
 
 
-	vars := mux.Vars(r)
-	idStr, ok := vars["id"]
-	if !ok {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("video ID is required"))
-		return
-	}
-
-	// تحويل ID من نص إلى عدد صحيح
-	id , err := strconv.Atoi(idStr)
+	id, err := auth.GetIDFromToken(token)
 	if err != nil {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid video ID"))
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
 		return
 	}
-
 
 
 	medicines , err := h.store.GetAllMedications(id)
