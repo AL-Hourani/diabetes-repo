@@ -1637,3 +1637,34 @@ func (s *Store) GetLogsByCenterID(centerID int) ([]types.MedicationLog, error) {
 
 	return logs, nil
 }
+
+
+
+
+
+func (s *Store) GetUniqueArabicMedicationNames(centerID int) ([]string, error) {
+	rows, err := s.db.Query(`
+		SELECT DISTINCT name_arabic
+		FROM medications
+		WHERE center_id = $1
+	`, centerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var names []string
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			return nil, err
+		}
+		names = append(names, name)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return names, nil
+}

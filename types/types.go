@@ -267,6 +267,7 @@ type CenterStore interface {
 	GetAllMedications(centerID int) ([]GeTMedication, error)
 	UpdateMedicationQuantity(id int, newQuantity int) error
 	GetLogsByCenterID(centerID int) ([]MedicationLog, error)
+	GetUniqueArabicMedicationNames(centerID int) ([]string, error)
 }
 
 type Center struct {
