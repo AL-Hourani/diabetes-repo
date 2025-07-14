@@ -959,43 +959,47 @@ func (s *Store) UpdateIsReadNotifications(userID int) error {
 
 
 func (s *Store) UpdatePatientBasicInfo(p types.UpdatePatientInfo , id int) (*types.UpdatePatientInfo, error){
-	// تنفيذ التحديث
-	_, err := s.db.Exec(`
-		UPDATE patients
-		SET fullName = $1,
-		    email = $2,
-		    phone = $3,
-		    id_number = $4,
-		    date = $5
-		WHERE id = $6
-	`,
-		p.FullName,
-		p.Email,
-		p.Phone,
-		p.IDNumber,
-		p.Date,
-		id,
-	)
-	if err != nil {
-		return nil, err
-	}
 
-	row := s.db.QueryRow(`
-		SELECT fullName, email, phone, id_number, date
-		FROM patients
-		WHERE id = $1
-	`, id)
+    tx, err := s.db.Begin()
+    if err != nil {
+        return &types.UpdatePatientInfo{}, err
+    }
 
-	var updated types.UpdatePatientInfo
-	if err := row.Scan(
-		&updated.FullName,
-		&updated.Email,
-		&updated.Phone,
-		&updated.IDNumber,
-		&updated.Date,
-	); err != nil {
-		return nil, err
-	}
+    // جلب البريد الحالي من جدول المرضى
+    var oldEmail string
+    err = tx.QueryRow(`SELECT email FROM patients WHERE id = $1`, id).Scan(&oldEmail)
+    if err != nil {
+        tx.Rollback()
+        return &types.UpdatePatientInfo{}, fmt.Errorf("failed to fetch existing email: %w", err)
+    }
 
-	return &updated, nil
+    // تحديث بيانات المريض
+    _, err = tx.Exec(`
+        UPDATE patients
+        SET fullName = $1, email = $2, phone = $3, id_number = $4, date = $5
+        WHERE id = $6
+    `, p.FullName, p.Email, p.Phone, p.IDNumber, p.Date, id)
+    if err != nil {
+        tx.Rollback()
+        return &types.UpdatePatientInfo{}, err
+    }
+
+    // تحديث البريد في جدول login_serach باستخدام البريد القديم
+    _, err = tx.Exec(`
+        UPDATE login_serach
+        SET email = $1
+        WHERE email = $2
+    `, p.Email, oldEmail)
+    if err != nil {
+        tx.Rollback()
+        return &types.UpdatePatientInfo{}, err
+    }
+
+    if err := tx.Commit(); err != nil {
+        return &types.UpdatePatientInfo{}, err
+    }
+
+    return &p, nil
 }
+
+
