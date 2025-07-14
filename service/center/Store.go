@@ -1603,8 +1603,8 @@ func (s *Store) UpdateMedicationQuantity(id int, newQuantity int) error {
 
 func (s *Store) GetLogsByCenterID(centerID int) ([]types.MedicationLog, error) {
 	rows, err := s.db.Query(`
-        SELECT id, name_arabic, dosage, medication_type, quantity, requested_at
-        FROM medication_logs
+        SELECT id, name_arabic, dosage, medication_type, requested_quantity, requested_at
+        FROM medication_requests
         WHERE center_id = $1
         ORDER BY requested_at DESC
     `, centerID)
