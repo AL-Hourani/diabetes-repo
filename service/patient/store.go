@@ -958,3 +958,44 @@ func (s *Store) UpdateIsReadNotifications(userID int) error {
 
 
 
+func (s *Store) UpdatePatientBasicInfo(p types.UpdatePatientInfo , id int) (*types.UpdatePatientInfo, error){
+	// تنفيذ التحديث
+	_, err := s.db.Exec(`
+		UPDATE patients
+		SET fullName = $1,
+		    email = $2,
+		    phone = $3,
+		    id_number = $4,
+		    date = $5
+		WHERE id = $6
+	`,
+		p.FullName,
+		p.Email,
+		p.Phone,
+		p.IDNumber,
+		p.Date,
+		id,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	row := s.db.QueryRow(`
+		SELECT fullName, email, phone, id_number, date
+		FROM patients
+		WHERE id = $1
+	`, id)
+
+	var updated types.UpdatePatientInfo
+	if err := row.Scan(
+		&updated.FullName,
+		&updated.Email,
+		&updated.Phone,
+		&updated.IDNumber,
+		&updated.Date,
+	); err != nil {
+		return nil, err
+	}
+
+	return &updated, nil
+}

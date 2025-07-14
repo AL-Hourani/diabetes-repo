@@ -52,7 +52,9 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/getNotifications" ,  auth.WithJWTAuth(h.handleGetPatientNotifications)).Methods("GET")
 	router.HandleFunc("/notifications/mark-all-read" ,  auth.WithJWTAuth(h.MarkAllNotificationsAsRead)).Methods("PUT")
    
+	router.HandleFunc("/UpdatePatientProfile" ,  auth.WithJWTAuth(h.handleUpdatePatient)).Methods("POST")
 
+	
 
 }
 
@@ -810,3 +812,45 @@ func (h *Handler) MarkAllNotificationsAsRead(w http.ResponseWriter , r *http.Req
     })   
 
 }
+
+
+
+
+
+
+
+func (h *Handler) handleUpdatePatient(w http.ResponseWriter, r *http.Request) {
+	var updateData types.UpdatePatientInfo
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	patientID, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	
+	if err := utils.ParseJSON(r , &updateData); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+		return
+	}
+
+
+	updatedPatient, err := h.store.UpdatePatientBasicInfo(updateData , patientID)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, updatedPatient)
+
+
+}
+
+
+
+

@@ -31,8 +31,9 @@ type PatientStore interface {
     GetUserByID(id int) (*UserLoginData, error) 
 	GetReviewsByPatientID(patientID int) ([]ReviewResponseForPatient, error) 
 
-	 GetNotificationsByUserID(userID int) ([]NotificationTwo, error)
-	  UpdateIsReadNotifications(userID int) error
+	GetNotificationsByUserID(userID int) ([]NotificationTwo, error)
+	UpdateIsReadNotifications(userID int) error
+	UpdatePatientBasicInfo(p UpdatePatientInfo , id int) (*UpdatePatientInfo, error)
 
    
 }
@@ -1022,4 +1023,22 @@ type MedicationLog struct {
 	MedicationType string    `json:"medication_type"`
 	Quantity       int       `json:"quantity"`
 	RequestedAt    time.Time `json:"requested_at"`
+}
+
+
+
+
+
+
+
+
+
+
+
+type UpdatePatientInfo struct {
+	FullName  string `json:"full_name"`
+	Email     string `json:"email"`
+	Phone     string `json:"phone"`
+	IDNumber  string `json:"id_number"`
+	Date      string `json:"date"`
 }
