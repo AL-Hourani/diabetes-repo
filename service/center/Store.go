@@ -1468,7 +1468,14 @@ func (s *Store) InsertNotification(n types.NotificationTwo) error {
 
 // medicine 
 func (s *Store) InsertMedication(m types.InsertMedication) error {
-    _, err := s.db.Exec(`
+
+    tx, err := s.db.Begin()
+    if err != nil {
+        return err
+    }
+
+    // إدخال الدواء في جدول medications
+    _, err = tx.Exec(`
         INSERT INTO medications (
             name_arabic,
             name_english,
@@ -1476,9 +1483,9 @@ func (s *Store) InsertMedication(m types.InsertMedication) error {
             dosage,
             expiration_date,
             quantity,
-            units_per_box
-			center_id
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7 ,$8)
+            units_per_box,
+            center_id
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     `,
         m.NameArabic,
         m.NameEnglish,
@@ -1487,10 +1494,39 @@ func (s *Store) InsertMedication(m types.InsertMedication) error {
         m.ExpirationDate,
         m.Quantity,
         m.UnitsPerBox,
-		m.CenterID,
+        m.CenterID,
     )
-    return err
+    if err != nil {
+        tx.Rollback()
+        return err
+    }
+
+    // إضافة سجل في جدول medication_logs مع center_id
+    _, err = tx.Exec(`
+        INSERT INTO medication_requests (
+            name_arabic,
+            dosage,
+            medication_type,
+            requested_quantity,
+            center_id,
+			requested_at
+        ) VALUES ($1, $2, $3, $4, $5 , NOW())
+    `,
+        m.NameArabic,
+        m.Dosage,
+        m.MedicationType,
+        m.Quantity,
+        m.CenterID,
+    )
+    if err != nil {
+        tx.Rollback()
+        return err
+    }
+
+    return tx.Commit()
 }
+
+
 
 
 
@@ -1562,4 +1598,42 @@ func (s *Store) UpdateMedicationQuantity(id int, newQuantity int) error {
         WHERE id = $2
     `, newQuantity, id)
     return err
+}
+
+
+func (s *Store) GetLogsByCenterID(centerID int) ([]types.MedicationLog, error) {
+	rows, err := s.db.Query(`
+        SELECT id, name_arabic, dosage, medication_type, quantity, requested_at
+        FROM medication_logs
+        WHERE center_id = $1
+        ORDER BY requested_at DESC
+    `, centerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var logs []types.MedicationLog
+	for rows.Next() {
+		var log types.MedicationLog
+		err := rows.Scan(
+			&log.ID,
+			&log.NameArabic,
+			&log.Dosage,
+			&log.MedicationType,
+			&log.Quantity,
+			&log.RequestedAt,
+		
+		)
+		if err != nil {
+			return nil, err
+		}
+		logs = append(logs, log)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return logs, nil
 }

@@ -1,5 +1,0 @@
-
-
-
-ALTER TABLE medications
-ALTER COLUMN quantity TYPE INTEGER USING quantity::INTEGER;
