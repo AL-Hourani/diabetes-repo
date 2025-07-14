@@ -34,6 +34,12 @@ type PatientStore interface {
 	GetNotificationsByUserID(userID int) ([]NotificationTwo, error)
 	UpdateIsReadNotifications(userID int) error
 	UpdatePatientBasicInfo(p UpdatePatientInfo , id int) (*UpdatePatientInfo, error)
+	UpdatePatientCenterInfo(id int, update UpdatePatientCenterInfo)  (UpdatePatientCenterInfo, error) 
+    ChangePatientPassword(patientID int, payload ChangePassword) error 
+
+
+
+
 
    
 }
@@ -1041,4 +1047,20 @@ type UpdatePatientInfo struct {
 	Phone     string `json:"phone"`
 	IDNumber  string `json:"id_number"`
 	Date      string `json:"date"`
+}
+
+
+
+
+
+type UpdatePatientCenterInfo struct {
+
+	City       string  `json:"city"`
+	CenterName string    `json:"centerName"`
+}
+
+type ChangePassword struct {
+
+	OldPassword       string  `json:"old_password"`
+	NewPassword       string  `json:"new_password"`
 }

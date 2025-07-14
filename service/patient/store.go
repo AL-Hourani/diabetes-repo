@@ -1003,3 +1003,87 @@ func (s *Store) UpdatePatientBasicInfo(p types.UpdatePatientInfo , id int) (*typ
 }
 
 
+
+
+func (s *Store) GetCenterIDByName(name string) (int, error) {
+	var id int
+	err := s.db.QueryRow(`SELECT id FROM centers WHERE centerName = $1`, name).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}
+
+
+
+
+func (s *Store) UpdatePatientCenterInfo(id int, update types.UpdatePatientCenterInfo) (types.UpdatePatientCenterInfo, error) {
+	centerID, err := s.GetCenterIDByName(update.CenterName)
+	if err != nil {
+		return types.UpdatePatientCenterInfo{}, fmt.Errorf("center not found: %w", err)
+	}
+
+	_, err = s.db.Exec(`
+		UPDATE patients
+		SET city = $1, center_id = $2
+		WHERE id = $3
+	`, update.City, centerID, id)
+	if err != nil {
+		return types.UpdatePatientCenterInfo{}, err
+	}
+
+	var centerName string
+	err = s.db.QueryRow(`SELECT centerName FROM centers WHERE id = $1`, centerID).Scan(&centerName)
+	if err != nil {
+		return types.UpdatePatientCenterInfo{}, err
+	}
+
+	result := types.UpdatePatientCenterInfo{
+		City:       update.City,
+		CenterName: centerName,
+	}
+
+	return result, nil
+	
+}
+
+
+
+
+
+
+
+
+func (s *Store) ChangePatientPassword(patientID int, payload types.ChangePassword) error {
+
+	var email, storedHashedPassword string
+	err := s.db.QueryRow(`SELECT email, password FROM patients WHERE id = $1`, patientID).Scan(&email, &storedHashedPassword)
+	if err != nil {
+		return fmt.Errorf("failed to get patient credentials: %w", err)
+	}
+
+	
+	if !auth.ComparePasswords(storedHashedPassword, []byte(payload.OldPassword)) {
+		return fmt.Errorf("old password is incorrect")
+	}
+
+	// تشفير كلمة المرور الجديدة
+	hashedNewPassword, err := auth.HashPassword(payload.NewPassword)
+	if err != nil {
+		return fmt.Errorf("failed to hash new password: %w", err)
+	}
+
+	// تحديث كلمة المرور الجديدة في جدول login_serach
+	_, err = s.db.Exec(`UPDATE login_serach SET password = $1 WHERE email = $2`, hashedNewPassword, email)
+	if err != nil {
+		return fmt.Errorf("failed to update password in login_serach: %w", err)
+	}
+
+	// تحديث كلمة المرور في جدول patients أيضاً (إذا مخزنة هناك)
+	_, err = s.db.Exec(`UPDATE patients SET password = $1 WHERE id = $2`, hashedNewPassword, patientID)
+	if err != nil {
+		return fmt.Errorf("failed to update password in patients: %w", err)
+	}
+
+	return nil
+}
