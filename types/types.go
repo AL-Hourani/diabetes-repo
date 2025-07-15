@@ -274,7 +274,7 @@ type CenterStore interface {
 	GetAllMedications(centerID int) ([]GeTMedication, error)
 	UpdateMedicationQuantity(id int, newQuantity int) error
 	GetLogsByCenterID(centerID int) ([]MedicationLog, error)
-	GetUniqueArabicMedicationNames(centerID int) ([]string, error)
+	GetReviewMedicationNames(centerID int) ([]GeTMedicationReview, error) 
 }
 
 type Center struct {
@@ -1004,7 +1004,7 @@ type GeTMedication struct {
     MedicationType string    `json:"medication_type"`
     Dosage         string    `json:"dosage"`
     ExpirationDate time.Time `json:"expiration_date"`
-    Quantity       int    `json:"quantity"`
+    Quantity       int        `json:"quantity"`
     UnitsPerBox    int       `json:"units_per_box"`
 	
 }
@@ -1063,4 +1063,11 @@ type ChangePassword struct {
 
 	OldPassword       string  `json:"old_password"`
 	NewPassword       string  `json:"new_password"`
+}
+
+
+type GeTMedicationReview struct {
+    NameArabic     string    `json:"name_arabic"`
+    Dosage         string    `json:"dosage"`
+    UnitsPerBox    int       `json:"units_per_box"`
 }

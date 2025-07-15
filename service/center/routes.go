@@ -88,7 +88,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/getMedicines",auth.WithJWTAuth(h.handleGetMedicine)).Methods("GET")
 	router.HandleFunc("/updateQuantity",auth.WithJWTAuth(h.handleUpdateNewQuantity)).Methods("POST")
    	router.HandleFunc("/getMedicineLogs",auth.WithJWTAuth(h.handleGetMedicationLogs)).Methods("GET")
-    router.HandleFunc("/getUniqueMedicinesName",auth.WithJWTAuth(h.handleGetUniqueMedicinesName)).Methods("GET")
+    router.HandleFunc("/getReviewMedicinesName",auth.WithJWTAuth(h.handleGetReviewMedicinesName)).Methods("GET")
 
 }
 
@@ -1426,7 +1426,7 @@ func (h *Handler) handleGetMedicationLogs(w http.ResponseWriter, r *http.Request
 
 
 
-func (h *Handler) handleGetUniqueMedicinesName(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) handleGetReviewMedicinesName(w http.ResponseWriter, r *http.Request) {
 	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
 	if !ok {
 		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
@@ -1439,7 +1439,7 @@ func (h *Handler) handleGetUniqueMedicinesName(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	names , err := h.store.GetUniqueArabicMedicationNames(centerID)
+	names , err := h.store.GetReviewMedicationNames(centerID)
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return

@@ -1642,9 +1642,9 @@ func (s *Store) GetLogsByCenterID(centerID int) ([]types.MedicationLog, error) {
 
 
 
-func (s *Store) GetUniqueArabicMedicationNames(centerID int) ([]string, error) {
+func (s *Store) GetReviewMedicationNames(centerID int) ([]types.GeTMedicationReview, error) {
 	rows, err := s.db.Query(`
-		SELECT DISTINCT name_arabic
+		SELECT  name_arabic , dosage , units_per_box
 		FROM medications
 		WHERE center_id = $1
 	`, centerID)
@@ -1653,18 +1653,18 @@ func (s *Store) GetUniqueArabicMedicationNames(centerID int) ([]string, error) {
 	}
 	defer rows.Close()
 
-	var names []string
+	var reviewMedicine []types.GeTMedicationReview
 	for rows.Next() {
-		var name string
-		if err := rows.Scan(&name); err != nil {
+		var rm types.GeTMedicationReview
+		if err := rows.Scan(&rm.NameArabic , &rm.Dosage , &rm.UnitsPerBox); err != nil {
 			return nil, err
 		}
-		names = append(names, name)
+		reviewMedicine = append(reviewMedicine, rm)
 	}
 
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 
-	return names, nil
+	return reviewMedicine, nil
 }
