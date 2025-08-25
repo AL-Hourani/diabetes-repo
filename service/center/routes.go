@@ -103,12 +103,12 @@ func (h *Handler) handleCenterRegister(w http.ResponseWriter , r *http.Request) 
 			utils.WriteError(w , http.StatusBadRequest , err)
 		}
 
-	// check from secret center key
+	// // check from secret center key
 
-	   if centerPayload.CenterKey != config.GetEnv("CENTER_KEY" , ""){
-		   utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("invalid center Key"))
-		   return
-	   }
+	//    if centerPayload.CenterKey != config.GetEnv("CENTER_KEY" , ""){
+	// 	   utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("invalid center Key"))
+	// 	   return
+	//    }
 
 		
 	// // check if center exists
