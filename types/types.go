@@ -277,6 +277,11 @@ type CenterStore interface {
 	GetReviewMedicationNames(centerID int) ([]GeTMedicationReview, error) 
 }
 
+
+
+type CheckIsCenter struct {
+	SecretKey        string       `json:"secret_key"`
+}
 type Center struct {
 	ID				int          `json:"centerId"`
     CenterName		string		 `json:"centerName"`

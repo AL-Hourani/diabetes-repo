@@ -42,6 +42,7 @@ func NewHandler(store types.CenterStore , patientStore types.PatientStore , sess
 func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	// router.HandleFunc("/centerLogin", h.handleCenterLogin).Methods("POST")
 	router.HandleFunc("/centerRegister", h.handleCenterRegister).Methods("POST")
+	router.HandleFunc("/checkIsCenter", h.handleCheckIsCenter).Methods("POST")
 	router.HandleFunc("/confirmAccount", h.handleConfirmPatientAccount).Methods("POST")
 	router.HandleFunc("/getCenters/{city}",h.handleGetCenters).Methods("GET")
 	router.HandleFunc("/getCities",h.handleGetCities).Methods("GET")
@@ -215,6 +216,23 @@ func (h *Handler) handleGetPatients(w http.ResponseWriter , r *http.Request) {
 }
 
 
+
+// check is center .....
+
+func (h *Handler) handleCheckIsCenter(w http.ResponseWriter , r *http.Request) {
+    var SecretKey types.CheckIsCenter
+
+	if err := utils.ParseJSON(r , &SecretKey); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+	}
+
+	if SecretKey.SecretKey != config.Envs.CENTERKEY {
+	    utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Secret key is in correct"))
+		return
+	}
+
+	utils.WriteJSON(w , http.StatusOK ,"")
+}
 
 func (h *Handler) handleGetCenters(w http.ResponseWriter , r *http.Request) {
 	vars := mux.Vars(r)

@@ -4,8 +4,8 @@ import (
 	// "fmt"
 	"os"
 	"strconv"
-	"github.com/joho/godotenv"
-	"fmt"
+	// "github.com/joho/godotenv"
+	// "fmt"
 )
 
 type Config struct {
@@ -24,17 +24,21 @@ type Config struct {
 	JWTSecret  string
 	MAILERSEND_SMTP_USER string
 	MAILERSEND_SMTP_PASS  string
+
+
+	CENTERKEY  string
 }
 
 var Envs = initConfig()
 
 func initConfig() Config {
-		err := godotenv.Load()
-		if err != nil {
-			fmt.Println("error can load .env file so we use the loacl env")
-		}
+		// err := godotenv.Load()
+		// if err != nil {
+		// 	fmt.Println("error can load .env file so we use the loacl env")
+		// }
 	return Config{
 		// PublicHost: GetEnv("PUBLIC_HOST", ""),
+		CENTERKEY: GetEnv("CENTER_KEY" , ""),
 		DBPort:GetEnv("DB_PORT" ,""),
 		DBHost:GetEnv("DB_HOST" ,""),
 		DBUser: GetEnv("DB_USER",""),
