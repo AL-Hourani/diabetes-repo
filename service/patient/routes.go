@@ -36,7 +36,7 @@ func NewHandler(store types.PatientStore , centerStore types.CenterStore , sessi
 
 func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/Login", h.handleLogin).Methods("POST")
-	router.HandleFunc("/patientRegister", h.handlePatientRegister).Methods("POST")
+	router.HandleFunc("/patientRegister", auth.WithJWTAuth(h.handlePatientRegister)).Methods("POST")
 	router.HandleFunc("/getPatient/{id}" , h.handleGetPatient).Methods("GET")
 	// router.HandleFunc("/getPatientProfile/{id}" , h.handleGetPatientProfile).Methods("GET")
 	// router.HandleFunc("/getAllPatientInfo/{id}" , h.handleGetAllPatientInfo).Methods("GET")
@@ -158,7 +158,6 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 
 
 func (h *Handler) handlePatientRegister(w http.ResponseWriter , r *http.Request) {
-
 
 	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
 	if !ok {
