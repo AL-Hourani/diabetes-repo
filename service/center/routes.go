@@ -2,14 +2,17 @@ package center
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
+
 	// "strings"
 	// "time"
 
 	"github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/service/auth"
 	"github.com/AL-Hourani/care-center/service/notifications"
+
 	// "github.com/AL-Hourani/care-center/service/patient"
 	"github.com/AL-Hourani/care-center/service/session"
 	"github.com/AL-Hourani/care-center/types"
@@ -471,8 +474,252 @@ func (h *Handler) handleUpdateCenterProfile(w http.ResponseWriter, r *http.Reque
 
 
 
-// handle with reviws
-func (h *Handler) handleAddReviewe (w http.ResponseWriter, r *http.Request) { 
+// // handle with reviws
+// func (h *Handler) handleAddReviewe (w http.ResponseWriter, r *http.Request) { 
+// 	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+// 	if !ok {
+// 		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+// 		return
+// 	}
+
+// 	_, err := auth.GetIDFromToken(token)
+// 	if err != nil {
+// 		http.Error(w, "Invalid token", http.StatusUnauthorized)
+// 		return
+// 	}
+
+//     var  AddReviewsPayload types.AddReviwePayload
+
+
+// 	if err := utils.ParseJSON(r , &AddReviewsPayload); err != nil {
+// 		utils.WriteError(w , http.StatusBadRequest , err)
+// 		return
+// 	}
+
+
+
+// 	newReviewe := types.Reviwe{
+// 		PatientID: AddReviewsPayload.PatientID,
+// 		Address: AddReviewsPayload.Address,
+// 		Weight: AddReviewsPayload.Weight,
+// 		LengthPatient: AddReviewsPayload.LengthPatient,
+// 		SugarType: AddReviewsPayload.SugarType,
+// 		OtherDisease: AddReviewsPayload.OtherDisease,
+// 		HistoryOfFamilyDisease: AddReviewsPayload.HistoryOfFamilyDisease,
+// 		HistoryOfDiseaseDetection: AddReviewsPayload.HistoryOfDiseaseDetection,
+// 		Gender: AddReviewsPayload.Gender,
+// 		Hemoglobin: AddReviewsPayload.Hemoglobin,
+// 		Grease: AddReviewsPayload.Grease,
+// 		UrineAcid: AddReviewsPayload.UrineAcid,
+// 		BloodPressure: AddReviewsPayload.BloodPressure,
+// 		Cholesterol: AddReviewsPayload.Cholesterol,
+// 		LDL: AddReviewsPayload.LDL,
+// 		HDL: AddReviewsPayload.HDL,
+// 		Creatine: AddReviewsPayload.Creatine,
+// 		Normal_Glocose: AddReviewsPayload.Normal_Glocose,
+// 		Glocose_after_Meal: AddReviewsPayload.Glocose_after_Meal,
+// 		Triple_Grease: AddReviewsPayload.Triple_Grease,
+// 		Hba1c: AddReviewsPayload.Hba1c,
+// 		Coments: AddReviewsPayload.Coments,
+		
+// 	}
+
+// 	// add review 
+// 	Review_id , err := h.store.InsertReview(newReviewe)
+// 	if err != nil {
+// 		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding review info : %v" , err))
+// 		return
+// 	}
+
+
+// 	// get id for this review
+
+
+// 	// add treatment
+// 	newTreatment := types.TreatmentInsert {
+// 	    ReviewID: Review_id,
+// 		Speed: AddReviewsPayload.Treatments.Speed,
+// 		Type: AddReviewsPayload.Treatments.Type,
+
+// 	}
+// 	treatmentID ,err := h.store.InsertTreatment(newTreatment)
+// 	if err != nil {
+// 		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding Tratment"))
+// 		return
+// 	}
+
+// 	var drugNames []string
+
+// 	for _, drug := range AddReviewsPayload.Treatments.Drugs {
+// 	drugID, err := h.store.FindOrCreateDrugByName(drug.Name)
+// 	if err != nil {
+// 		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("failed to add/find drug: %w", err))
+// 		return
+// 	}
+
+// 	drugNames = append(drugNames, drug.Name)
+
+// 	// ربط الدواء بالعلاج
+// 	err = h.store.InsertTreatmentDrug(types.TreatmentDrug{
+// 		TreatmentID:   treatmentID,
+// 		DrugID:        drugID,
+// 		DosagePerDay:  drug.Dosage_per_day,
+// 		Units:         drug.Units,
+// 	})
+// 	if err != nil {
+// 		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("failed to insert treatment-drug: %w", err))
+// 		return
+// 	}
+// }
+
+
+
+
+// 	if AddReviewsPayload.Has_a_eye_disease {
+
+//       newClininEyeInfo := types.Clinic_Eye {
+// 		ReviewID: Review_id,
+//         Has_a_eye_disease: AddReviewsPayload.Has_a_eye_disease,
+// 		In_kind_disease: AddReviewsPayload.In_kind_disease,
+// 		Relationship_eyes_with_diabetes: AddReviewsPayload.Relationship_eyes_with_diabetes,
+// 		Comments_eyes_clinic: AddReviewsPayload.Comments_eyes_clinic,
+// 	  }
+
+// 	  	err := h.store.InsertClinicEye(newClininEyeInfo)
+// 			if err != nil {
+// 				utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding clinic eye info"))
+// 				return
+// 			}
+// 	}
+
+// 	// 2
+
+// 	if AddReviewsPayload.Has_a_heart_disease {
+		
+//       newClininHeartInfo := types.Clinic_heart {
+// 		ReviewID: Review_id,
+// 		Has_a_heart_disease: AddReviewsPayload.Has_a_heart_disease,
+// 		Heart_disease: AddReviewsPayload.Heart_disease,
+// 		Relationship_heart_with_diabetes: AddReviewsPayload.Relationship_heart_with_diabetes,
+// 		Comments_heart_clinic: AddReviewsPayload.Comments_heart_clinic,
+// 	  }
+// 	  	  	err := h.store.InsertClinicHeart(newClininHeartInfo)
+// 			if err != nil {
+// 				utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding clinic heart info"))
+// 				return
+// 			}
+
+// 	}
+
+
+
+// 	// 3
+
+// 	if AddReviewsPayload.Has_a_nerve_disease {
+				
+//       newClininNerveInfo := types.Clinic__nerve {
+// 		ReviewID: Review_id,
+// 		Has_a_nerve_disease: AddReviewsPayload.Has_a_nerve_disease,
+// 		Nerve_disease: AddReviewsPayload.Nerve_disease,
+// 		Relationship_nerve_with_diabetes: AddReviewsPayload.Relationship_nerve_with_diabetes,
+// 		Comments_nerve_clinic: AddReviewsPayload.Comments_nerve_clinic,
+// 	  }
+// 	  	  	err := h.store.InsertClinicNerve(newClininNerveInfo)
+// 			if err != nil {
+// 				utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding clinic nerve info"))
+// 				return
+// 			}
+
+// 	}
+
+
+// 	// 4
+	
+// 	if AddReviewsPayload.Has_a_bone_disease {
+				
+//       newClininBoneInfo := types.Clinic__bone {
+// 		ReviewID: Review_id,
+// 	    Has_a_bone_disease: AddReviewsPayload.Has_a_bone_disease,
+// 		Bone_disease: AddReviewsPayload.Bone_disease,
+// 		Relationship_bone_with_diabetes: AddReviewsPayload.Relationship_bone_with_diabetes,
+// 		Comments_bone_clinic: AddReviewsPayload.Comments_bone_clinic,
+// 	  }
+// 	  	  	err := h.store.InsertClinicBone(newClininBoneInfo)
+// 			if err != nil {
+// 				utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding clinic bone info"))
+// 				return
+// 			}
+
+// 	}
+
+// 	// 5
+
+		
+// 	if AddReviewsPayload.Has_a_urinary_disease {
+				
+//       newClininUrinaryInfo := types.Clinic__urinary {
+// 		ReviewID: Review_id,
+// 		Has_a_urinary_disease: AddReviewsPayload.Has_a_urinary_disease,
+// 		Urinary_disease: AddReviewsPayload.Urinary_disease,
+// 		Relationship_urinary_with_diabetes: AddReviewsPayload.Relationship_urinary_with_diabetes,
+// 		Comments_urinary_clinic: AddReviewsPayload.Comments_urinary_clinic,
+// 	  }
+// 	  	  	err := h.store.InsertClinicUrinary(newClininUrinaryInfo)
+// 			if err != nil {
+// 				utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding clinic urinary info"))
+// 				return
+// 			}
+
+// 	}
+
+
+
+// 	// newConfirmAccount := types.ConfirmAccount {
+// 	// 	ID: AddReviewsPayload.PatientID,
+// 	// 	IsCompleted: true,
+// 	// }
+// 	// err = h.store.UpdateIsCompletedPatientField(newConfirmAccount)
+// 	// if err != nil {
+// 	// 	utils.WriteError(w, http.StatusBadRequest ,err)
+// 	// }
+
+
+
+
+// // 	message := fmt.Sprintf("🩺 تمت إضافة مراجعة جديدة لك، وتشمل الأدوية التالية: %s", strings.Join(drugNames, "، "))
+
+// // 	h.NotifHub.Broadcast <- types.Notification{
+// //     SenderID:   center_id, 
+// //     ReceiverID: AddReviewsPayload.PatientID,
+// //     Message:    message,
+// // 	IsRead: false,
+// // 	CreatedAt: patient.FormatRelativeTime(time.Now()),
+
+// //    }
+
+   
+// //    _ = h.store.InsertNotification(types.NotificationTwo{
+// //     SenderID:   center_id,
+// //     ReceiverID: AddReviewsPayload.PatientID,
+// //     Message:    message,
+// //     })
+
+
+
+// 	utils.WriteJSON(w , http.StatusOK , map[string]string{
+// 		"message": "Review added successfully",
+// 	})
+
+
+
+// }
+
+
+
+// add review / 
+
+func (h *Handler) handleAddReviewe(w http.ResponseWriter, r *http.Request) {
+	// التحقق من التوكن
 	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
 	if !ok {
 		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
@@ -485,235 +732,150 @@ func (h *Handler) handleAddReviewe (w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-    var  AddReviewsPayload types.AddReviwePayload
-
-
-	if err := utils.ParseJSON(r , &AddReviewsPayload); err != nil {
-		utils.WriteError(w , http.StatusBadRequest , err)
+	// قراءة الـ payload
+	var payload types.AddReviwePayload
+	if err := utils.ParseJSON(r, &payload); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
-
-
-	newReviewe := types.Reviwe{
-		PatientID: AddReviewsPayload.PatientID,
-		Address: AddReviewsPayload.Address,
-		Weight: AddReviewsPayload.Weight,
-		LengthPatient: AddReviewsPayload.LengthPatient,
-		SugarType: AddReviewsPayload.SugarType,
-		OtherDisease: AddReviewsPayload.OtherDisease,
-		HistoryOfFamilyDisease: AddReviewsPayload.HistoryOfFamilyDisease,
-		HistoryOfDiseaseDetection: AddReviewsPayload.HistoryOfDiseaseDetection,
-		Gender: AddReviewsPayload.Gender,
-		Hemoglobin: AddReviewsPayload.Hemoglobin,
-		Grease: AddReviewsPayload.Grease,
-		UrineAcid: AddReviewsPayload.UrineAcid,
-		BloodPressure: AddReviewsPayload.BloodPressure,
-		Cholesterol: AddReviewsPayload.Cholesterol,
-		LDL: AddReviewsPayload.LDL,
-		HDL: AddReviewsPayload.HDL,
-		Creatine: AddReviewsPayload.Creatine,
-		Normal_Glocose: AddReviewsPayload.Normal_Glocose,
-		Glocose_after_Meal: AddReviewsPayload.Glocose_after_Meal,
-		Triple_Grease: AddReviewsPayload.Triple_Grease,
-		Hba1c: AddReviewsPayload.Hba1c,
-		Coments: AddReviewsPayload.Coments,
-		
+	// إدخال المراجعة الأساسية
+	newReview := types.Reviwe{
+		PatientID:                 payload.PatientID,
+		Address:                   payload.Address,
+		Weight:                    payload.Weight,
+		LengthPatient:             payload.LengthPatient,
+		SugarType:                 payload.SugarType,
+		OtherDisease:              payload.OtherDisease,
+		HistoryOfFamilyDisease:    payload.HistoryOfFamilyDisease,
+		HistoryOfDiseaseDetection: payload.HistoryOfDiseaseDetection,
+		Gender:                    payload.Gender,
+		Hemoglobin:                payload.Hemoglobin,
+		Grease:                    payload.Grease,
+		UrineAcid:                 payload.UrineAcid,
+		BloodPressure:             payload.BloodPressure,
+		Cholesterol:               payload.Cholesterol,
+		LDL:                       payload.LDL,
+		HDL:                       payload.HDL,
+		Creatine:                  payload.Creatine,
+		Normal_Glocose:            payload.Normal_Glocose,
+		Glocose_after_Meal:        payload.Glocose_after_Meal,
+		Triple_Grease:             payload.Triple_Grease,
+		Hba1c:                     payload.Hba1c,
+		Coments:                   payload.Coments,
 	}
 
-	// add review 
-	Review_id , err := h.store.InsertReview(newReviewe)
+	reviewID, err := h.store.InsertReview(newReview)
 	if err != nil {
-		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding review info : %v" , err))
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("error adding review: %v", err))
 		return
 	}
 
-
-	// get id for this review
-
-
-	// add treatment
-	newTreatment := types.TreatmentInsert {
-	    ReviewID: Review_id,
-		Speed: AddReviewsPayload.Treatments.Speed,
-		Type: AddReviewsPayload.Treatments.Type,
-
+	// إدخال العلاج الأساسي
+	newTreatment := types.TreatmentInsert{
+		ReviewID: reviewID,
+		Speed:    payload.Treatments.Speed,
+		Type:     payload.Treatments.Type,
 	}
-	treatmentID ,err := h.store.InsertTreatment(newTreatment)
+
+	treatmentID, err := h.store.InsertTreatment(newTreatment)
 	if err != nil {
-		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding Tratment"))
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("error adding treatment"))
 		return
 	}
 
-	var drugNames []string
-
-	for _, drug := range AddReviewsPayload.Treatments.Drugs {
-	drugID, err := h.store.FindOrCreateDrugByName(drug.Name)
-	if err != nil {
-		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("failed to add/find drug: %w", err))
-		return
-	}
-
-	 drugNames = append(drugNames, drug.Name)
-
-	// ربط الدواء بالعلاج
-	err = h.store.InsertTreatmentDrug(types.TreatmentDrug{
-		TreatmentID:   treatmentID,
-		DrugID:        drugID,
-		DosagePerDay:  drug.Dosage_per_day,
-		Units:         drug.Units,
-	})
-	if err != nil {
-		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("failed to insert treatment-drug: %w", err))
-		return
-	}
-}
-
-
-
-
-	if AddReviewsPayload.Has_a_eye_disease {
-
-      newClininEyeInfo := types.Clinic_Eye {
-		ReviewID: Review_id,
-        Has_a_eye_disease: AddReviewsPayload.Has_a_eye_disease,
-		In_kind_disease: AddReviewsPayload.In_kind_disease,
-		Relationship_eyes_with_diabetes: AddReviewsPayload.Relationship_eyes_with_diabetes,
-		Comments_eyes_clinic: AddReviewsPayload.Comments_eyes_clinic,
-	  }
-
-	  	err := h.store.InsertClinicEye(newClininEyeInfo)
+	// إدخال الأدوية وربطها بالعلاج
+	go func() {
+		for _, drug := range payload.Treatments.Drugs {
+			drugID, err := h.store.FindOrCreateDrugByName(drug.Name)
 			if err != nil {
-				utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding clinic eye info"))
-				return
-			}
-	}
-
-	// 2
-
-	if AddReviewsPayload.Has_a_heart_disease {
-		
-      newClininHeartInfo := types.Clinic_heart {
-		ReviewID: Review_id,
-		Has_a_heart_disease: AddReviewsPayload.Has_a_heart_disease,
-		Heart_disease: AddReviewsPayload.Heart_disease,
-		Relationship_heart_with_diabetes: AddReviewsPayload.Relationship_heart_with_diabetes,
-		Comments_heart_clinic: AddReviewsPayload.Comments_heart_clinic,
-	  }
-	  	  	err := h.store.InsertClinicHeart(newClininHeartInfo)
-			if err != nil {
-				utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding clinic heart info"))
-				return
+				log.Println("failed to add/find drug:", err)
+				continue
 			}
 
-	}
-
-
-
-	// 3
-
-	if AddReviewsPayload.Has_a_nerve_disease {
-				
-      newClininNerveInfo := types.Clinic__nerve {
-		ReviewID: Review_id,
-		Has_a_nerve_disease: AddReviewsPayload.Has_a_nerve_disease,
-		Nerve_disease: AddReviewsPayload.Nerve_disease,
-		Relationship_nerve_with_diabetes: AddReviewsPayload.Relationship_nerve_with_diabetes,
-		Comments_nerve_clinic: AddReviewsPayload.Comments_nerve_clinic,
-	  }
-	  	  	err := h.store.InsertClinicNerve(newClininNerveInfo)
+			err = h.store.InsertTreatmentDrug(types.TreatmentDrug{
+				TreatmentID:  treatmentID,
+				DrugID:       drugID,
+				DosagePerDay: drug.Dosage_per_day,
+				Units:        drug.Units,
+			})
 			if err != nil {
-				utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding clinic nerve info"))
-				return
+				log.Println("failed to insert treatment-drug:", err)
 			}
+		}
+	}()
 
-	}
+	// العمليات الثانوية: إدخال بيانات العيون / القلب / الأعصاب / العظام / البول
+	go func() {
+		if payload.Has_a_eye_disease {
+			_ = h.store.InsertClinicEye(types.Clinic_Eye{
+				ReviewID:                     reviewID,
+				Has_a_eye_disease:            payload.Has_a_eye_disease,
+				In_kind_disease:              payload.In_kind_disease,
+				Relationship_eyes_with_diabetes: payload.Relationship_eyes_with_diabetes,
+				Comments_eyes_clinic:         payload.Comments_eyes_clinic,
+			})
+		}
 
+		if payload.Has_a_heart_disease {
+			_ = h.store.InsertClinicHeart(types.Clinic_heart{
+				ReviewID:                         reviewID,
+				Has_a_heart_disease:              payload.Has_a_heart_disease,
+				Heart_disease:                     payload.Heart_disease,
+				Relationship_heart_with_diabetes: payload.Relationship_heart_with_diabetes,
+				Comments_heart_clinic:            payload.Comments_heart_clinic,
+			})
+		}
 
-	// 4
-	
-	if AddReviewsPayload.Has_a_bone_disease {
-				
-      newClininBoneInfo := types.Clinic__bone {
-		ReviewID: Review_id,
-	    Has_a_bone_disease: AddReviewsPayload.Has_a_bone_disease,
-		Bone_disease: AddReviewsPayload.Bone_disease,
-		Relationship_bone_with_diabetes: AddReviewsPayload.Relationship_bone_with_diabetes,
-		Comments_bone_clinic: AddReviewsPayload.Comments_bone_clinic,
-	  }
-	  	  	err := h.store.InsertClinicBone(newClininBoneInfo)
-			if err != nil {
-				utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding clinic bone info"))
-				return
-			}
+		if payload.Has_a_nerve_disease {
+			_ = h.store.InsertClinicNerve(types.Clinic__nerve{
+				ReviewID:                         reviewID,
+				Has_a_nerve_disease:              payload.Has_a_nerve_disease,
+				Nerve_disease:                     payload.Nerve_disease,
+				Relationship_nerve_with_diabetes: payload.Relationship_nerve_with_diabetes,
+				Comments_nerve_clinic:            payload.Comments_nerve_clinic,
+			})
+		}
 
-	}
+		if payload.Has_a_bone_disease {
+			_ = h.store.InsertClinicBone(types.Clinic__bone{
+				ReviewID:                         reviewID,
+				Has_a_bone_disease:               payload.Has_a_bone_disease,
+				Bone_disease:                      payload.Bone_disease,
+				Relationship_bone_with_diabetes:  payload.Relationship_bone_with_diabetes,
+				Comments_bone_clinic:             payload.Comments_bone_clinic,
+			})
+		}
 
-	// 5
+		if payload.Has_a_urinary_disease {
+			_ = h.store.InsertClinicUrinary(types.Clinic__urinary{
+				ReviewID:                          reviewID,
+				Has_a_urinary_disease:             payload.Has_a_urinary_disease,
+				Urinary_disease:                   payload.Urinary_disease,
+				Relationship_urinary_with_diabetes: payload.Relationship_urinary_with_diabetes,
+				Comments_urinary_clinic:           payload.Comments_urinary_clinic,
+			})
+		}
+	}()
 
-		
-	if AddReviewsPayload.Has_a_urinary_disease {
-				
-      newClininUrinaryInfo := types.Clinic__urinary {
-		ReviewID: Review_id,
-		Has_a_urinary_disease: AddReviewsPayload.Has_a_urinary_disease,
-		Urinary_disease: AddReviewsPayload.Urinary_disease,
-		Relationship_urinary_with_diabetes: AddReviewsPayload.Relationship_urinary_with_diabetes,
-		Comments_urinary_clinic: AddReviewsPayload.Comments_urinary_clinic,
-	  }
-	  	  	err := h.store.InsertClinicUrinary(newClininUrinaryInfo)
-			if err != nil {
-				utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error in adding clinic urinary info"))
-				return
-			}
-
-	}
-
-
-
-	newConfirmAccount := types.ConfirmAccount {
-		ID: AddReviewsPayload.PatientID,
+	// تحديث حالة الحساب
+	_ = h.store.UpdateIsCompletedPatientField(types.ConfirmAccount{
+		ID:          payload.PatientID,
 		IsCompleted: true,
-	}
-	err = h.store.UpdateIsCompletedPatientField(newConfirmAccount)
-	if err != nil {
-		utils.WriteError(w, http.StatusBadRequest ,err)
-	}
+	})
 
-
-
-
-// 	message := fmt.Sprintf("🩺 تمت إضافة مراجعة جديدة لك، وتشمل الأدوية التالية: %s", strings.Join(drugNames, "، "))
-
-// 	h.NotifHub.Broadcast <- types.Notification{
-//     SenderID:   center_id, 
-//     ReceiverID: AddReviewsPayload.PatientID,
-//     Message:    message,
-// 	IsRead: false,
-// 	CreatedAt: patient.FormatRelativeTime(time.Now()),
-
-//    }
-
-   
-//    _ = h.store.InsertNotification(types.NotificationTwo{
-//     SenderID:   center_id,
-//     ReceiverID: AddReviewsPayload.PatientID,
-//     Message:    message,
-//     })
-
-
-
-	utils.WriteJSON(w , http.StatusOK , map[string]string{
+	// إرسال الرد للعميل مباشرة
+	utils.WriteJSON(w, http.StatusOK, map[string]string{
 		"message": "Review added successfully",
 	})
-
-
-
 }
 
 
 
 
+
+
+//end ----------------
 
 
 
