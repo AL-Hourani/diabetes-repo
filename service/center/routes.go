@@ -784,9 +784,31 @@ func (h *Handler) handleAddReviewe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// إدخال الأدوية وربطها بالعلاج
+	// // إدخال الأدوية وربطها بالعلاج
+	// var drugNames []string
+	// go func() {
+	// 	for _, drug := range payload.Treatments.Drugs {
+	// 		drugID, err := h.store.FindOrCreateDrugByName(drug.Name)
+	// 		if err != nil {
+	// 			log.Println("failed to add/find drug:", err)
+	// 			continue
+	// 		}
+
+	//        drugNames = append(drugNames, drug.Name)
+
+
+	// 		err = h.store.InsertTreatmentDrug(types.TreatmentDrug{
+	// 			TreatmentID:  treatmentID,
+	// 			DrugID:       drugID,
+	// 			DosagePerDay: drug.Dosage_per_day,
+	// 			Units:        drug.Units,
+	// 		})
+	// 		if err != nil {
+	// 			log.Println("failed to insert treatment-drug:", err)
+	// 		}
+	// 	}
+	// }()
 	var drugNames []string
-	go func() {
 		for _, drug := range payload.Treatments.Drugs {
 			drugID, err := h.store.FindOrCreateDrugByName(drug.Name)
 			if err != nil {
@@ -794,20 +816,18 @@ func (h *Handler) handleAddReviewe(w http.ResponseWriter, r *http.Request) {
 				continue
 			}
 
-	       drugNames = append(drugNames, drug.Name)
+			drugNames = append(drugNames, drug.Name)
 
-
-			err = h.store.InsertTreatmentDrug(types.TreatmentDrug{
-				TreatmentID:  treatmentID,
-				DrugID:       drugID,
-				DosagePerDay: drug.Dosage_per_day,
-				Units:        drug.Units,
-			})
-			if err != nil {
-				log.Println("failed to insert treatment-drug:", err)
-			}
+		
+			go func(d types.Drug, tID int, dID int) {
+				_ = h.store.InsertTreatmentDrug(types.TreatmentDrug{
+					TreatmentID:  tID,
+					DrugID:       dID,
+					DosagePerDay: d.Dosage_per_day,
+					Units:        d.Units,
+				})
+			}(drug, treatmentID, drugID)
 		}
-	}()
 
 	// العمليات الثانوية: إدخال بيانات العيون / القلب / الأعصاب / العظام / البول
 	go func() {
