@@ -78,14 +78,13 @@ func GetTokenFromRequest(r *http.Request) string {
 
 
 func ValidateToken(tokenString string) (*jwt.Token, error) {
-	// التحقق من صحة التوكن وتفسيره
+
 	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// التحقق من خوارزمية التوقيع المستخدمة
+	
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
-		// إرجاع المفتاح السري المستخدم للتوقيع
 		return []byte(config.Envs.JWTSecret), nil
 	})
 }

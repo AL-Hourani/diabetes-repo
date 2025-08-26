@@ -203,7 +203,6 @@ type CardData struct {
 	Age             string		 `json:"age"`
 	Phone			string       `json:"phone"`
 	IDNumber		string       `json:"id_number"`
-	IsCompleted     bool         `json:"isCompleted"`
 	SugarType		string      `json:"sugarType"`
 	CreateAt         string      `json:"create_At"`
 	Reviews         []Review     `json:"reviews"`          
