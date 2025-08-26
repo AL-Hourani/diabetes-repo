@@ -443,18 +443,13 @@ func (h *Handler)  VerifyTokenHandler(w http.ResponseWriter , r *http.Request) {
 		return
 	}
 
-	_ , err = h.store.GetPatientById(id)
+	_ , err = h.store.GetUserByID(id)
 		if err != nil {
 		http.Error(w, "Invalid token", http.StatusUnauthorized)
 		return
 	}
 
-	_ , err = h.storeCenter.GetCenterByID(id)
-	if err != nil {
-		http.Error(w, "Invalid token", http.StatusUnauthorized)
-		return
-	}
-	
+
 
 	utils.WriteJSON(w , http.StatusOK , "Token is Vaild")
 }

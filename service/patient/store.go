@@ -65,6 +65,8 @@ func  (s *Store) GetPatientById(id int) (*types.Patient , error) {
 }
 
 
+
+
 func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 	patient := new(types.Patient)
 
@@ -87,6 +89,27 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 	return patient , nil
 }
 
+
+
+func (s *Store) GetLoginByID(id int) (*types.Login, error) {
+    // استعلام لاستخراج بيانات المستخدم من جدول login_serach
+    row := s.db.QueryRow(`
+        SELECT id, email, password
+        FROM login_serach
+        WHERE id=$1
+    `, id)
+
+    l := new(types.Login)
+    err := row.Scan(&l.ID, &l.Email, &l.Password)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return nil, fmt.Errorf("user not found")
+        }
+        return nil, err
+    }
+
+    return l, nil
+}
 
 
 

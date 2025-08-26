@@ -39,7 +39,7 @@ type PatientStore interface {
 
 
 
-
+   GetLoginByID(id int) (*Login, error)
 
    
 }
@@ -209,6 +209,11 @@ type CardData struct {
 }
 
 
+type Login struct {
+    ID       int
+    Email    string
+    Password string
+}
 
 
 

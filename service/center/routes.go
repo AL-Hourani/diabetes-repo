@@ -227,7 +227,7 @@ func (h *Handler) handleCheckIsCenter(w http.ResponseWriter , r *http.Request) {
 	}
 
 	if SecretKey.SecretKey != config.Envs.CENTERKEY {
-	    utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Secret key is in correct"))
+	    utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("secret key is in correct"))
 		return
 	}
 
