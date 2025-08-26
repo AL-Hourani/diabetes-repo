@@ -6,14 +6,14 @@ import (
 	"net/http"
 	"strconv"
 
-	// "strings"
-	// "time"
+	"strings"
+	"time"
 
 	"github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/service/auth"
 	"github.com/AL-Hourani/care-center/service/notifications"
 
-	// "github.com/AL-Hourani/care-center/service/patient"
+	"github.com/AL-Hourani/care-center/service/patient"
 	"github.com/AL-Hourani/care-center/service/session"
 	"github.com/AL-Hourani/care-center/types"
 	"github.com/AL-Hourani/care-center/utils"
@@ -726,7 +726,7 @@ func (h *Handler) handleAddReviewe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := auth.GetIDFromToken(token)
+	center_id, err := auth.GetIDFromToken(token)
 	if err != nil {
 		http.Error(w, "Invalid token", http.StatusUnauthorized)
 		return
@@ -785,6 +785,7 @@ func (h *Handler) handleAddReviewe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// إدخال الأدوية وربطها بالعلاج
+	var drugNames []string
 	go func() {
 		for _, drug := range payload.Treatments.Drugs {
 			drugID, err := h.store.FindOrCreateDrugByName(drug.Name)
@@ -792,6 +793,9 @@ func (h *Handler) handleAddReviewe(w http.ResponseWriter, r *http.Request) {
 				log.Println("failed to add/find drug:", err)
 				continue
 			}
+
+	       drugNames = append(drugNames, drug.Name)
+
 
 			err = h.store.InsertTreatmentDrug(types.TreatmentDrug{
 				TreatmentID:  treatmentID,
@@ -858,6 +862,23 @@ func (h *Handler) handleAddReviewe(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
+	message := fmt.Sprintf(" تمت إضافة مراجعة جديدة لك، وتشمل الأدوية التالية: %s", strings.Join(drugNames, "، "))
+
+	h.NotifHub.Broadcast <- types.Notification{
+    SenderID:   center_id, 
+    ReceiverID: payload.PatientID,
+    Message:    message,
+	IsRead: false,
+	CreatedAt: patient.FormatRelativeTime(time.Now()),
+
+   }
+
+
+    _ = h.store.InsertNotification(types.NotificationTwo{
+    SenderID:   center_id,
+    ReceiverID: payload.PatientID,
+    Message:    message,
+    })
 
 	// إرسال الرد للعميل مباشرة
 	utils.WriteJSON(w, http.StatusOK, map[string]string{
