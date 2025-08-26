@@ -38,11 +38,11 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/Login", h.handleLogin).Methods("POST")
 	router.HandleFunc("/patientRegister", h.handlePatientRegister).Methods("POST")
 	router.HandleFunc("/getPatient/{id}" , h.handleGetPatient).Methods("GET")
-	router.HandleFunc("/getPatientProfile/{id}" , h.handleGetPatientProfile).Methods("GET")
-	router.HandleFunc("/getAllPatientInfo/{id}" , h.handleGetAllPatientInfo).Methods("GET")
+	// router.HandleFunc("/getPatientProfile/{id}" , h.handleGetPatientProfile).Methods("GET")
+	// router.HandleFunc("/getAllPatientInfo/{id}" , h.handleGetAllPatientInfo).Methods("GET")
 	router.HandleFunc("/verify-token", h.VerifyTokenHandler).Methods("POST")
-	router.HandleFunc("/verifyOtp", h.VerifyOTPHandler).Methods("POST")
-	router.HandleFunc("/updatePatientProfile", h.handleUpdatePatientProfile).Methods(http.MethodPatch)
+	// router.HandleFunc("/verifyOtp", h.VerifyOTPHandler).Methods("POST")
+	// router.HandleFunc("/updatePatientProfile", h.handleUpdatePatientProfile).Methods(http.MethodPatch)
 	router.HandleFunc("/CenterStatistics/{id}",h.handleStatisticsSugerType).Methods("GET")
 	router.HandleFunc("/sendEmail",h.handleVerifyEmail).Methods("POST")
 	router.HandleFunc("/verfiyOTPResetPassword",h.handleVerifyOTP).Methods("POST")
@@ -155,9 +155,22 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 
 
 
-var pendingPatients = make(map[string]types.RegisterPatientPayload)
+
 
 func (h *Handler) handlePatientRegister(w http.ResponseWriter , r *http.Request) {
+
+
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	centerID, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
 
 	//get json payload
 		var patientPayload types.RegisterPatientPayload
@@ -176,95 +189,26 @@ func (h *Handler) handlePatientRegister(w http.ResponseWriter , r *http.Request)
 
 	// check if user exists
 
-	_ , err := h.store.GetPatientByEmail(patientPayload.Email)
+	_ , err = h.store.GetPatientByEmail(patientPayload.Email)
 	if err == nil {
 		utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("patient with email %s already exists" , patientPayload.Email))
 		return 
 	}
 
-	
-	// ✅ 4. حفظ بيانات المريض مؤقتًا بانتظار التحقق من OTP
-	pendingPatients[patientPayload.Email] = patientPayload
-
-	// err = mail.Mailer(patientPayload.Email , patientPayload.FullName)
-	// 	if err != nil {
-	// 		utils.WriteError(w, http.StatusInternalServerError, err)
-	// 		return
-	// 	}
-
-	// ✅ 5. إرسال رسالة انتظار التحقق
-	utils.WriteJSON(w, http.StatusAccepted, map[string]string{
-		"message": "OTP sent. Please verify to complete registration.",
-	})
-
-
-
-	
-}
-
-
-
-// ----------------------------------------------------
-
-
-
-func (h *Handler) VerifyOTPHandler(w http.ResponseWriter , r *http.Request) {
-	var optCodePayload types.VerifyRequest
-	if err := utils.ParseJSON(r , &optCodePayload); err != nil {
-		utils.WriteError(w , http.StatusBadRequest , err)
-		return
+	hashedPassword , err := auth.HashPassword(patientPayload.Password)
+	    if err != nil {
+			utils.WriteError(w , http.StatusInternalServerError , err)
 	}
 
-		//validate the payoad .....................
-		if err := utils.Validate.Struct(optCodePayload);err != nil {
-			error := err.(validator.ValidationErrors)
-			  utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("invalid payload %v", error) )
-			return
-		}
-
-
-			
-
-
-		patientPayload, exists := pendingPatients[optCodePayload.Email]
-		if !exists {
-			utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("no email registered"))
-			return
-		}
-		// if !auth.VerifyOTP(optCodePayload.Email , optCodePayload.Email) {
-		// 	utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid OTP Code"))
-		// 	return
-		// }
-
-		if optCodePayload.OTPCode != "666666" {
-			utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid OTP Code"))
-			return
-		}
-
-
-		hashedPassword , err := auth.HashPassword(patientPayload.Password)
-		if err != nil {
-			utils.WriteError(w , http.StatusInternalServerError , err)
-		}
-
-		//get center 
-
-		cenetr , err := h.storeCenter.GetCenterByName(patientPayload.CenterName)
-		if err != nil {
-			utils.WriteError(w , http.StatusInternalServerError , err)
-		}
-
-	//if it dosen't we create the new user
-	id , err := h.store.GreatePatient(types.Patient{
+		//if it dosen't we create the new user
+	err = h.store.GreatePatient(types.Patient{
 		FullName: patientPayload.FullName,
 		Email: patientPayload.Email,
 		Password: hashedPassword,
 		Age: patientPayload.Age,
 		Phone:patientPayload.Phone,
 	    IDNumber: patientPayload.IDNumber,
-		IsCompleted: false,
-		CenterID: cenetr.ID,
-		City: patientPayload.City,
+		CenterID: centerID,
 		
 	})
 	if err != nil {
@@ -285,33 +229,130 @@ func (h *Handler) VerifyOTPHandler(w http.ResponseWriter , r *http.Request) {
 		return 
 	}
 
-	message := fmt.Sprintf("مرحبًا %s، أهلًا بك في %s.\nيسعدنا انضمامك إلينا، صحتك أمانة في أعيننا. ", patientPayload.FullName, patientPayload.CenterName)
-
-		h.NotifHub.Broadcast <- types.Notification{
-		SenderID:  1  , 
-		ReceiverID: id,
-		Message:    message,
-		IsRead: false,
-		CreatedAt: FormatRelativeTime(time.Now()),
-
-	}
 
 	
-	_ = h.storeCenter.InsertNotification(types.NotificationTwo{
-		SenderID:   1,
-		ReceiverID: id,
-		Message:    message,
-		})
-
-
-
-	
-	delete(pendingPatients,optCodePayload.Email)
 
 
 	utils.WriteJSON(w , http.StatusCreated , map[string]string{"message":"successfully Created"})
 
+
+	
+
+
+
+	
 }
+
+
+
+// ----------------------------------------------------
+
+
+
+// func (h *Handler) VerifyOTPHandler(w http.ResponseWriter , r *http.Request) {
+// 	var optCodePayload types.VerifyRequest
+// 	if err := utils.ParseJSON(r , &optCodePayload); err != nil {
+// 		utils.WriteError(w , http.StatusBadRequest , err)
+// 		return
+// 	}
+
+// 		//validate the payoad .....................
+// 		if err := utils.Validate.Struct(optCodePayload);err != nil {
+// 			error := err.(validator.ValidationErrors)
+// 			  utils.WriteError(w , http.StatusBadRequest , fmt.Errorf("invalid payload %v", error) )
+// 			return
+// 		}
+
+
+			
+
+
+// 		patientPayload, exists := pendingPatients[optCodePayload.Email]
+// 		if !exists {
+// 			utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("no email registered"))
+// 			return
+// 		}
+// 		// if !auth.VerifyOTP(optCodePayload.Email , optCodePayload.Email) {
+// 		// 	utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid OTP Code"))
+// 		// 	return
+// 		// }
+
+// 		if optCodePayload.OTPCode != "666666" {
+// 			utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid OTP Code"))
+// 			return
+// 		}
+
+
+// 		hashedPassword , err := auth.HashPassword(patientPayload.Password)
+// 		if err != nil {
+// 			utils.WriteError(w , http.StatusInternalServerError , err)
+// 		}
+
+// 		//get center 
+
+// 		cenetr , err := h.storeCenter.GetCenterByName(patientPayload.CenterName)
+// 		if err != nil {
+// 			utils.WriteError(w , http.StatusInternalServerError , err)
+// 		}
+
+// 	//if it dosen't we create the new user
+// 	id , err := h.store.GreatePatient(types.Patient{
+// 		FullName: patientPayload.FullName,
+// 		Email: patientPayload.Email,
+// 		Password: hashedPassword,
+// 		Age: patientPayload.Age,
+// 		Phone:patientPayload.Phone,
+// 	    IDNumber: patientPayload.IDNumber,
+// 		IsCompleted: false,
+// 		CenterID: cenetr.ID,
+// 		City: patientPayload.City,
+		
+// 	})
+// 	if err != nil {
+// 		utils.WriteError(w, http.StatusBadRequest, err)
+// 		return
+// 	}
+
+// 	newLoginFailed := types.InsertLogin {
+// 		Email:patientPayload.Email ,
+// 		Password:hashedPassword ,
+// 	}
+	
+// 	err = h.storeCenter.GreateLoginFailed(newLoginFailed)
+	
+
+// 	if err != nil {
+// 		utils.WriteError(w , http.StatusBadRequest ,err)
+// 		return 
+// 	}
+
+// 	message := fmt.Sprintf("مرحبًا %s، أهلًا بك في %s.\nيسعدنا انضمامك إلينا، صحتك أمانة في أعيننا. ", patientPayload.FullName, patientPayload.CenterName)
+
+// 		h.NotifHub.Broadcast <- types.Notification{
+// 		SenderID:  1  , 
+// 		ReceiverID: id,
+// 		Message:    message,
+// 		IsRead: false,
+// 		CreatedAt: FormatRelativeTime(time.Now()),
+
+// 	}
+
+	
+// 	_ = h.storeCenter.InsertNotification(types.NotificationTwo{
+// 		SenderID:   1,
+// 		ReceiverID: id,
+// 		Message:    message,
+// 		})
+
+
+
+	
+// 	delete(pendingPatients,optCodePayload.Email)
+
+
+// 	utils.WriteJSON(w , http.StatusCreated , map[string]string{"message":"successfully Created"})
+
+// }
 
 
 
@@ -359,26 +400,26 @@ func (h *Handler) handleGetPatient (w http.ResponseWriter , r *http.Request) {
 // handle get all patient info ..........................................
 
 
-func (h *Handler) handleGetAllPatientInfo (w http.ResponseWriter , r *http.Request) {
+// func (h *Handler) handleGetAllPatientInfo (w http.ResponseWriter , r *http.Request) {
 
-	vars := mux.Vars(r)
-	id , err := strconv.Atoi(vars["id"])
-	if err != nil  {
-       utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid ID"))
-       return
-	}
+// 	vars := mux.Vars(r)
+// 	id , err := strconv.Atoi(vars["id"])
+// 	if err != nil  {
+//        utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid ID"))
+//        return
+// 	}
 
-	patientDetials , err := h.store.GetPatientDetailsByID(id)
-	if err != nil {
-		utils.WriteError(w , http.StatusBadRequest ,err)
-		return 
-	}
-
-
-	utils.WriteJSON(w , http.StatusOK , patientDetials)
+// 	patientDetials , err := h.store.GetPatientDetailsByID(id)
+// 	if err != nil {
+// 		utils.WriteError(w , http.StatusBadRequest ,err)
+// 		return 
+// 	}
 
 
-}
+// 	utils.WriteJSON(w , http.StatusOK , patientDetials)
+
+
+// }
 
 
 
@@ -420,30 +461,30 @@ func (h *Handler)  VerifyTokenHandler(w http.ResponseWriter , r *http.Request) {
 }
 
 
-// update patient profile
-func (h *Handler) handleUpdatePatientProfile(w http.ResponseWriter , r *http.Request) {
-	var updatePatietPayload types.ParientUpdatePayload
-	if err := utils.ParseJSON(r , &updatePatietPayload); err != nil {
-		utils.WriteError(w , http.StatusBadRequest , err)
-		return
-	}
+// // update patient profile
+// func (h *Handler) handleUpdatePatientProfile(w http.ResponseWriter , r *http.Request) {
+// 	var updatePatietPayload types.ParientUpdatePayload
+// 	if err := utils.ParseJSON(r , &updatePatietPayload); err != nil {
+// 		utils.WriteError(w , http.StatusBadRequest , err)
+// 		return
+// 	}
 
-	err := h.store.UpdatePatientProfile(updatePatietPayload)
-	if err != nil {
-		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error update patient profile"))
-		return
-	}
+// 	err := h.store.UpdatePatientProfile(updatePatietPayload)
+// 	if err != nil {
+// 		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error update patient profile"))
+// 		return
+// 	}
     
 	
-	updateProfileInfo , err := h.store.GetPatientProfile(updatePatietPayload.ID)
-	if err != nil {
-		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error get patient profile"))
-		return
-	}
+// 	updateProfileInfo , err := h.store.GetPatientProfile(updatePatietPayload.ID)
+// 	if err != nil {
+// 		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error get patient profile"))
+// 		return
+// 	}
 
 	
-	utils.WriteJSON(w , http.StatusOK , updateProfileInfo)
-}
+// 	utils.WriteJSON(w , http.StatusOK , updateProfileInfo)
+// }
 
 
 
@@ -483,23 +524,23 @@ func (h *Handler) handleUpdatePatientProfile(w http.ResponseWriter , r *http.Req
 // utils.WriteJSON(w , http.StatusOK ,returnLoggingData)
 
 
-func (h *Handler) handleGetPatientProfile(w http.ResponseWriter , r *http.Request) {
-	vars := mux.Vars(r)
-	id , err := strconv.Atoi(vars["id"])
-	if err != nil  {
-       utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid ID"))
-       return
-	}
-	patientProfile , err := h.store.GetPatientProfile(id)
-	if err != nil {
-		utils.WriteError(w , http.StatusBadRequest ,err)
-		return 
-	}
+// func (h *Handler) handleGetPatientProfile(w http.ResponseWriter , r *http.Request) {
+// 	vars := mux.Vars(r)
+// 	id , err := strconv.Atoi(vars["id"])
+// 	if err != nil  {
+//        utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid ID"))
+//        return
+// 	}
+// 	patientProfile , err := h.store.GetPatientProfile(id)
+// 	if err != nil {
+// 		utils.WriteError(w , http.StatusBadRequest ,err)
+// 		return 
+// 	}
 
 
 
-	utils.WriteJSON(w , http.StatusOK , patientProfile)
-}
+// 	utils.WriteJSON(w , http.StatusOK , patientProfile)
+// }
 
 
 

@@ -13,10 +13,10 @@ type PatientStore interface {
 	GetPatientByEmail(email string) (*Patient , error)
 	GetPatientById(id int) (*Patient , error)
 	// GreatePatient(Patient) error
-	GreatePatient(patient Patient) (int, error)
-	GetPatientDetailsByID(patientID int) (*PatientDetails, error)
+	GreatePatient(patient Patient) ( error)
+	// GetPatientDetailsByID(patientID int) (*PatientDetails, error)
 	GetUserByEmail(email string) (*UserLoginData, error)
-	GetPatientProfile(id int)(*PatientProfile , error)
+	// GetPatientProfile(id int)(*PatientProfile , error)
 	UpdatePatientProfile(patientPayload ParientUpdatePayload) error
 	GetSugarTypeStats(centerID int) ([]*Statistics, error)
 	GetUpdatePatientProfile(id int) (*GetPatientUpdateProfile , error) 
@@ -52,10 +52,9 @@ type Patient struct {
 	Age             string		 `json:"age"`
 	Phone			string       `json:"phone"`
 	IDNumber		string       `json:"id_number"`
-	IsCompleted     bool         `json:"isCompleted"`
 	CenterID		int			 `json:"center_id"`
 	CreateAt        time.Time    `json:"createAt"`
-	City            string       `json:"city"`
+
 }
 
 type RegisterPatientPayload struct {
@@ -65,9 +64,6 @@ type RegisterPatientPayload struct {
 	Phone           string	     `json:"phone"    validate:"required"`
 	Password		string		 `json:"password" validate:"required"`
 	IDNumber		string       `json:"id_number" validate:"required"`
-	City            string       `json:"city" validate:"required"`
-	CenterName		string		 `json:"center_name" validate:"required"`
-      
 }
 
 type ParientUpdatePayload struct {
@@ -77,7 +73,7 @@ type ParientUpdatePayload struct {
 	Age 			string       `json:"age"    validate:"required"`
 	Phone           string	     `json:"phone"    validate:"required"`
 	IDNumber		string       `json:"id_number" validate:"required"`
-	City            string       `json:"city" validate:"required"`
+
 }
 type GetPatientUpdateProfile struct {
 	FullName		string		 `json:"fullname" validate:"required"`
@@ -85,7 +81,6 @@ type GetPatientUpdateProfile struct {
 	Age 			string       `json:"age"    validate:"required"`
 	Phone           string	     `json:"phone"    validate:"required"`
 	IDNumber		string       `json:"id_number" validate:"required"`
-	City            string       `json:"city" validate:"required"`
 }
 
 type PatientProfile struct {

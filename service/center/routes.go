@@ -50,7 +50,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/updateCenterProfile", h.handleUpdateCenterProfile).Methods(http.MethodPatch)
 	router.HandleFunc("/getPatients", auth.WithJWTAuth(h.handleGetPatients)).Methods(http.MethodGet)
 	router.HandleFunc("/addPatient/{id}", h.handleGetCenters).Methods(http.MethodPost)
-	router.HandleFunc("/updatePatient", h.handleUpdatePatient).Methods(http.MethodPatch)
+	// router.HandleFunc("/updatePatient", h.handleUpdatePatient).Methods(http.MethodPatch)
 	router.HandleFunc("/deletePatient/{id}", auth.WithJWTAuth(h.handleDeletePatient)).Methods(http.MethodDelete)
 	router.HandleFunc("/logout",auth.WithJWTAuth(h.Logout)).Methods("POST")
 	router.HandleFunc("/deleteCenter",h.handleDeleteCenter).Methods(http.MethodDelete)
@@ -293,37 +293,37 @@ func (h *Handler) handleConfirmPatientAccount(w http.ResponseWriter , r *http.Re
 
 
 
-// update patient
+// // update patient
 
-func (h *Handler) handleUpdatePatient(w http.ResponseWriter , r *http.Request) { 
-	var udpatePayload types.PatientUpdatePayload
+// func (h *Handler) handleUpdatePatient(w http.ResponseWriter , r *http.Request) { 
+// 	var udpatePayload types.PatientUpdatePayload
 		
-	if err := utils.ParseJSON(r , &udpatePayload); err != nil {
-		utils.WriteError(w , http.StatusBadRequest , err)
-		return
-	}
+// 	if err := utils.ParseJSON(r , &udpatePayload); err != nil {
+// 		utils.WriteError(w , http.StatusBadRequest , err)
+// 		return
+// 	}
 
-	if udpatePayload.ID == 0 {
-        utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("patient ID is required"))
-        return
-    }
+// 	if udpatePayload.ID == 0 {
+//         utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("patient ID is required"))
+//         return
+//     }
 
 	
-    // تحديث بيانات المريض جزئيًا باستخدام دالة PATCH
-    err := h.store.PatchUpdatePatient(&udpatePayload)
-    if err != nil {
-        utils.WriteError(w, http.StatusInternalServerError,fmt.Errorf("faild updated"))
-        return
-    }
+//     // تحديث بيانات المريض جزئيًا باستخدام دالة PATCH
+//     err := h.store.PatchUpdatePatient(&udpatePayload)
+//     if err != nil {
+//         utils.WriteError(w, http.StatusInternalServerError,fmt.Errorf("faild updated"))
+//         return
+//     }
 
-	patient , err := h.pStore.GetPatientDetailsByID(udpatePayload.ID)
-	if err != nil {
-        utils.WriteError(w, http.StatusInternalServerError, err)
-        return
-    }
+// 	patient , err := h.pStore.GetPatientDetailsByID(udpatePayload.ID)
+// 	if err != nil {
+//         utils.WriteError(w, http.StatusInternalServerError, err)
+//         return
+//     }
 
-    utils.WriteJSON(w, http.StatusOK,patient)
-}
+//     utils.WriteJSON(w, http.StatusOK,patient)
+// }
 
 
 
