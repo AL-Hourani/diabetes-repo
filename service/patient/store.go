@@ -144,7 +144,7 @@ func (s *Store) GreatePatient(patient types.Patient)  error {
 func (s *Store) SetFirstLoginTrue(patientID int) error {
     query := `
         UPDATE patients
-        SET first_login = TRUE
+        SET first_login = FALSE
         WHERE id = $1
     `
     _, err := s.db.Exec(query, patientID)

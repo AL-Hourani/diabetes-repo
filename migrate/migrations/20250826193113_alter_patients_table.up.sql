@@ -1,0 +1,2 @@
+ALTER TABLE patients
+    ALTER COLUMN first_login SET DEFAULT TRUE;
