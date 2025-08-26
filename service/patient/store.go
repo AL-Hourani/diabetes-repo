@@ -19,7 +19,7 @@ func NewStore(db *sql.DB) *Store {
 	return &Store{db: db}
 }
 func  (s *Store) GetPatientByEmail(email string) (*types.Patient , error) {
-	rows , err := s.db.Query("SELECT id,fullName,email,password,phone,date,id_number,center_id,createAt FROM patients WHERE email=$1",email)
+	rows , err := s.db.Query("SELECT id,fullName,email,password,phone,date,id_number,center_id,createAt,first_login FROM patients WHERE email=$1",email)
 	if err != nil {
 		return nil , err
 	}
@@ -43,7 +43,7 @@ func  (s *Store) GetPatientByEmail(email string) (*types.Patient , error) {
 
 
 func  (s *Store) GetPatientById(id int) (*types.Patient , error) {
-	rows , err := s.db.Query("SELECT id,fullName,email,password,phone,date,id_number,center_id,createAt FROM patients WHERE id=$1",id)
+	rows , err := s.db.Query("SELECT id,fullName,email,password,phone,date,id_number,center_id,createAt,first_login FROM patients WHERE id=$1",id)
 	if err != nil {
 		return nil , err
 	}
@@ -80,6 +80,7 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 		&patient.IDNumber,
 		&patient.CenterID,
 		&patient.CreateAt,
+		&patient.FirstLogin,
 	)
 	
 	if err  != nil {
@@ -140,6 +141,15 @@ func (s *Store) GreatePatient(patient types.Patient)  error {
 }
 
 
+func (s *Store) SetFirstLoginTrue(patientID int) error {
+    query := `
+        UPDATE patients
+        SET first_login = TRUE
+        WHERE id = $1
+    `
+    _, err := s.db.Exec(query, patientID)
+    return err
+}
 
 
 

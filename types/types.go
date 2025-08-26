@@ -40,6 +40,7 @@ type PatientStore interface {
 
 
    GetLoginByID(id int) (*Login, error)
+   SetFirstLoginTrue(patientID int) error
 
    
 }
@@ -54,6 +55,7 @@ type Patient struct {
 	IDNumber		string       `json:"id_number"`
 	CenterID		int			 `json:"center_id"`
 	CreateAt        time.Time    `json:"createAt"`
+	FirstLogin      bool         `json:"first_login"`
 
 }
 
@@ -180,7 +182,7 @@ type ReturnLoggingData struct {
 	Name		    string		 `json:"name"`
 	Email			string		 `json:"email"`
 	Role 			string       `json:"role"`
-	IsCompletes     bool         `json:"isCompleted"`
+	FirstLogin     bool          `json:"first_login"`
 	Token            string      `json:"token"`
 }
 type ReturnLoggingCenterData struct {

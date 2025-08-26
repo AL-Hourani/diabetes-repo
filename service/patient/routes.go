@@ -119,7 +119,7 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 				Name:        patient.FullName,
 				Email:       user.Email,
 				Role:        user.Role,
-				IsCompletes:  false,
+				FirstLogin :  false,
 				Token:        token,
 			}
 			utils.WriteJSON(w, http.StatusOK, returnLoggingData)
@@ -664,6 +664,18 @@ func (h *Handler) handleVerifyOTP(w http.ResponseWriter , r *http.Request) {
 }
 
 func (h *Handler) handleResetPassword(w http.ResponseWriter , r *http.Request) {
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	id, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
 	var resetPasswordPayload types.ResetPassword
 	if err := utils.ParseJSON(r , &resetPasswordPayload); err != nil {
 		utils.WriteError(w , http.StatusBadRequest , err)
@@ -672,13 +684,18 @@ func (h *Handler) handleResetPassword(w http.ResponseWriter , r *http.Request) {
 
 
 	// rest password......
-	err := h.store.UpdatePasswordByEmail(resetPasswordPayload.Email, resetPasswordPayload.NewPassword)
+	err = h.store.UpdatePasswordByEmail(resetPasswordPayload.Email, resetPasswordPayload.NewPassword)
     if err != nil {
         utils.WriteError(w, http.StatusInternalServerError, err)
         return
     }
 
 
+	err =   h.store.SetFirstLoginTrue(id)
+    if err != nil {
+        utils.WriteError(w, http.StatusInternalServerError, err)
+        return
+    }
 	
    
     utils.WriteJSON(w, http.StatusOK, map[string]string{
