@@ -53,12 +53,6 @@ func (s *APIServer) Run() error {
 	imageHandler.RegisterRoutes(subrouter)
 
 	
-    router.PathPrefix("/api/v1/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-    if r.Method == http.MethodOptions {
-        w.WriteHeader(http.StatusOK)
-        return
-    }
-})
 
    
 		// إعدادات CORS

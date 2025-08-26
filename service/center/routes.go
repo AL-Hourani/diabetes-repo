@@ -858,11 +858,6 @@ func (h *Handler) handleAddReviewe(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	// تحديث حالة الحساب
-	_ = h.store.UpdateIsCompletedPatientField(types.ConfirmAccount{
-		ID:          payload.PatientID,
-		IsCompleted: true,
-	})
 
 	// إرسال الرد للعميل مباشرة
 	utils.WriteJSON(w, http.StatusOK, map[string]string{
