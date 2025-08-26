@@ -119,7 +119,7 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 				Name:        patient.FullName,
 				Email:       user.Email,
 				Role:        user.Role,
-				FirstLogin :  false,
+				FirstLogin :  patient.FirstLogin,
 				Token:        token,
 			}
 			utils.WriteJSON(w, http.StatusOK, returnLoggingData)
