@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
-	"time"
+	// "strings"
+	// "time"
 
 	"github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/service/auth"
 	"github.com/AL-Hourani/care-center/service/notifications"
-	"github.com/AL-Hourani/care-center/service/patient"
+	// "github.com/AL-Hourani/care-center/service/patient"
 	"github.com/AL-Hourani/care-center/service/session"
 	"github.com/AL-Hourani/care-center/types"
 	"github.com/AL-Hourani/care-center/utils"
@@ -479,7 +479,7 @@ func (h *Handler) handleAddReviewe (w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	center_id, err := auth.GetIDFromToken(token)
+	_, err := auth.GetIDFromToken(token)
 	if err != nil {
 		http.Error(w, "Invalid token", http.StatusUnauthorized)
 		return
@@ -683,23 +683,23 @@ func (h *Handler) handleAddReviewe (w http.ResponseWriter, r *http.Request) {
 
 
 
-	message := fmt.Sprintf("🩺 تمت إضافة مراجعة جديدة لك، وتشمل الأدوية التالية: %s", strings.Join(drugNames, "، "))
+// 	message := fmt.Sprintf("🩺 تمت إضافة مراجعة جديدة لك، وتشمل الأدوية التالية: %s", strings.Join(drugNames, "، "))
 
-	h.NotifHub.Broadcast <- types.Notification{
-    SenderID:   center_id, 
-    ReceiverID: AddReviewsPayload.PatientID,
-    Message:    message,
-	IsRead: false,
-	CreatedAt: patient.FormatRelativeTime(time.Now()),
+// 	h.NotifHub.Broadcast <- types.Notification{
+//     SenderID:   center_id, 
+//     ReceiverID: AddReviewsPayload.PatientID,
+//     Message:    message,
+// 	IsRead: false,
+// 	CreatedAt: patient.FormatRelativeTime(time.Now()),
 
-   }
+//    }
 
    
-   _ = h.store.InsertNotification(types.NotificationTwo{
-    SenderID:   center_id,
-    ReceiverID: AddReviewsPayload.PatientID,
-    Message:    message,
-    })
+//    _ = h.store.InsertNotification(types.NotificationTwo{
+//     SenderID:   center_id,
+//     ReceiverID: AddReviewsPayload.PatientID,
+//     Message:    message,
+//     })
 
 
 
