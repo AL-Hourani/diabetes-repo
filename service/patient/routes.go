@@ -97,27 +97,7 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 			return
 		}
 
-
-
-		if user.Role == "supervisor" {
-				secret := []byte(config.Envs.JWTSecret)
-				token, err := auth.CreateJWT(secret, user.ID)
-				if err != nil {
-					utils.WriteError(w, http.StatusInternalServerError, err)
-					return
-				}
-
-				ruturnData := types.Supervisor {
-					Email: user.Email,
-					Role: user.Role,
-					Token: token,
-				}
-
-				utils.WriteJSON(w, http.StatusOK, ruturnData)
-				return
-
-		} else if user.Role == "center" {
-
+        if user.Role == "center" {
 		  center , err  := h.storeCenter.GetCenterByEmail(user.Email)
 		   if err != nil {
 			   utils.WriteError(w, http.StatusInternalServerError, err)
