@@ -99,32 +99,24 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 
 
 
-		if user.Role == "patient" {
-		   patient , err  := h.store.GetPatientByEmail(user.Email)
-		   if err != nil {
-			   utils.WriteError(w, http.StatusInternalServerError, err)
-			   return
-		   }
-		   
-				// إنشاء JWT Token
+		if user.Role == "supervisor" {
 				secret := []byte(config.Envs.JWTSecret)
-				token, err := auth.CreateJWT(secret, patient.ID)
+				token, err := auth.CreateJWT(secret, user.ID)
 				if err != nil {
 					utils.WriteError(w, http.StatusInternalServerError, err)
 					return
 				}
 
-			returnLoggingData := types.ReturnLoggingData{
-				ID:          patient.ID,
-				Name:        patient.FullName,
-				Email:       user.Email,
-				Role:        user.Role,
-				FirstLogin :  patient.FirstLogin,
-				Token:        token,
-			}
-			utils.WriteJSON(w, http.StatusOK, returnLoggingData)
-			return 
-		} else {
+				ruturnData := types.Supervisor {
+					Email: user.Email,
+					Role: user.Role,
+					Token: token,
+				}
+
+				utils.WriteJSON(w, http.StatusOK, ruturnData)
+				return
+
+		} else if user.Role == "center" {
 
 		  center , err  := h.storeCenter.GetCenterByEmail(user.Email)
 		   if err != nil {
@@ -148,6 +140,33 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 				Token:   token,
 			}
 			utils.WriteJSON(w, http.StatusOK, returnLoggingData)
+			return
+		} else {
+
+		   patient , err  := h.store.GetPatientByEmail(user.Email)
+		   if err != nil {
+			   utils.WriteError(w, http.StatusInternalServerError, err)
+			   return
+		   }
+		   
+				// إنشاء JWT Token
+				secret := []byte(config.Envs.JWTSecret)
+				token, err := auth.CreateJWT(secret, patient.ID)
+				if err != nil {
+					utils.WriteError(w, http.StatusInternalServerError, err)
+					return
+				}
+
+			returnLoggingData := types.ReturnLoggingData{
+				ID:          patient.ID,
+				Name:        patient.FullName,
+				Email:       user.Email,
+				Role:        user.Role,
+				FirstLogin :  patient.FirstLogin,
+				Token:        token,
+			}
+			utils.WriteJSON(w, http.StatusOK, returnLoggingData)
+		
 		}
 	
 

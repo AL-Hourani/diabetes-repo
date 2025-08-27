@@ -1076,3 +1076,11 @@ type GeTMedicationReview struct {
     Dosage         string    `json:"dosage"`
     UnitsPerBox    int       `json:"units_per_box"`
 }
+
+
+
+type Supervisor struct {
+	Email			string		 `json:"email"`
+	Role 			string       `json:"role"`
+	Token           string       `json:"token"`
+}
