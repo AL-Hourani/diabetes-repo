@@ -18,7 +18,7 @@ func NewStore(db *sql.DB) *Store {
 // 
 
 func (s *Store) GetAllCenters() ([]*types.ReturnCenters, error) {
-    rows, err := s.db.Query(`SELECT c.id, c.centerName, c.centerEmail, c.centerCity,TO_CHAR(createAt, 'DD-MM-YYYY'), COUNT(p.id) as patient_count
+    rows, err := s.db.Query(`SELECT c.id, c.centerName, c.centerEmail, c.centerCity,TO_CHAR(c.createAt, 'DD-MM-YYYY'), COUNT(p.id) as patient_count
         FROM centers c
         LEFT JOIN patients p ON p.center_id = c.id
         GROUP BY c.id, c.centerName, c.centerEmail, c.centerCity, c.createAt`)
