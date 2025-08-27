@@ -95,13 +95,13 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 func (s *Store) GetLoginByID(id int) (*types.Login, error) {
     // استعلام لاستخراج بيانات المستخدم من جدول login_serach
     row := s.db.QueryRow(`
-        SELECT id, email, password
+        SELECT id, email, password , role
         FROM login_serach
         WHERE id=$1
     `, id)
 
     l := new(types.Login)
-    err := row.Scan(&l.ID, &l.Email, &l.Password)
+    err := row.Scan(&l.ID, &l.Email, &l.Password , &l.Role)
     if err != nil {
         if err == sql.ErrNoRows {
             return nil, fmt.Errorf("user not found")
