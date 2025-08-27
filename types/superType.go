@@ -6,7 +6,7 @@ package types
 
 
 type SuperisorStore interface {
-     GetAllCenters() ([]*Center, error)
+     GetAllCenters() ([]*ReturnCenters, error)
    
 }
 

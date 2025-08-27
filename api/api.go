@@ -6,10 +6,11 @@ import (
 	"net/http"
 
 	"github.com/AL-Hourani/care-center/service/center"
+	"github.com/AL-Hourani/care-center/service/notifications"
 	"github.com/AL-Hourani/care-center/service/patient"
 	"github.com/AL-Hourani/care-center/service/readimage"
 	"github.com/AL-Hourani/care-center/service/session"
-	"github.com/AL-Hourani/care-center/service/notifications"
+	"github.com/AL-Hourani/care-center/service/supervisor"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
@@ -41,10 +42,15 @@ func (s *APIServer) Run() error {
 	// center .....
 	centerStore := center.NewStore(s.db)
 	patientStore := patient.NewStore(s.db)
+	supervisorStore := supervisor.NewStore(s.db)
 
 	centerHandler := center.NewHandler(centerStore ,patientStore , *sessionManager , notifHub)
 	centerHandler.RegisterCenterRoutes(subrouter)
 	// patients ....
+
+	//supervisor
+	superVisorHandler := supervisor.NewHandler(centerStore ,patientStore , supervisorStore)
+	superVisorHandler.RegisterSuperVisorRoutes(subrouter)
 
 	patientHandler := patient.NewHandler(patientStore , centerStore ,*sessionManager , notifHub )
 	patientHandler.RegisterPatientRoutes(subrouter)
