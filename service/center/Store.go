@@ -1480,17 +1480,15 @@ func (s *Store) InsertMedication(m types.InsertMedication) error {
             name_english,
             medication_type,
             dosage,
-            expiration_date,
             quantity,
             units_per_box,
             center_id
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7)
     `,
         m.NameArabic,
         m.NameEnglish,
         m.MedicationType,
         m.Dosage,
-        m.ExpirationDate,
         m.Quantity,
         m.UnitsPerBox,
         m.CenterID,

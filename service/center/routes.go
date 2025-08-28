@@ -129,7 +129,7 @@ func (h *Handler) handleCenterRegister(w http.ResponseWriter , r *http.Request) 
 	}
 	
 
-		hashedPassword , err := auth.HashPassword(centerPayload.CenterPassword)
+	hashedPassword , err := auth.HashPassword(centerPayload.CenterPassword)
 		if err != nil {
 			utils.WriteError(w , http.StatusInternalServerError , err)
 		}
@@ -1533,7 +1533,6 @@ func (h *Handler) handleRequestMedicine(w http.ResponseWriter, r *http.Request) 
 		NameEnglish: medicinePayload.NameEnglish,
 		MedicationType: medicinePayload.MedicationType,
 		Dosage: medicinePayload.Dosage,
-		ExpirationDate: medicinePayload.ExpirationDate,
 		Quantity: medicinePayload.Quantity,
 		UnitsPerBox: medicinePayload.UnitsPerBox,
 		CenterID: id,

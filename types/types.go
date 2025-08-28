@@ -988,7 +988,6 @@ type Medication struct {
     NameEnglish    string    `json:"name_english"`
     MedicationType string    `json:"medication_type"`
     Dosage         string    `json:"dosage"`
-    ExpirationDate time.Time `json:"expiration_date"`
     Quantity       int       `json:"quantity"`
     UnitsPerBox    int       `json:"units_per_box"`
 }
@@ -997,7 +996,6 @@ type InsertMedication struct {
     NameEnglish    string   
     MedicationType string   
     Dosage         string   
-    ExpirationDate time.Time 
     Quantity       int       
     UnitsPerBox    int     
 	CenterID       int  
