@@ -117,6 +117,7 @@ func scanRowIntoCenter(rows *sql.Rows) (*types.ReturnCenters , error ){
 func (s *Store) GetAllInformation() ([]types.GetAllInformation, error) {
     rows, err := s.db.Query(`
         SELECT 
+            id ,
             name_arabic,
             name_english,
             requested_quantity,
@@ -134,6 +135,7 @@ func (s *Store) GetAllInformation() ([]types.GetAllInformation, error) {
         var info types.GetAllInformation
         var centerID int
         err := rows.Scan(
+            &info.ID,
             &info.NameArabic,
             &info.NameEnglish,
             &info.Quantity,

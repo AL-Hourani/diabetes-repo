@@ -166,7 +166,7 @@ func (h *Handler) handleLoginSupervisor(w http.ResponseWriter, r *http.Request) 
 				return
 
 			}else {
-				utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("Unauthorized: You are not supervisor"))
+				utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: You are not supervisor"))
 				return
 			}
 
