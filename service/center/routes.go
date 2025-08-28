@@ -93,6 +93,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/updateQuantity",auth.WithJWTAuth(h.handleUpdateNewQuantity)).Methods("POST")
    	router.HandleFunc("/getMedicineLogs",auth.WithJWTAuth(h.handleGetMedicationLogs)).Methods("GET")
     router.HandleFunc("/getReviewMedicinesName",auth.WithJWTAuth(h.handleGetReviewMedicinesName)).Methods("GET")
+    router.HandleFunc("/getRecords",auth.WithJWTAuth(h.handleGetRecords)).Methods("GET")
 
 }
 
@@ -1543,6 +1544,23 @@ func (h *Handler) handleRequestMedicine(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+    newRecord := types.InsertRecord {
+		NameArabic: medicinePayload.NameArabic,
+		Dosage: medicinePayload.Dosage,
+		MedicationType: medicinePayload.MedicationType,
+		Quantity: medicinePayload.Quantity,
+		CenterID: id,
+		CreateAt: time.Now().Format("2/1/2002"),
+		ApprovalAt: "غير محدد بعد",
+		Status: string(types.StatusSent),
+	}
+
+	err = h.store.InsertRecord(newRecord)
+	    if err != nil {
+		utils.WriteError(w, http.StatusBadRequest,err)
+		return
+	}
+
 	utils.WriteJSON(w , http.StatusOK , map[string]string{
 		"message": "medicine added successfully",
 	})
@@ -1660,4 +1678,36 @@ func (h *Handler) handleGetReviewMedicinesName(w http.ResponseWriter, r *http.Re
 	}
 
 	utils.WriteJSON(w, http.StatusOK, names)
+}
+
+
+
+
+
+
+//=====================Records .......................................
+
+
+
+
+func (h *Handler) handleGetRecords(w http.ResponseWriter, r *http.Request) {
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	centerID, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	records , err := h.store.GetRecordsByCenter(centerID)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, records)
 }

@@ -277,6 +277,11 @@ type CenterStore interface {
 	UpdateMedicationQuantity(id int, newQuantity int) error
 	GetLogsByCenterID(centerID int) ([]MedicationLog, error)
 	GetReviewMedicationNames(centerID int) ([]GeTMedicationReview, error) 
+
+
+
+	InsertRecord(r InsertRecord) error
+	GetRecordsByCenter(centerID int) ([]Record, error)
 }
 
 
@@ -1081,4 +1086,40 @@ type Supervisor struct {
 	Email			string		 `json:"email"`
 	Role 			string       `json:"role"`
 	Token           string       `json:"token"`
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+type InsertRecord struct {
+    NameArabic     string     
+    MedicationType string   
+    Dosage         string   
+    Quantity       int       
+    CreateAt       string
+	ApprovalAt     string  
+	CenterID       int  
+	Status         string
+}
+
+
+type Record struct {
+    ID               int
+    NameArabic       string
+    Dosage           string
+    MedicationType   string
+    RequestedQuantity int
+    CenterID         int
+    CreatedAt        string
+    ApprovalDate     string
+    RecordStatus     string
 }

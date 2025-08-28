@@ -1526,6 +1526,81 @@ func (s *Store) InsertMedication(m types.InsertMedication) error {
 
 
 
+func (s *Store) InsertRecord(r types.InsertRecord) error {
+    _, err := s.db.Exec(`
+        INSERT INTO records (
+            name_arabic,
+            dosage,
+            medication_type,
+            requested_quantity,
+            center_id,
+            created_at,
+            approval_date,
+            record_status
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    `,
+        r.NameArabic,
+        r.Dosage,
+        r.MedicationType,
+        r.Quantity,
+        r.CenterID,
+        r.CreateAt,
+        r.ApprovalAt,
+        r.Status,
+    )
+
+    return err
+}
+
+
+
+
+func (s *Store) GetRecordsByCenter(centerID int) ([]types.Record, error) {
+    rows, err := s.db.Query(`
+        SELECT 
+            id, name_arabic, dosage, medication_type, requested_quantity, 
+            center_id, created_at, approval_date, record_status
+        FROM records
+        WHERE center_id = $1
+    `, centerID)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var records []types.Record
+    for rows.Next() {
+        var r types.Record
+        err := rows.Scan(
+            &r.ID,
+            &r.NameArabic,
+            &r.Dosage,
+            &r.MedicationType,
+            &r.RequestedQuantity,
+            &r.CenterID,
+            &r.CreatedAt,
+            &r.ApprovalDate,
+            &r.RecordStatus,
+        )
+        if err != nil {
+            return nil, err
+        }
+        records = append(records, r)
+    }
+
+    if err = rows.Err(); err != nil {
+        return nil, err
+    }
+
+    return records, nil
+}
+
+
+
+
+
+
+
 
 
 
