@@ -1549,7 +1549,7 @@ func (s *Store) GetMedicationStats() (types.MedicationStats, error) {
 func (s *Store) GetAllMedications(centerID int) ([]types.GeTMedication, error) {
     rows, err := s.db.Query(`
         SELECT id , name_arabic, name_english, medication_type, dosage,
-               expiration_date, quantity, units_per_box
+                quantity, units_per_box
         FROM medications
         WHERE center_id = $1
     `, centerID)
@@ -1568,7 +1568,6 @@ func (s *Store) GetAllMedications(centerID int) ([]types.GeTMedication, error) {
             &m.NameEnglish,
             &m.MedicationType,
             &m.Dosage,
-            &m.ExpirationDate,
             &m.Quantity,
             &m.UnitsPerBox,
         )

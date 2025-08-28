@@ -1555,7 +1555,6 @@ func (h *Handler) handleRequestMedicine(w http.ResponseWriter, r *http.Request) 
 
 func (h *Handler) handleGetMedicine(w http.ResponseWriter, r *http.Request) {
 
-
 	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
 	if !ok {
 		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
