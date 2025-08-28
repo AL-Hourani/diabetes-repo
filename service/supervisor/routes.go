@@ -32,6 +32,7 @@ func NewHandler(store types.CenterStore , patientStore types.PatientStore , supe
 
 func (h *Handler) RegisterSuperVisorRoutes(router *mux.Router) {
 	router.HandleFunc("/getSupervisorCenters",auth.WithJWTAuth(h.handleGetAllCentersData)).Methods("GET")
+	router.HandleFunc("/getInquiries",auth.WithJWTAuth(h.handleGetInquiries)).Methods("GET")
 	router.HandleFunc("/superLogin",h.handleLoginSupervisor).Methods("POST")
 }
 
@@ -73,6 +74,44 @@ func (h *Handler) handleGetAllCentersData(w http.ResponseWriter, r *http.Request
 	}
 
 	utils.WriteJSON(w , http.StatusOK , centerData	)
+
+}
+
+
+
+
+func (h *Handler) handleGetInquiries(w http.ResponseWriter, r *http.Request) {
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+
+	id, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	user , err := h.pStore.GetLoginByID(id)
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	if user.Role != "supervisor" {
+		http.Error(w, "Unauthorized: You are not supervisor", http.StatusUnauthorized)
+		return
+	}
+
+    InquiriesData , err := h.superStore.GetAllInformation()
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	utils.WriteJSON(w , http.StatusOK , InquiriesData	)
 
 }
 

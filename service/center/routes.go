@@ -1550,7 +1550,7 @@ func (h *Handler) handleRequestMedicine(w http.ResponseWriter, r *http.Request) 
 		MedicationType: medicinePayload.MedicationType,
 		Quantity: medicinePayload.Quantity,
 		CenterID: id,
-		CreateAt: time.Now().Format("2/1/2002"),
+		CreateAt: time.Now().Format("2/1/2006"),
 		ApprovalAt: "غير محدد بعد",
 		Status: string(types.StatusSent),
 	}
@@ -1560,6 +1560,22 @@ func (h *Handler) handleRequestMedicine(w http.ResponseWriter, r *http.Request) 
 		utils.WriteError(w, http.StatusBadRequest,err)
 		return
 	}
+
+	newInfo := types.InsertInformation {
+		NameArabic: medicinePayload.NameArabic,
+		NameEnglish: medicinePayload.NameEnglish,
+		Quantity: medicinePayload.Quantity,
+		CenterID: id,
+		Status: string(types.CurrentReviewing),
+	}
+
+	err = h.store.InsertInformation(newInfo)
+	    if err != nil {
+		utils.WriteError(w, http.StatusBadRequest,err)
+		return
+	}
+
+
 
 	utils.WriteJSON(w , http.StatusOK , map[string]string{
 		"message": "medicine added successfully",

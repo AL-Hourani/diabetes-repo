@@ -1552,6 +1552,27 @@ func (s *Store) InsertRecord(r types.InsertRecord) error {
     return err
 }
 
+func (s *Store) InsertInformation(r types.InsertInformation) error {
+    _, err := s.db.Exec(`
+        INSERT INTO information (
+            name_arabic,
+            name_english,
+            requested_quantity,
+            center_id,
+			information_status
+
+        ) VALUES ($1, $2, $3, $4, $5)
+    `,
+        r.NameArabic,
+		r.NameEnglish,
+        r.Quantity,
+        r.CenterID,
+        r.Status,
+    )
+
+    return err
+}
+
 
 
 
@@ -1594,8 +1615,6 @@ func (s *Store) GetRecordsByCenter(centerID int) ([]types.Record, error) {
 
     return records, nil
 }
-
-
 
 
 

@@ -282,6 +282,7 @@ type CenterStore interface {
 
 	InsertRecord(r InsertRecord) error
 	GetRecordsByCenter(centerID int) ([]Record, error)
+	InsertInformation(r InsertInformation) error
 }
 
 
@@ -1123,3 +1124,24 @@ type Record struct {
     ApprovalDate     string
     RecordStatus     string
 }
+
+
+
+type InsertInformation struct {
+    NameArabic     string     
+    NameEnglish    string     
+    Quantity       int       
+	CenterID       int  
+	Status         string
+}
+
+
+type GetAllInformation struct {
+	ID             int        `json:"id"`
+    NameArabic     string     `json:"name_arabic"`
+    NameEnglish    string     `json:"name_english"`
+    Quantity       int        `json:"quantity"`
+	CenterName       string   `json:"center_name"`
+	Status         string     `json:"status"`
+}
+	

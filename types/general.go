@@ -8,4 +8,9 @@ const (
     StatusApproved  RecordStatus = "تمت الموافقة"
 )
 
-
+type InformationStatus string
+const (
+    CurrentReviewing      InformationStatus = "جاري المعالجة "
+    InfoStatusOK          InformationStatus = "مقبول"
+    InfoStatusCancel      InformationStatus = "مرفوض"
+)
