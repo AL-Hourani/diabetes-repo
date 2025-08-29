@@ -277,3 +277,44 @@ func (s *Store) GetMedicationRequestByID(id int) (*types.MedicationRequest, erro
 
     return &req, nil
 }
+
+
+
+
+
+
+
+
+func (s *Store) UpdateInformationStatus(id int, newStatus string) error {
+    _, err := s.db.Exec(`
+        UPDATE information
+        SET information_status = $1
+        WHERE id = $2
+    `, newStatus, id)
+
+    return err
+}
+
+
+func (s *Store) UpdateRecordStatusAndApprovalDate(id int, newStatus string) error {
+    _, err := s.db.Exec(`
+        UPDATE records
+        SET 
+            approval_date = CURRENT_DATE,
+            record_status = $1
+        WHERE id = $2
+    `, newStatus, id)
+
+    return err
+}
+
+
+func (s *Store) UpdateMedicationQuantity(id int, newQuantity string) error {
+    _, err := s.db.Exec(`
+        UPDATE medications
+        SET quantity = $1
+        WHERE id = $2
+    `, newQuantity, id)
+
+    return err
+}

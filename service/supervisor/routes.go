@@ -35,6 +35,8 @@ func (h *Handler) RegisterSuperVisorRoutes(router *mux.Router) {
 	router.HandleFunc("/getSupervisorCenters",auth.WithJWTAuth(h.handleGetAllCentersData)).Methods("GET")
 	router.HandleFunc("/getInquiries",auth.WithJWTAuth(h.handleGetInquiries)).Methods("GET")
 	router.HandleFunc("/getInquiriesDetails/{id}",auth.WithJWTAuth(h.handleGetInquiriesDetails)).Methods("GET")
+	router.HandleFunc("/rejectInquiries",auth.WithJWTAuth(h.handleRejectInquiries)).Methods("POST")
+	router.HandleFunc("/acceptedInquiries",auth.WithJWTAuth(h.handleAcceptedInquiries)).Methods("POST")
 	router.HandleFunc("/superLogin",h.handleLoginSupervisor).Methods("POST")
 }
 
@@ -259,3 +261,120 @@ func (h *Handler) handleLoginSupervisor(w http.ResponseWriter, r *http.Request) 
 
 
 }
+
+
+
+
+
+
+func (h *Handler) handleRejectInquiries(w http.ResponseWriter, r *http.Request) {
+	var queryId types.QueryID
+
+	if err := utils.ParseJSON(r , &queryId); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+		return
+	}
+
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	idSup, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	user , err := h.pStore.GetLoginByID(idSup)
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	if user.Role != "supervisor" {
+		http.Error(w, "Unauthorized: You are not supervisor", http.StatusUnauthorized)
+		return
+	}
+
+
+	err = h.superStore.UpdateInformationStatus(queryId.Query_ID , string(types.InfoStatusCancel))
+    if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	err = h.superStore.UpdateRecordStatusAndApprovalDate(queryId.Query_ID , string(types.StatusRejected))
+    if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
+
+		utils.WriteJSON(w , http.StatusOK , map[string]string{
+		"message": "query reject successfully",
+	})
+}
+
+
+
+
+
+
+
+
+func (h *Handler) handleAcceptedInquiries(w http.ResponseWriter, r *http.Request) {
+	var queryAccept types.QueryAccepted
+
+	if err := utils.ParseJSON(r , &queryAccept); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+		return
+	}
+
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	idSup, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	user , err := h.pStore.GetLoginByID(idSup)
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	if user.Role != "supervisor" {
+		http.Error(w, "Unauthorized: You are not supervisor", http.StatusUnauthorized)
+		return
+	}
+
+
+	err = h.superStore.UpdateInformationStatus(queryAccept.Query_ID , string(types.InfoStatusOK))
+    if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	err = h.superStore.UpdateRecordStatusAndApprovalDate(queryAccept.Query_ID , string(types.StatusApproved))
+    if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
+    
+	err = h.superStore.UpdateMedicationQuantity(queryAccept.Query_ID ,strconv.Itoa(queryAccept.Quantity) )
+    if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
+
+		utils.WriteJSON(w , http.StatusOK , map[string]string{
+		"message": "query Accepted successfully",
+	})
+}
+

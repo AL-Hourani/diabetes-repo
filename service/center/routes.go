@@ -1552,7 +1552,7 @@ func (h *Handler) handleRequestMedicine(w http.ResponseWriter, r *http.Request) 
 		CenterID: id,
 		CreateAt: time.Now().Format("2/1/2006"),
 		ApprovalAt: "غير محدد بعد",
-		Status: string(types.StatusSent),
+		Status: string(types.CurrentReviewing),
 	}
 
 	err = h.store.InsertRecord(newRecord)

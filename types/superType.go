@@ -13,6 +13,9 @@ type SuperisorStore interface {
 	 CountPatientsByCenter(centerID int) (int, error)
 	 GetMedicationByArabicName(name string , id int) (*GetMedicationRow, error)
 	 GetMedicationRequestByID(id int) (*MedicationRequest, error)
+     UpdateInformationStatus(id int, newStatus string) error
+     UpdateRecordStatusAndApprovalDate(id int, newStatus string) error
+     UpdateMedicationQuantity(id int, newQuantity string) error
    
 }
 
@@ -44,4 +47,13 @@ type MedicationRequest struct {
     RequestedQuantity int
     CenterID         int
     RequestedAt      string  // أو time.Time إذا عمودك DATE
+}
+
+
+type QueryID struct {
+    Query_ID    int    `json:"query_id"`
+}
+type QueryAccepted struct {
+    Query_ID    int    `json:"query_id"`
+    Quantity    int    `json:"quantity"`
 }
