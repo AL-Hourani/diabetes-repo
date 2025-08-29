@@ -55,5 +55,4 @@ type QueryID struct {
 }
 type QueryAccepted struct {
     Query_ID    int    `json:"query_id"`
-    Quantity    int    `json:"quantity"`
 }

@@ -44,7 +44,7 @@ func (s *APIServer) Run() error {
 	patientStore := patient.NewStore(s.db)
 	supervisorStore := supervisor.NewStore(s.db)
 
-	centerHandler := center.NewHandler(centerStore ,patientStore , *sessionManager , notifHub)
+	centerHandler := center.NewHandler(centerStore ,patientStore , *sessionManager , notifHub , supervisorStore)
 	centerHandler.RegisterCenterRoutes(subrouter)
 	// patients ....
 

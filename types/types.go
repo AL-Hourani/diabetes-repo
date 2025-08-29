@@ -274,15 +274,24 @@ type CenterStore interface {
 	GetMedicationStats() (MedicationStats, error)
 	InsertMedication(m InsertMedication) (int ,error)
 	GetAllMedications(centerID int) ([]GeTMedication, error)
-	UpdateMedicationQuantity(id int, newQuantity int) error
+	// UpdateMedicationQuantity(id int, newQuantity int) error
 	GetLogsByCenterID(centerID int) ([]MedicationLog, error)
 	GetReviewMedicationNames(centerID int) ([]GeTMedicationReview, error) 
+
+
+
+
+	GetMedicationByID(id int) (*GeTMedication, error) 
 
 
 
 	InsertRecord(r InsertRecord) error
 	GetRecordsByCenter(centerID int) ([]Record, error)
 	InsertInformation(r InsertInformation) error
+
+
+
+	InsertMedicationRequest(m InsertRequestMedicine)  error
 }
 
 
@@ -1015,6 +1024,7 @@ type GeTMedication struct {
     Dosage         string    `json:"dosage"`
     Quantity       int        `json:"quantity"`
     UnitsPerBox    int       `json:"units_per_box"`
+	CenterID       int       `json:"center_id"`
 	
 }
 
@@ -1111,6 +1121,17 @@ type InsertRecord struct {
 	CenterID       int  
 	Status         string
 	RequestID      int
+}
+
+
+
+type InsertRequestMedicine struct {
+    NameArabic     string     
+    MedicationType string   
+    Dosage         string   
+    Quantity       int        
+	CenterID       int  
+	MedicineID      int
 }
 
 

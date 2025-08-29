@@ -26,16 +26,18 @@ import (
 type Handler struct {
 	store types.CenterStore
     pStore types.PatientStore
+	superStore types.SuperisorStore
 	SessionManager *session.Manager
 	NotifHub      *notifications.Hub
 }
 
-func NewHandler(store types.CenterStore , patientStore types.PatientStore , sessionManager session.Manager ,  notifHub *notifications.Hub) *Handler {
+func NewHandler(store types.CenterStore , patientStore types.PatientStore , sessionManager session.Manager ,  notifHub *notifications.Hub , superStore types.SuperisorStore) *Handler {
 	return &Handler {
 		store: store,
 		pStore: patientStore,
 		SessionManager: &sessionManager,
 		NotifHub:       notifHub,
+		superStore: superStore,
 	}
 }
 
@@ -1534,7 +1536,7 @@ func (h *Handler) handleRequestMedicine(w http.ResponseWriter, r *http.Request) 
 		NameEnglish: medicinePayload.NameEnglish,
 		MedicationType: medicinePayload.MedicationType,
 		Dosage: medicinePayload.Dosage,
-		Quantity: medicinePayload.Quantity,
+		Quantity:0,
 		UnitsPerBox: medicinePayload.UnitsPerBox,
 		CenterID: idCenter,
 	}
@@ -1633,15 +1635,64 @@ func (h *Handler) handleUpdateNewQuantity(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-    err := h.store.UpdateMedicationQuantity(newQuantity.ID , newQuantity.NewQuantity)
+	medicine , err := h.store.GetMedicationByID(newQuantity.ID)
     if err != nil {
 		utils.WriteError(w, http.StatusBadRequest,err)
 		return
 	}
+	newMediciRequest := types.InsertRequestMedicine{
+		NameArabic: medicine.NameArabic,
+		MedicationType: medicine.MedicationType,
+		Dosage: medicine.Dosage,
+		Quantity:newQuantity.NewQuantity,
+		CenterID: medicine.CenterID,
+		MedicineID: medicine.ID,
+	}
+
+	err = h.store.InsertMedicationRequest(newMediciRequest)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest,err)
+		return
+	}
+	    newRecord := types.InsertRecord {
+		NameArabic: medicine.NameArabic,
+		Dosage: medicine.Dosage,
+		MedicationType: medicine.MedicationType,
+		Quantity: newQuantity.NewQuantity,
+		CenterID: medicine.CenterID,
+		CreateAt: time.Now().Format("2/1/2006"),
+		ApprovalAt: "غير محدد بعد",
+		Status: string(types.CurrentReviewing),
+		RequestID: medicine.ID,
+	}
+
+	err = h.store.InsertRecord(newRecord)
+	    if err != nil {
+		utils.WriteError(w, http.StatusBadRequest,err)
+		return
+	}
+
+	newInfo := types.InsertInformation {
+		NameArabic: medicine.NameArabic,
+		NameEnglish: medicine.NameEnglish,
+		Quantity: newQuantity.NewQuantity,
+		CenterID: medicine.CenterID,
+		Status: string(types.CurrentReviewing),
+		RequestId: medicine.ID,
+	}
+
+	err = h.store.InsertInformation(newInfo)
+	    if err != nil {
+		utils.WriteError(w, http.StatusBadRequest,err)
+		return
+	}
+
+
 
 	utils.WriteJSON(w , http.StatusOK , map[string]string{
-		"message": "update quantity successfully",
+		"message": "medicine added successfully",
 	})
+
 
 }
 

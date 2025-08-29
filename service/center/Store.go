@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"strconv"
 	"strings"
 	"time"
 
@@ -1523,6 +1522,27 @@ func (s *Store) InsertMedication(m types.InsertMedication) (int, error) {
 
 
 
+func (s *Store) InsertMedicationRequest(m types.InsertRequestMedicine)  error {
+  
+   _ ,  err := s.db.Exec(`
+        INSERT INTO medication_requests (
+            name_arabic,
+            dosage,
+            medication_type,
+            requested_quantity,
+            center_id,
+			medication_id,
+			requested_at
+        ) VALUES ($1, $2, $3, $4, $5 ,$6 ,NOW())
+       
+    `, m.NameArabic, m.Dosage, m.MedicationType, m.Quantity, m.CenterID , m.MedicineID)
+
+
+    return  err
+}
+
+
+
 func (s *Store) InsertRecord(r types.InsertRecord) error {
     _, err := s.db.Exec(`
         INSERT INTO records (
@@ -1682,36 +1702,36 @@ func (s *Store) GetAllMedications(centerID int) ([]types.GeTMedication, error) {
 
 
 
-func (s *Store) UpdateMedicationQuantity(id int, newQuantity int) error {
+// func (s *Store) UpdateMedicationQuantity(id int, newQuantity int) error {
 
- var oldQuantityStr string
-    err := s.db.QueryRow(`
-        SELECT quantity FROM medications WHERE id = $1
-    `, id).Scan(&oldQuantityStr)
-    if err != nil {
-        return err
-    }
+//  var oldQuantityStr string
+//     err := s.db.QueryRow(`
+//         SELECT quantity FROM medications WHERE id = $1
+//     `, id).Scan(&oldQuantityStr)
+//     if err != nil {
+//         return err
+//     }
 
-    oldQuantity, err := strconv.Atoi(oldQuantityStr)
-    if err != nil {
+//     oldQuantity, err := strconv.Atoi(oldQuantityStr)
+//     if err != nil {
     
-        oldQuantity = 0
-    }
+//         oldQuantity = 0
+//     }
 
    
-    totalQuantity := oldQuantity + newQuantity
+//     totalQuantity := oldQuantity + newQuantity
 
     
-    totalQuantityStr := strconv.Itoa(totalQuantity)
+//     totalQuantityStr := strconv.Itoa(totalQuantity)
 
-    _, err = s.db.Exec(`
-        UPDATE medications
-        SET quantity = $1
-        WHERE id = $2
-    `, totalQuantityStr, id)
+//     _, err = s.db.Exec(`
+//         UPDATE medications
+//         SET quantity = $1
+//         WHERE id = $2
+//     `, totalQuantityStr, id)
 
-    return err
-}
+//     return err
+// }
 
 
 func (s *Store) GetLogsByCenterID(centerID int) ([]types.MedicationLog, error) {
@@ -1780,4 +1800,42 @@ func (s *Store) GetReviewMedicationNames(centerID int) ([]types.GeTMedicationRev
 	}
 
 	return reviewMedicine, nil
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+func (s *Store) GetMedicationByID(id int) (*types.GeTMedication, error) {
+    var m types.GeTMedication
+
+    err := s.db.QueryRow(`
+        SELECT id, name_arabic, name_english, medication_type, dosage, quantity, units_per_box , center_id
+        FROM medications
+        WHERE id = $1
+    `, id).Scan(
+        &m.ID,
+        &m.NameArabic,
+        &m.NameEnglish,
+        &m.MedicationType,
+        &m.Dosage,
+        &m.Quantity,
+        &m.UnitsPerBox,
+		&m.CenterID,
+    )
+
+    if err != nil {
+        return nil, err
+    }
+
+    return &m, nil
 }
