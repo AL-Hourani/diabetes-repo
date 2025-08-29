@@ -1133,6 +1133,7 @@ type InsertInformation struct {
     Quantity       int       
 	CenterID       int  
 	Status         string
+	RequestId      int
 }
 
 
@@ -1145,3 +1146,15 @@ type GetAllInformation struct {
 	Status         string     `json:"status"`
 }
 	
+
+type InquirieDetails struct {
+	NameArabic     string     `json:"name_arabic"`
+    NameEnglish    string     `json:"name_english"`
+	CenterName       string   `json:"center_name"`
+	CenterCity     string     `json:"center_city"`
+	RQuantity       int       `json:"r_quantity"`
+	CQuantity       int       `json:"c_quantity"`
+	Nop             int       `json:"nop"`
+	Request_date    string    `json:"request_date"`
+	
+}

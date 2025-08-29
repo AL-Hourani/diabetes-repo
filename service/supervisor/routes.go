@@ -3,6 +3,7 @@ package supervisor
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/service/auth"
@@ -33,6 +34,7 @@ func NewHandler(store types.CenterStore , patientStore types.PatientStore , supe
 func (h *Handler) RegisterSuperVisorRoutes(router *mux.Router) {
 	router.HandleFunc("/getSupervisorCenters",auth.WithJWTAuth(h.handleGetAllCentersData)).Methods("GET")
 	router.HandleFunc("/getInquiries",auth.WithJWTAuth(h.handleGetInquiries)).Methods("GET")
+	router.HandleFunc("/getInquiriesDetails/{id}",auth.WithJWTAuth(h.handleGetInquiriesDetails)).Methods("GET")
 	router.HandleFunc("/superLogin",h.handleLoginSupervisor).Methods("POST")
 }
 
@@ -112,6 +114,91 @@ func (h *Handler) handleGetInquiries(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteJSON(w , http.StatusOK , InquiriesData	)
+
+}
+
+func (h *Handler) handleGetInquiriesDetails(w http.ResponseWriter, r *http.Request) {
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	idSup, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	user , err := h.pStore.GetLoginByID(idSup)
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	if user.Role != "supervisor" {
+		http.Error(w, "Unauthorized: You are not supervisor", http.StatusUnauthorized)
+		return
+	}
+
+	vars := mux.Vars(r)
+	id , err := strconv.Atoi(vars["id"])
+	if err != nil  {
+       utils.WriteError(w, http.StatusBadRequest , fmt.Errorf("invalid ID"))
+       return
+	}
+
+
+
+    Inquirie , err := h.superStore.GetInformationByID(id)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	center , err := h.superStore.GetCenterByID(Inquirie.CenterID)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	nop , err := h.superStore.CountPatientsByCenter(center.ID)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	cQuentitiy , err  := h.superStore.GetMedicationByArabicName(Inquirie.NameArabic , center.ID)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	currentquentitiy , err  := strconv.Atoi(cQuentitiy.Quantity)
+	if err != nil {
+        fmt.Println("خطأ في التحويل:", err)
+        return
+    }
+
+	RequestDetails , err := h.superStore.GetMedicationRequestByID(Inquirie.RequestId)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	newQueryDetails := types.InquirieDetails {
+		NameArabic: Inquirie.NameArabic,
+		NameEnglish: Inquirie.NameEnglish,
+		CenterName: center.CenterName,
+		CenterCity: center.CenterCity,
+		RQuantity: Inquirie.Quantity,
+		CQuantity: currentquentitiy,
+		Nop: nop,
+		Request_date: RequestDetails.RequestedAt,
+
+	}
+
+	utils.WriteJSON(w , http.StatusOK , newQueryDetails)
 
 }
 
