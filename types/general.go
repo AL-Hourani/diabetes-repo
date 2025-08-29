@@ -10,7 +10,7 @@ const (
 
 type InformationStatus string
 const (
-    CurrentReviewing      InformationStatus = "جاري المعالجة "
-    InfoStatusOK          InformationStatus = "مقبول"
-    InfoStatusCancel      InformationStatus = "مرفوض"
+    CurrentReviewing      InformationStatus = "inProgress"
+    InfoStatusOK          InformationStatus = "accepted"
+    InfoStatusCancel      InformationStatus = "rejected"
 )
