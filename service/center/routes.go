@@ -1538,7 +1538,7 @@ func (h *Handler) handleRequestMedicine(w http.ResponseWriter, r *http.Request) 
 		UnitsPerBox: medicinePayload.UnitsPerBox,
 		CenterID: id,
 	}
-	err = h.store.InsertMedication(newMedicine)
+	id , err = h.store.InsertMedication(newMedicine)
     if err != nil {
 		utils.WriteError(w, http.StatusBadRequest,err)
 		return
@@ -1553,6 +1553,7 @@ func (h *Handler) handleRequestMedicine(w http.ResponseWriter, r *http.Request) 
 		CreateAt: time.Now().Format("2/1/2006"),
 		ApprovalAt: "غير محدد بعد",
 		Status: string(types.CurrentReviewing),
+		RequestID: id,
 	}
 
 	err = h.store.InsertRecord(newRecord)
@@ -1567,6 +1568,7 @@ func (h *Handler) handleRequestMedicine(w http.ResponseWriter, r *http.Request) 
 		Quantity: medicinePayload.Quantity,
 		CenterID: id,
 		Status: string(types.CurrentReviewing),
+		RequestId: id,
 	}
 
 	err = h.store.InsertInformation(newInfo)

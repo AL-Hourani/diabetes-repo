@@ -1466,37 +1466,25 @@ func (s *Store) InsertNotification(n types.NotificationTwo) error {
 
 
 // medicine 
-func (s *Store) InsertMedication(m types.InsertMedication) error {
+func (s *Store) InsertMedication(m types.InsertMedication) (int, error) {
 
     tx, err := s.db.Begin()
     if err != nil {
-        return err
+        return 0 , err
     }
 
     // إدخال الدواء في جدول medications
-    _, err = tx.Exec(`
+    var medID int
+    err = tx.QueryRow(`
         INSERT INTO medications (
-            name_arabic,
-            name_english,
-            medication_type,
-            dosage,
-            quantity,
-            units_per_box,
-            center_id
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-    `,
-        m.NameArabic,
-        m.NameEnglish,
-        m.MedicationType,
-        m.Dosage,
-        m.Quantity,
-        m.UnitsPerBox,
-        m.CenterID,
-    )
+            name_arabic, name_english, medication_type, dosage, quantity, units_per_box, center_id
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id
+    `, m.NameArabic, m.NameEnglish, m.MedicationType, m.Dosage, m.Quantity, m.UnitsPerBox, m.CenterID).Scan(&medID)
     if err != nil {
         tx.Rollback()
-        return err
+        return 0 , err
     }
+  
 
     // إضافة سجل في جدول medication_logs مع center_id
     _, err = tx.Exec(`
@@ -1506,21 +1494,29 @@ func (s *Store) InsertMedication(m types.InsertMedication) error {
             medication_type,
             requested_quantity,
             center_id,
+			medication_id,
 			requested_at
-        ) VALUES ($1, $2, $3, $4, $5 , NOW())
+        ) VALUES ($1, $2, $3, $4, $5 ,$6 ,NOW()
     `,
         m.NameArabic,
         m.Dosage,
         m.MedicationType,
         m.Quantity,
         m.CenterID,
+		medID,
     )
-    if err != nil {
+       if err != nil {
         tx.Rollback()
-        return err
+        return 0, err
     }
 
-    return tx.Commit()
+    // Commit المعاملة
+    if err := tx.Commit(); err != nil {
+        return 0, err
+    }
+
+    // إرجاع ID الدواء
+    return medID, nil
 }
 
 
@@ -1536,8 +1532,9 @@ func (s *Store) InsertRecord(r types.InsertRecord) error {
             center_id,
             created_at,
             approval_date,
-            record_status
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            record_status,
+			request_id
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8 , $9)
     `,
         r.NameArabic,
         r.Dosage,
@@ -1547,6 +1544,7 @@ func (s *Store) InsertRecord(r types.InsertRecord) error {
         r.CreateAt,
         r.ApprovalAt,
         r.Status,
+		r.RequestID,
     )
 
     return err
@@ -1559,15 +1557,17 @@ func (s *Store) InsertInformation(r types.InsertInformation) error {
             name_english,
             requested_quantity,
             center_id,
-			information_status
+			information_status,
+			request_id
 
-        ) VALUES ($1, $2, $3, $4, $5)
+        ) VALUES ($1, $2, $3, $4, $5,$6)
     `,
         r.NameArabic,
 		r.NameEnglish,
         r.Quantity,
         r.CenterID,
         r.Status,
+	    r.RequestId,
     )
 
     return err

@@ -272,7 +272,7 @@ type CenterStore interface {
 
 	InsertNotification(n NotificationTwo) error
 	GetMedicationStats() (MedicationStats, error)
-	InsertMedication(m InsertMedication) error
+	InsertMedication(m InsertMedication) (int ,error)
 	GetAllMedications(centerID int) ([]GeTMedication, error)
 	UpdateMedicationQuantity(id int, newQuantity int) error
 	GetLogsByCenterID(centerID int) ([]MedicationLog, error)
@@ -1110,6 +1110,7 @@ type InsertRecord struct {
 	ApprovalAt     string  
 	CenterID       int  
 	Status         string
+	RequestID      int
 }
 
 
