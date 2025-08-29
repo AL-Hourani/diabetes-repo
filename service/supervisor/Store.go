@@ -258,7 +258,7 @@ func (s *Store) GetMedicationRequestByID(id int) (*types.MedicationRequest, erro
             center_id,
             requested_at
         FROM medication_requests
-        WHERE id = $1
+        WHERE  medication_id = $1
     `, id)
 
     var req types.MedicationRequest
