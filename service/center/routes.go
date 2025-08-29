@@ -1518,7 +1518,7 @@ func (h *Handler) handleRequestMedicine(w http.ResponseWriter, r *http.Request) 
 	}
 
 
-	id, err := auth.GetIDFromToken(token)
+	idCenter, err := auth.GetIDFromToken(token)
 	if err != nil {
 		http.Error(w, "Invalid token", http.StatusUnauthorized)
 		return
@@ -1536,9 +1536,9 @@ func (h *Handler) handleRequestMedicine(w http.ResponseWriter, r *http.Request) 
 		Dosage: medicinePayload.Dosage,
 		Quantity: medicinePayload.Quantity,
 		UnitsPerBox: medicinePayload.UnitsPerBox,
-		CenterID: id,
+		CenterID: idCenter,
 	}
-	id , err = h.store.InsertMedication(newMedicine)
+	id , err := h.store.InsertMedication(newMedicine)
     if err != nil {
 		utils.WriteError(w, http.StatusBadRequest,err)
 		return
@@ -1549,7 +1549,7 @@ func (h *Handler) handleRequestMedicine(w http.ResponseWriter, r *http.Request) 
 		Dosage: medicinePayload.Dosage,
 		MedicationType: medicinePayload.MedicationType,
 		Quantity: medicinePayload.Quantity,
-		CenterID: id,
+		CenterID: idCenter,
 		CreateAt: time.Now().Format("2/1/2006"),
 		ApprovalAt: "غير محدد بعد",
 		Status: string(types.CurrentReviewing),
@@ -1566,7 +1566,7 @@ func (h *Handler) handleRequestMedicine(w http.ResponseWriter, r *http.Request) 
 		NameArabic: medicinePayload.NameArabic,
 		NameEnglish: medicinePayload.NameEnglish,
 		Quantity: medicinePayload.Quantity,
-		CenterID: id,
+		CenterID: idCenter,
 		Status: string(types.CurrentReviewing),
 		RequestId: id,
 	}
