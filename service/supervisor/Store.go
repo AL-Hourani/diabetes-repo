@@ -3,6 +3,7 @@ package supervisor
 import (
 	"database/sql"
 	"fmt"
+	"strconv"
 
 	"github.com/AL-Hourani/care-center/types"
 )
@@ -308,28 +309,38 @@ func (s *Store) UpdateRecordStatusAndApprovalDate(id int, newStatus string) erro
     return err
 }
 
+
+
+
 func (s *Store) UpdateMedicationQuantity(id int, newQuantity int) error {
-    
-    var oldQuantity sql.NullInt64
+   
+    var oldQuantityStr string
     err := s.db.QueryRow(`
         SELECT quantity FROM medications WHERE id = $1
-    `, id).Scan(&oldQuantity)
+    `, id).Scan(&oldQuantityStr)
     if err != nil {
         return err
     }
 
+   
+    oldQuantity, err := strconv.Atoi(oldQuantityStr)
+    if err != nil {
     
-    totalQuantity := newQuantity
-    if oldQuantity.Valid {
-        totalQuantity += int(oldQuantity.Int64)
+        oldQuantity = 0
     }
 
-    // تحديث القيمة الجديدة
+    // نجمع القديم مع الجديد
+    totalQuantity := oldQuantity + newQuantity
+
+    // نحفظه كـ string
+    totalQuantityStr := strconv.Itoa(totalQuantity)
+
+    // تحديث الجدول
     _, err = s.db.Exec(`
         UPDATE medications
         SET quantity = $1
         WHERE id = $2
-    `, totalQuantity, id)
+    `, totalQuantityStr, id)
 
     return err
 }

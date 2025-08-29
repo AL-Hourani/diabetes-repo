@@ -373,7 +373,7 @@ func (h *Handler) handleAcceptedInquiries(w http.ResponseWriter, r *http.Request
 		return
 	}
     
-	err = h.superStore.UpdateMedicationQuantity(query.RequestId ,strconv.Itoa(queryAccept.Quantity) )
+	err = h.superStore.UpdateMedicationQuantity(query.RequestId ,queryAccept.Quantity )
     if err != nil {
 		utils.WriteError(w, http.StatusUnauthorized, err)
 		return

@@ -15,7 +15,7 @@ type SuperisorStore interface {
 	 GetMedicationRequestByID(id int) (*MedicationRequest, error)
      UpdateInformationStatus(id int, newStatus string) error
      UpdateRecordStatusAndApprovalDate(id int, newStatus string) error
-     UpdateMedicationQuantity(id int, newQuantity string) error
+     UpdateMedicationQuantity(id int, newQuantity int) error
    
 }
 
