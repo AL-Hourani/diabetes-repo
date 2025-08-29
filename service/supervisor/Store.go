@@ -303,7 +303,7 @@ func (s *Store) UpdateRecordStatusAndApprovalDate(id int, newStatus string) erro
         SET 
             approval_date = CURRENT_DATE,
             record_status = $1
-        WHERE id = $2
+        WHERE request_id = $2
     `, newStatus, id)
 
     return err

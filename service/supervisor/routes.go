@@ -361,7 +361,7 @@ func (h *Handler) handleAcceptedInquiries(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	query , err := h.superStore.GetInformationByID(queryAccept.Query_ID )
+	query , err := h.superStore.GetInformationByID(queryAccept.Query_ID)
 	if err != nil {
 		utils.WriteError(w, http.StatusUnauthorized, err)
 		return
