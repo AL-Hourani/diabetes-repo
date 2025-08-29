@@ -361,13 +361,19 @@ func (h *Handler) handleAcceptedInquiries(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err = h.superStore.UpdateRecordStatusAndApprovalDate(queryAccept.Query_ID , string(types.StatusApproved))
+	query , err := h.superStore.GetInformationByID(queryAccept.Query_ID )
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	err = h.superStore.UpdateRecordStatusAndApprovalDate(query.RequestId, string(types.StatusApproved))
     if err != nil {
 		utils.WriteError(w, http.StatusUnauthorized, err)
 		return
 	}
     
-	err = h.superStore.UpdateMedicationQuantity(queryAccept.Query_ID ,strconv.Itoa(queryAccept.Quantity) )
+	err = h.superStore.UpdateMedicationQuantity(query.RequestId ,strconv.Itoa(queryAccept.Quantity) )
     if err != nil {
 		utils.WriteError(w, http.StatusUnauthorized, err)
 		return

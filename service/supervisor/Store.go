@@ -308,13 +308,29 @@ func (s *Store) UpdateRecordStatusAndApprovalDate(id int, newStatus string) erro
     return err
 }
 
+func (s *Store) UpdateMedicationQuantity(id int, newQuantity int) error {
+    
+    var oldQuantity sql.NullInt64
+    err := s.db.QueryRow(`
+        SELECT quantity FROM medications WHERE id = $1
+    `, id).Scan(&oldQuantity)
+    if err != nil {
+        return err
+    }
 
-func (s *Store) UpdateMedicationQuantity(id int, newQuantity string) error {
-    _, err := s.db.Exec(`
+    
+    totalQuantity := newQuantity
+    if oldQuantity.Valid {
+        totalQuantity += int(oldQuantity.Int64)
+    }
+
+    // تحديث القيمة الجديدة
+    _, err = s.db.Exec(`
         UPDATE medications
         SET quantity = $1
         WHERE id = $2
-    `, newQuantity, id)
+    `, totalQuantity, id)
 
     return err
 }
+
