@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
@@ -1682,11 +1683,33 @@ func (s *Store) GetAllMedications(centerID int) ([]types.GeTMedication, error) {
 
 
 func (s *Store) UpdateMedicationQuantity(id int, newQuantity int) error {
-    _, err := s.db.Exec(`
+
+ var oldQuantityStr string
+    err := s.db.QueryRow(`
+        SELECT quantity FROM medications WHERE id = $1
+    `, id).Scan(&oldQuantityStr)
+    if err != nil {
+        return err
+    }
+
+    oldQuantity, err := strconv.Atoi(oldQuantityStr)
+    if err != nil {
+    
+        oldQuantity = 0
+    }
+
+   
+    totalQuantity := oldQuantity + newQuantity
+
+    
+    totalQuantityStr := strconv.Itoa(totalQuantity)
+
+    _, err = s.db.Exec(`
         UPDATE medications
         SET quantity = $1
         WHERE id = $2
-    `, newQuantity, id)
+    `, totalQuantityStr, id)
+
     return err
 }
 
