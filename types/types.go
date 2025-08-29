@@ -1143,6 +1143,7 @@ type GetAllInformation struct {
     NameEnglish    string     `json:"name_english"`
     Quantity       int        `json:"quantity"`
 	CenterName       string   `json:"center_name"`
+	CenterCity     string     `json:"center_city"`
 	Status         string     `json:"status"`
 }
 	

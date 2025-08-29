@@ -152,6 +152,7 @@ func (s *Store) GetAllInformation() ([]types.GetAllInformation, error) {
         }
         
         info.CenterName = center.CenterName
+        info.CenterCity = center.CenterCity
         
         infos = append(infos, info)
     }
