@@ -1496,7 +1496,7 @@ func (s *Store) InsertMedication(m types.InsertMedication) (int, error) {
             center_id,
 			medication_id,
 			requested_at
-        ) VALUES ($1, $2, $3, $4, $5 ,$6 ,NOW()
+        ) VALUES ($1, $2, $3, $4, $5 ,$6 ,NOW())
     `,
         m.NameArabic,
         m.Dosage,
