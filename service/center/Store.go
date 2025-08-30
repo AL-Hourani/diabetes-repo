@@ -1812,7 +1812,7 @@ func (s *Store) GetMedicationByID(id int) (*types.GeTMedication, error) {
 
 
 
-func (s *Store) UpdateMedicationQuantity(id int, decreaseQuantity int) error {
+func (s *Store) UpdateMedicationQuantity(id int, decreaseQuantity string) error {
     var oldQuantityStr string
     err := s.db.QueryRow(`
         SELECT quantity FROM medications WHERE id = $1
@@ -1825,9 +1825,13 @@ func (s *Store) UpdateMedicationQuantity(id int, decreaseQuantity int) error {
     if err != nil {
         oldQuantity = 0
     }
+    dQuan, err := strconv.Atoi(decreaseQuantity)
+    if err != nil {
+        oldQuantity = 0
+    }
 
     
-    totalQuantity := oldQuantity - decreaseQuantity
+    totalQuantity := oldQuantity - dQuan
 
   
     // if totalQuantity < 0 {

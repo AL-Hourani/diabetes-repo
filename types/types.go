@@ -282,7 +282,7 @@ type CenterStore interface {
 
 
 	GetMedicationByID(id int) (*GeTMedication, error) 
-    UpdateMedicationQuantity(id int, decreaseQuantity int) error
+    UpdateMedicationQuantity(id int, decreaseQuantity string) error
 
 
 	InsertRecord(r InsertRecord) error
@@ -454,7 +454,7 @@ type SugarStatsResponse struct {
 // ............................................................
 type Drug struct {
 	ID                int        `json:"id,string"`
-	Quantity          int        `json:"quantity"`
+	Quantity          string     `json:"quantity"`
 	Dosage_per_day    string     `json:"dosage_per_day"`
 
 }
@@ -630,7 +630,7 @@ type TreatmentDrug struct {
 	TreatmentID   int
 	DrugID        int
 	DosagePerDay  string
-	Quantity      int
+	Quantity      string
 }
 
 
