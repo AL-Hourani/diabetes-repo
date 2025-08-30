@@ -248,7 +248,7 @@ type CenterStore interface {
 	InsertClinicBone(data Clinic__bone) error 
 	InsertClinicUrinary(data Clinic__urinary) error 
 	InsertTreatment(data TreatmentInsert) (int, error)
-	FindOrCreateDrugByName(name string ) (int, error) 
+	// FindOrCreateDrugByName(name string ) (int, error) 
 	InsertTreatmentDrug(td TreatmentDrug) error 
 	GetReviewsByPatientID(patientID int) ([]Review, error)
 	DeleteReviewByID(reviewID int) error 
@@ -282,7 +282,7 @@ type CenterStore interface {
 
 
 	GetMedicationByID(id int) (*GeTMedication, error) 
-
+    UpdateMedicationQuantity(id int, decreaseQuantity int) error
 
 
 	InsertRecord(r InsertRecord) error
@@ -453,15 +453,14 @@ type SugarStatsResponse struct {
 
 // ............................................................
 type Drug struct {
-	Name              string     `json:"name"`
-	Units             string     `json:"units"`
+	ID                int        `json:"id"`
+	Quantity          int        `json:"quantity"`
 	Dosage_per_day    string     `json:"dosage_per_day"`
 
 }
 
 type Treatment struct {
 	Type      []string       	`json:"type"`
-	Speed     string            `json:"speed"`
 	Drugs     []Drug            `json:"druges"`
 }
 
@@ -618,7 +617,6 @@ type Clinic__urinary struct  {
 
 type TreatmentInsert struct {
 	ReviewID  int
-	Speed     string
 	Type      []string            
 }
 
@@ -632,7 +630,7 @@ type TreatmentDrug struct {
 	TreatmentID   int
 	DrugID        int
 	DosagePerDay  string
-	Units         string
+	Quantity      int
 }
 
 
@@ -703,15 +701,17 @@ type GetReviwe struct {
 
 //response review vvvv
 type DrugR struct {
-	Name           string `json:"name"`
-	Units          string `json:"units"`
+	// ID             int    `json:"id"`
+	Name_arabic    string  `json:"name_arabic"`
+	Dosage         string  `json:"dosage"`
+	Units_per_box  int     `json:"units_per_box"`
 	DosagePerDay   string `json:"dosage_per_day"`
+	Quantity       int    `json:"quantity"`
 }
 
 type TreatmentR struct {
 	Type  []string `json:"type"`
-	Speed string   `json:"speed"`
-	Drugs []DrugR   `json:"druges"`
+	Drugs []DrugR  `json:"druges"`
 }
 
 type ReviewResponse struct {

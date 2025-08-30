@@ -722,7 +722,7 @@ func (h *Handler) handleUpdateCenterProfile(w http.ResponseWriter, r *http.Reque
 // add review / 
 
 func (h *Handler) handleAddReviewe(w http.ResponseWriter, r *http.Request) {
-	// التحقق من التوكن
+
 	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
 	if !ok {
 		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
@@ -735,7 +735,7 @@ func (h *Handler) handleAddReviewe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// قراءة الـ payload
+
 	var payload types.AddReviwePayload
 	if err := utils.ParseJSON(r, &payload); err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
@@ -774,10 +774,9 @@ func (h *Handler) handleAddReviewe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// إدخال العلاج الأساسي
+	
 	newTreatment := types.TreatmentInsert{
 		ReviewID: reviewID,
-		Speed:    payload.Treatments.Speed,
 		Type:     payload.Treatments.Type,
 	}
 
@@ -811,25 +810,32 @@ func (h *Handler) handleAddReviewe(w http.ResponseWriter, r *http.Request) {
 	// 		}
 	// 	}
 	// }()
-	var drugNames []string
+	    var drugNames []string
 		for _, drug := range payload.Treatments.Drugs {
-			drugID, err := h.store.FindOrCreateDrugByName(drug.Name)
+			err = h.store.InsertTreatmentDrug(types.TreatmentDrug{
+				TreatmentID:  treatmentID,
+				DrugID:       drug.ID,
+				DosagePerDay: drug.Dosage_per_day,
+				Quantity: drug.Quantity,
+			})
 			if err != nil {
-				log.Println("failed to add/find drug:", err)
-				continue
+				log.Println("failed to insert treatment-drug:", err)
 			}
 
-			drugNames = append(drugNames, drug.Name)
+			medicine , err := h.store.GetMedicationByID(drug.ID)
+			if err != nil {
+				utils.WriteError(w, http.StatusBadRequest, err)
+				return
+			}
 
-		
-			go func(d types.Drug, tID int, dID int) {
-				_ = h.store.InsertTreatmentDrug(types.TreatmentDrug{
-					TreatmentID:  tID,
-					DrugID:       dID,
-					DosagePerDay: d.Dosage_per_day,
-					Units:        d.Units,
-				})
-			}(drug, treatmentID, drugID)
+			drugNames = append(drugNames,medicine.NameArabic)
+			err = h.store.UpdateMedicationQuantity(drug.ID , drug.Quantity)
+            if err != nil {
+				utils.WriteError(w, http.StatusBadRequest, err)
+				return
+			}
+
+
 		}
 
 	// العمليات الثانوية: إدخال بيانات العيون / القلب / الأعصاب / العظام / البول

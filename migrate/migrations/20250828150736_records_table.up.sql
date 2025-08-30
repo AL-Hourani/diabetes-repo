@@ -7,5 +7,6 @@ CREATE TABLE IF NOT EXISTS records (
     center_id INT NOT NULL,
     created_at  TEXT NOT NULL,
     approval_date TEXT NOT Null,
-    record_status  TEXT NOT NULL
+    record_status  TEXT NOT NULL,
+    request_id INT NOT NULL
 );

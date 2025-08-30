@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
@@ -815,10 +816,10 @@ func  (s *Store)  InsertTreatment(data types.TreatmentInsert) (int , error) {
 	}
 	    query := `
         INSERT INTO treatments (
-		review_id , treatment_type , speed
+		review_id , treatment_type 
 		
         ) VALUES (
-            $1, $2, $3
+            $1, $2
         )
 		RETURNING id
     `
@@ -826,7 +827,6 @@ func  (s *Store)  InsertTreatment(data types.TreatmentInsert) (int , error) {
     err = s.db.QueryRow(query,
        data.ReviewID,
 	   string(typeM),
-	   data.Speed,
     ).Scan(&id)
 
     if err != nil {
@@ -837,54 +837,19 @@ func  (s *Store)  InsertTreatment(data types.TreatmentInsert) (int , error) {
 
 }
 
-func (s *Store) FindOrCreateDrugByName(name string) (int, error) {
-	var id int
-	err := s.db.QueryRow("SELECT id FROM drugs WHERE name = $1", name).Scan(&id)
-	if err == sql.ErrNoRows {
-		err = s.db.QueryRow("INSERT INTO drugs (name) VALUES ($1) RETURNING id", name).Scan(&id)
-	}
-	if err != nil {
-		return 0, fmt.Errorf("error finding/creating drug: %w", err)
-	}
-	return id, nil
-}
 
 
 func (s *Store) InsertTreatmentDrug(td types.TreatmentDrug) error {
 	query := `
-		INSERT INTO treatment_drugs (treatment_id, drug_id, dosage_per_day, units)
-		VALUES ($1, $2, $3, $4)
+		INSERT INTO treatment_drugs (treatment_id, drug_id, dosage_per_day , quantity)
+		VALUES ($1, $2, $3)
 	`
-	_, err := s.db.Exec(query, td.TreatmentID, td.DrugID, td.DosagePerDay, td.Units)
+	_, err := s.db.Exec(query, td.TreatmentID, td.DrugID, td.DosagePerDay , td.Quantity)
 	return err
 }
 
 
 
-
-
-
-func  (s *Store)  AddDrugNaame(data types.DrugsName) error { 
-	    query := `
-        INSERT INTO drugs (
-		name
-		
-        ) VALUES (
-            $1
-        )
-    `
-	
-    _, err := s.db.Exec(query,
-       data.Name,
-    )
-
-    if err != nil {
-        return fmt.Errorf("failed to insert drug name: %w", err)
-    }
-
-    return nil
-
-}
 
 
 
@@ -925,7 +890,6 @@ func (s *Store) GetReviewByID(reviewID int) (*types.ReviewResponse, error) {
 	}
 	_ = json.Unmarshal(historyJSON, &review.HistoryOfFamilyDisease)
 
-	// 2. استعلام العيادات الفرعية (مثال: العيون)
 	s.db.QueryRow(`
 		SELECT has_a_eye_disease, in_kind_disease, relationship_with_diabetes, comments 
 		FROM eyes_clinic WHERE review_id = $1
@@ -935,7 +899,7 @@ func (s *Store) GetReviewByID(reviewID int) (*types.ReviewResponse, error) {
 		&review.RelationshipEyesWithDiabetes,
 		&review.CommentsEyesClinic,
 	)
-	// لا تتعامل مع الخطأ إن لم تكن النتائج موجودة لأن بعضها اختياري
+	
 
 	// 3. استعلام باقي العيادات (نفس الطريقة):
 	s.db.QueryRow(`SELECT has_a_heart_disease, heart_disease, relationship_with_diabetes, comments FROM heart_clinic WHERE review_id = $1`,
@@ -953,21 +917,21 @@ func (s *Store) GetReviewByID(reviewID int) (*types.ReviewResponse, error) {
 	// 4. استعلام العلاج والأدوية
 	var treatmentID int
 	var treatmentTypesJSON []byte
-	err = s.db.QueryRow(`SELECT id, treatment_type, speed FROM treatments WHERE review_id = $1`, reviewID).
-		Scan(&treatmentID, &treatmentTypesJSON, &review.Treatments.Speed)
+	err = s.db.QueryRow(`SELECT id, treatment_type FROM treatments WHERE review_id = $1`, reviewID).
+		Scan(&treatmentID, &treatmentTypesJSON)
 	if err == nil {
 		_ = json.Unmarshal(treatmentTypesJSON, &review.Treatments.Type)
 
 		rows, err := s.db.Query(`
-			SELECT d.name, td.units, td.dosage_per_day 
+			SELECT m.name_arabic  , m.dosage , m.units_per_box , td.dosage_per_day , td.quantity
 			FROM treatment_drugs td
-			JOIN drugs d ON td.drug_id = d.id
+			JOIN medications m ON td.drug_id = m.id
 			WHERE td.treatment_id = $1`, treatmentID)
 		if err == nil {
 			defer rows.Close()
 			for rows.Next() {
 				var drug types.DrugR
-				if err := rows.Scan(&drug.Name, &drug.Units, &drug.DosagePerDay); err == nil {
+				if err := rows.Scan(&drug.Name_arabic, &drug.Dosage, &drug.Units_per_box, &drug.DosagePerDay  , &drug.Quantity); err == nil {
 					review.Treatments.Drugs = append(review.Treatments.Drugs, drug)
 				}
 			}
@@ -1838,4 +1802,45 @@ func (s *Store) GetMedicationByID(id int) (*types.GeTMedication, error) {
     }
 
     return &m, nil
+}
+
+
+
+
+
+
+
+
+
+func (s *Store) UpdateMedicationQuantity(id int, decreaseQuantity int) error {
+    var oldQuantityStr string
+    err := s.db.QueryRow(`
+        SELECT quantity FROM medications WHERE id = $1
+    `, id).Scan(&oldQuantityStr)
+    if err != nil {
+        return err
+    }
+
+    oldQuantity, err := strconv.Atoi(oldQuantityStr)
+    if err != nil {
+        oldQuantity = 0
+    }
+
+    
+    totalQuantity := oldQuantity - decreaseQuantity
+
+  
+    // if totalQuantity < 0 {
+    //     totalQuantity = 0
+    // }
+
+    totalQuantityStr := strconv.Itoa(totalQuantity)
+
+    _, err = s.db.Exec(`
+        UPDATE medications
+        SET quantity = $1
+        WHERE id = $2
+    `, totalQuantityStr, id)
+
+    return err
 }

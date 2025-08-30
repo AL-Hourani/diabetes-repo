@@ -5,5 +5,6 @@ CREATE TABLE IF NOT EXISTS information (
     requested_quantity INTEGER NOT NULL,
     center_id INT NOT NULL,
     information_status  TEXT NOT NULL,
-    createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    request_id INT NOT NULL
 );
