@@ -453,7 +453,7 @@ type SugarStatsResponse struct {
 
 // ............................................................
 type Drug struct {
-	ID                int        `json:"id"`
+	ID                int        `json:"id,string"`
 	Quantity          int        `json:"quantity"`
 	Dosage_per_day    string     `json:"dosage_per_day"`
 
