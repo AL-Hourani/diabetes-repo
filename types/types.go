@@ -705,8 +705,8 @@ type DrugR struct {
 	Name_arabic    string  `json:"name_arabic"`
 	Dosage         string  `json:"dosage"`
 	Units_per_box  int     `json:"units_per_box"`
-	DosagePerDay   string `json:"dosage_per_day"`
-	Quantity       int    `json:"quantity"`
+	DosagePerDay   string  `json:"dosage_per_day"`
+	Quantity       int     `json:"quantity"`
 }
 
 type TreatmentR struct {

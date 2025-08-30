@@ -842,9 +842,14 @@ func  (s *Store)  InsertTreatment(data types.TreatmentInsert) (int , error) {
 func (s *Store) InsertTreatmentDrug(td types.TreatmentDrug) error {
 	query := `
 		INSERT INTO treatment_drugs (treatment_id, drug_id, dosage_per_day , quantity)
-		VALUES ($1, $2, $3)
+		VALUES ($1, $2, $3 , $4)
 	`
-	_, err := s.db.Exec(query, td.TreatmentID, td.DrugID, td.DosagePerDay , td.Quantity)
+	
+	quantity, errs := strconv.Atoi(td.Quantity)
+	if errs != nil {
+		fmt.Println("خطأ في التحويل:", errs)
+	}
+	_, err := s.db.Exec(query, td.TreatmentID, td.DrugID, td.DosagePerDay , quantity)
 	return err
 }
 
