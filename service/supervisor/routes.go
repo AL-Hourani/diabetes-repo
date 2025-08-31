@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"sync"
 
 	"github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/service/auth"
@@ -36,6 +37,7 @@ func (h *Handler) RegisterSuperVisorRoutes(router *mux.Router) {
 	router.HandleFunc("/getInquiries",auth.WithJWTAuth(h.handleGetInquiries)).Methods("GET")
 	router.HandleFunc("/getInquiriesDetails/{id}",auth.WithJWTAuth(h.handleGetInquiriesDetails)).Methods("GET")
 	router.HandleFunc("/getCityInfo",auth.WithJWTAuth(h.handleGetCentersByCity)).Methods("GET")
+	router.HandleFunc("/getSuperInfo",auth.WithJWTAuth(h.handleGetSuperInfo)).Methods("GET")
 	router.HandleFunc("/rejectInquiries",auth.WithJWTAuth(h.handleRejectInquiries)).Methods("POST")
 	router.HandleFunc("/acceptedInquiries",auth.WithJWTAuth(h.handleAcceptedInquiries)).Methods("POST")
 	router.HandleFunc("/superLogin",h.handleLoginSupervisor).Methods("POST")
@@ -450,6 +452,115 @@ func (h *Handler) handleGetCentersByCity(w http.ResponseWriter, r *http.Request)
 
 	
 	utils.WriteJSON(w , http.StatusOK ,newCityInfo )
+}
+
+
+
+
+
+
+
+
+
+func (h *Handler) handleGetSuperInfo(w http.ResponseWriter, r *http.Request) {
+
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	idSup, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	user , err := h.pStore.GetLoginByID(idSup)
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	if user.Role != "supervisor" {
+		http.Error(w, "Unauthorized: You are not supervisor", http.StatusUnauthorized)
+		return
+	}
+
+
+	var ( 
+		citiesInSystem []string
+		nopis          int
+		nopisLastMonth int
+		firstCenter    types.CenterWithCount
+	)
+
+
+	errCh := make(chan error, 4)
+
+	var wg sync.WaitGroup
+	wg.Add(4)
+
+
+	go func() {
+		defer wg.Done()
+		cities, err := h.store.GetCities()
+		if err != nil {
+			errCh <- err
+			return
+		}
+		citiesInSystem = cities
+	}()
+
+	go func() {
+		defer wg.Done()
+		total, err := h.pStore.GetTotalPatientsInSystem()
+		if err != nil {
+			errCh <- err
+			return
+		}
+		nopis = total
+	}()
+
+	go func() {
+		defer wg.Done()
+		lastMonth, err := h.pStore.GetPatientsLastMonth()
+		if err != nil {
+			errCh <- err
+			return
+		}
+		nopisLastMonth = lastMonth
+	}()
+
+
+	go func() {
+		defer wg.Done()
+		center, err := h.superStore.GetCenterWithMostPatients()
+		if err != nil {
+			errCh <- err
+			return
+		}
+		firstCenter = *center
+	}()
+
+
+	wg.Wait()
+	close(errCh)
+
+	
+	if err := <-errCh; err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+	newSystemInfo := types.GenericSuperInfo {
+	   NumberOfPatientInSystem:nopis,
+       NumberOfPatientInSystemLastMonth:nopisLastMonth ,
+	   ActiveCities:citiesInSystem ,
+	   FirstCenter: firstCenter,
+	}
+
+	
+	utils.WriteJSON(w , http.StatusOK ,newSystemInfo )
 }
 
 

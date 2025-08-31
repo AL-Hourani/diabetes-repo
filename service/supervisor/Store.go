@@ -414,3 +414,33 @@ func (s *Store) GetPatientCountByCityLastMonth(cityName string) (int, error) {
     }
     return count, nil
 }
+
+
+
+func (s *Store) GetCenterWithMostPatients() (*types.CenterWithCount, error) {
+	query := `
+		SELECT c.id, c.centerName, c.centerCity, COUNT(p.id) AS patients_count
+		FROM centers c
+		LEFT JOIN patients p ON c.id = p.center_id
+		GROUP BY c.id, c.centerName, c.centerCity
+		ORDER BY patients_count DESC
+		LIMIT 1;
+	`
+
+	var result types.CenterWithCount
+
+	err := s.db.QueryRow(query).Scan(
+		&result.ID,
+		&result.CenterName,
+		&result.CenterCity,
+		&result.PatientsCount,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("no centers found")
+		}
+		return nil, err
+	}
+
+	return &result, nil
+}

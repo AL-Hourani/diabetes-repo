@@ -42,7 +42,7 @@ type PatientStore interface {
    GetLoginByID(id int) (*Login, error)
    SetFirstLoginTrue(patientID int) error
 
-   
+   GetPatientsLastMonth() (int, error)
 }
 
 type Patient struct {
