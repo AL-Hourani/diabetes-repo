@@ -1116,3 +1116,45 @@ func (s *Store) ChangePatientPassword(patientID int, payload types.ChangePasswor
 
 	return nil
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+// count alll patient
+
+
+//عدد المرضى الكلي في النظام لدي
+
+func (s *Store) GetTotalPatients() (int, error) {
+    var total int
+    err := s.db.QueryRow(`SELECT COUNT(*) FROM patients`).Scan(&total)
+    if err != nil {
+        return 0, err
+    }
+    return total, nil
+}
+
+// عدد المرضى المسجلين ف الشهر الاخير
+
+func (s *Store) GetPatientsLastMonth() (int, error) {
+    var total int
+    err := s.db.QueryRow(`
+        SELECT COUNT(*) 
+        FROM patients 
+        WHERE createAt >= NOW() - INTERVAL '1 month'
+    `).Scan(&total)
+
+    if err != nil {
+        return 0, err
+    }
+    return total, nil
+}

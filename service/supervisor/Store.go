@@ -345,3 +345,72 @@ func (s *Store) UpdateMedicationQuantity(id int, newQuantity int) error {
     return err
 }
 
+
+
+
+
+
+// للجلب اسم المراكز بناء هلى اسم المينة 
+
+
+
+func (s *Store) GetCentersByCity(cityName string) ([]string, error) {
+    rows, err := s.db.Query(`
+        SELECT centerName 
+        FROM centers
+        WHERE centerCity ILIKE $1
+    `, cityName)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var centers []string
+    for rows.Next() {
+        var name string
+        if err := rows.Scan(&name); err != nil {
+            return nil, err
+        }
+        centers = append(centers, name)
+    }
+
+    if err := rows.Err(); err != nil {
+        return nil, err
+    }
+
+    return centers, nil
+}
+
+
+
+func (s *Store) GetPatientCountByCity(cityName string) (int, error) {
+    var count int
+    err := s.db.QueryRow(`
+        SELECT COUNT(p.id)
+        FROM patients p
+        INNER JOIN centers c ON p.center_id = c.id
+        WHERE c.centerCity ILIKE $1
+    `, cityName).Scan(&count)
+
+    if err != nil {
+        return 0, err
+    }
+    return count, nil
+}
+
+
+func (s *Store) GetPatientCountByCityLastMonth(cityName string) (int, error) {
+    var count int
+    err := s.db.QueryRow(`
+        SELECT COUNT(p.id)
+        FROM patients p
+        INNER JOIN centers c ON p.center_id = c.id
+        WHERE c.centerCity ILIKE $1
+          AND p.createAt >= NOW() - INTERVAL '1 month'
+    `, cityName).Scan(&count)
+
+    if err != nil {
+        return 0, err
+    }
+    return count, nil
+}

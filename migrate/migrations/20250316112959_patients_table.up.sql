@@ -6,25 +6,8 @@ CREATE TABLE IF NOT EXISTS patients (
     phone    VARCHAR(255) NOT NULL,
     date     VARCHAR(255) NOT NULL,
     id_number VARCHAR(255) NOT NULL,
-    isCompleted BOOLEAN NOT NULL,
-    gender VARCHAR(255) DEFAULT NULL,
-    wight VARCHAR(255) DEFAULT NULL,
-    length_patient  VARCHAR(255) DEFAULT NULL,
-    address_patient  VARCHAR(255) DEFAULT NULL,
-    bloodSugar VARCHAR(255) DEFAULT NULL,
-    hemoglobin VARCHAR(255) DEFAULT NULL,
-    bloodPressure VARCHAR(255) DEFAULT NULL,
-    sugarType VARCHAR(255) DEFAULT NULL,
-    diseaseDetection  VARCHAR(255) DEFAULT NULL,
-    otherDisease VARCHAR(255) DEFAULT NULL,
-    typeOfMedicine VARCHAR(255) DEFAULT NULL,
-    urineAcid VARCHAR(255) DEFAULT NULL,
-    cholesterol VARCHAR(255) DEFAULT NULL,
-    grease VARCHAR(255) DEFAULT NULL,
-    historyOfFamilyDisease VARCHAR(255) DEFAULT NULL,
     center_id INT NOT NULL,
-    city VARCHAR(255) NOT NULL,
     createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+    first_login BOOL  NOT NULL DEFAULT true
     CONSTRAINT fk_center FOREIGN KEY (center_id) REFERENCES centers(id) ON DELETE CASCADE
 );

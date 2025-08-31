@@ -16,6 +16,9 @@ type SuperisorStore interface {
      UpdateInformationStatus(id int, newStatus string) error
      UpdateRecordStatusAndApprovalDate(id int, newStatus string) error
      UpdateMedicationQuantity(id int, newQuantity int) error
+     GetCentersByCity(cityName string) ([]string, error)
+     GetPatientCountByCity(cityName string) (int, error)
+     GetPatientCountByCityLastMonth(cityName string) (int, error) 
    
 }
 
@@ -55,4 +58,15 @@ type QueryID struct {
 }
 type QueryAccepted struct {
     Query_ID    int    `json:"query_id"`
+}
+
+type City struct {
+    City   string    `json:"city_name"`
+}
+
+
+type AllCityInfo struct {
+    NumberOfPatientInCity          int `json:"nopic"`
+    NumberOfPatientInCityLastMonth int `json:"nopic_lm"`
+    ActiveCenter                   []string `json:"active_center"`
 }
