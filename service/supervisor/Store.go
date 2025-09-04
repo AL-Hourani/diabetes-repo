@@ -474,6 +474,8 @@ func (s *Store) GetPatientReviewsByMonth(month, year int) ([]types.PatientReview
             p.fullName,
             p.email,
             p.phone,
+            pm.gender,
+            pm.sugarType,
             r.address_patient,
             r.wight,
             r.length_patient,
@@ -543,17 +545,33 @@ func (s *Store) GetPatientReviewsByMonth(month, year int) ([]types.PatientReview
             COALESCE(
                 CASE WHEN u.relationship_with_diabetes THEN 'نعم' ELSE 'لا' END, 'لا يوجد'
             ) AS relationship_urinary_with_diabetes,
-            COALESCE(NULLIF(u.comments,''), 'لا يوجد') AS comments_urinary
+            COALESCE(NULLIF(u.comments,''), 'لا يوجد') AS comments_urinary,
+
+            COALESCE(t.treatment_type::text, '[]') AS treatment_type
 
         FROM reviews r
         LEFT JOIN patients p ON p.id = r.patient_id
+        LEFT JOIN patient_m pm ON pm.patient_id = r.patient_id
         LEFT JOIN eyes_clinic e ON e.review_id = r.id
         LEFT JOIN heart_clinic h ON h.review_id = r.id
         LEFT JOIN nerve_clinic n ON n.review_id = r.id
         LEFT JOIN bone_clinic b ON b.review_id = r.id
         LEFT JOIN urinary_clinic u ON u.review_id = r.id
+        LEFT JOIN treatments t ON t.review_id = r.id
+        LEFT JOIN treatment_drugs td ON td.treatment_id = t.id
         WHERE EXTRACT(MONTH FROM r.date_review) = $1
           AND EXTRACT(YEAR FROM r.date_review) = $2
+          GROUP BY 
+        r.id, r.patient_id, p.fullName, p.email, p.phone, pm.gender, pm.sugarType,
+        r.address_patient, r.wight, r.length_patient, r.otherDisease, r.hemoglobin,
+        r.grease, r.urineAcid, r.bloodPressure, r.cholesterol, r.LDL, r.HDL, r.creatine,
+        r.normal_clucose, r.clucose_after_meal, r.triple_grease, r.hba1c, r.comments, r.date_review,
+        e.has_a_eye_disease, e.in_kind_disease, e.relationship_with_diabetes, e.comments,
+        h.has_a_heart_disease, h.heart_disease, h.relationship_with_diabetes, h.comments,
+        n.has_a_nerve_disease, n.nervous_disease, n.relationship_with_diabetes, n.comments,
+        b.has_a_bone_disease, b.bone_disease, b.relationship_with_diabetes, b.comments,
+        u.has_a_urinary_disease, u.urinary_disease, u.relationship_with_diabetes, u.comments,
+        t.treatment_type
         ORDER BY r.date_review;
     `
 
@@ -583,15 +601,35 @@ func (s *Store) GetPatientReviewsByMonth(month, year int) ([]types.PatientReview
         if err != nil {
             return nil, err
         }
+        var treatmentDrugs []types.TreatmentDrugExel
+        drugRows, err := s.db.Query(`
+            SELECT d.name_arabic, td.dosage_per_day, td.quantity
+            FROM treatment_drugs td
+            JOIN drugs d ON d.id = td.drug_id
+            WHERE td.treatment_id = (
+                SELECT id FROM treatments WHERE review_id = $1
+            )
+        `, r.ReviewID)
+        if err != nil {
+            return nil, err
+        }
+ 
+
+        for drugRows.Next() {
+            var d types.TreatmentDrugExel
+            if err := drugRows.Scan(&d.DrugName, &d.DosagePerDay, &d.Quantity); err != nil {
+                return nil, err
+            }
+            treatmentDrugs = append(treatmentDrugs, d)
+        }
+        defer drugRows.Close()
+        r.TreatmentDrugs = treatmentDrugs
         reviews = append(reviews, r)
     }
 
+           
     return reviews, nil
 }
-
-
-
-
 
 
 func CreateExcelFile(reviews []types.PatientReview) (*excelize.File, error) {
@@ -599,9 +637,9 @@ func CreateExcelFile(reviews []types.PatientReview) (*excelize.File, error) {
     sheet := "Patients"
     f.NewSheet(sheet)
 
-    // رؤوس الأعمدة بالعربية
     headers := []string{
         "اسم المريض", "البريد الإلكتروني", "الهاتف",
+        "الجنس", "نوع السكر",
         "العنوان", "الوزن", "الطول", "أمراض أخرى", "الهيموغلوبين",
         "الدهون", "حمض اليوريك", "ضغط الدم", "الكوليسترول", "LDL", "HDL",
         "الكرياتين", "سكر طبيعي", "سكر بعد الوجبة", "الدهون الثلاثية", "HBA1c", "ملاحظات", "تاريخ المراجعة",
@@ -610,11 +648,12 @@ func CreateExcelFile(reviews []types.PatientReview) (*excelize.File, error) {
         "أمراض الأعصاب", "نوع المرض بالأعصاب", "علاقة الأعصاب بالسكري", "ملاحظات الأعصاب",
         "أمراض العظام", "نوع المرض بالعظام", "علاقة العظام بالسكري", "ملاحظات العظام",
         "أمراض الجهاز البولي", "نوع المرض بالجهاز البولي", "علاقة الجهاز البولي بالسكري", "ملاحظات الجهاز البولي",
+        "نوع العلاج", "الأدوية (جرعة/يوم و كمية)",
     }
 
     // تنسيق الهيدر
     headerStyle, _ := f.NewStyle(&excelize.Style{
-        Font: &excelize.Font{Bold: true, Family: "Arial Unicode MS", Size: 12},
+        Font: &excelize.Font{Bold: true, Family: "Tajawal", Size: 12},
         Fill: excelize.Fill{Type: "pattern", Color: []string{"#D9E1F2"}, Pattern: 1},
         Alignment: &excelize.Alignment{Horizontal: "center", Vertical: "center"},
     })
@@ -630,18 +669,26 @@ func CreateExcelFile(reviews []types.PatientReview) (*excelize.File, error) {
     for i, r := range reviews {
         row := i + 2
 
+        // دمج بيانات الأدوية في عمود واحد كنص
+        treatmentDrugs := ""
+        for _, d := range r.TreatmentDrugs {
+            treatmentDrugs += fmt.Sprintf("%s: %s جرعة/يوم، الكمية: %d\n", d.DrugName, d.DosagePerDay, d.Quantity)
+        }
+
         values := []interface{}{
-            r.PatientFullName, r.PatientEmail, r.PatientPhone, r.AddressPatient,
-            r.Wight, r.LengthPatient, r.OtherDisease, r.Hemoglobin, r.Grease,
-            r.UrineAcid, r.BloodPressure, r.Cholesterol, r.LDL, r.HDL,
+            r.PatientFullName, r.PatientEmail, r.PatientPhone,
+            r.Gender, r.SugarType,
+            r.AddressPatient, r.Wight, r.LengthPatient, r.OtherDisease, r.Hemoglobin,
+            r.Grease, r.UrineAcid, r.BloodPressure, r.Cholesterol, r.LDL, r.HDL,
             r.Creatine, r.NormalClucose, r.ClucoseAfterMeal, r.TripleGrease,
             r.Hba1c, r.Comments, r.DateReview,
-
             r.Has_a_eye_disease, r.In_kind_disease, r.Relationship_with_diabetes, r.Comments_eye,
             r.Has_a_heart_disease, r.Heart_disease, r.Relationship_heart_with_diabetes, r.Comments_heart,
             r.Has_a_nerve_disease, r.Nervous_disease, r.Relationship_nervous_with_diabetes, r.Comments_nervous,
             r.Has_a_bone_disease, r.Bone_disease, r.Relationship_bone_with_diabetes, r.Comments_bone,
             r.Has_a_urinary_disease, r.Urinary_disease, r.Relationship_urinary_with_diabetes, r.Comments_urinary,
+            r.TreatmentType,
+            treatmentDrugs,
         }
 
         for j, v := range values {
@@ -651,17 +698,10 @@ func CreateExcelFile(reviews []types.PatientReview) (*excelize.File, error) {
     }
 
     // ضبط عرض الأعمدة تلقائياً
-    f.SetColWidth(sheet, "A", "AO", 20)
+    f.SetColWidth(sheet, "A", "AQ", 25)
 
     return f, nil
 }
-
-
-
-
-
-
-
 
 
 

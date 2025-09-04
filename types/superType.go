@@ -87,8 +87,11 @@ type CenterWithCount struct {
 	PatientsCount int
 }
 
-
-
+type TreatmentDrugExel struct {
+    DrugName     string
+    DosagePerDay string
+    Quantity     int
+}
 
 type PatientReview struct {
     ReviewID        int
@@ -96,6 +99,8 @@ type PatientReview struct {
     PatientFullName string
     PatientEmail    string
     PatientPhone    string
+    Gender          string   // جديد
+    SugarType       string   // جديد
     AddressPatient  string
     Wight           string
     LengthPatient   string
@@ -112,36 +117,37 @@ type PatientReview struct {
     ClucoseAfterMeal string
     TripleGrease    string
     Hba1c           string
-    Comments           string
+    Comments        string
     DateReview      string
-    
-    Has_a_eye_disease string
-    In_kind_disease string
-    Relationship_with_diabetes string
-    Comments_eye        string
 
-    Has_a_heart_disease string
-    Heart_disease   string
+    Has_a_eye_disease             string
+    In_kind_disease               string
+    Relationship_with_diabetes    string
+    Comments_eye                  string
+
+    Has_a_heart_disease           string
+    Heart_disease                 string
     Relationship_heart_with_diabetes string
-    Comments_heart string
+    Comments_heart                string
 
-    Has_a_nerve_disease string
-    Nervous_disease string
+    Has_a_nerve_disease           string
+    Nervous_disease               string
     Relationship_nervous_with_diabetes string
-    Comments_nervous  string
+    Comments_nervous              string
 
-    Has_a_bone_disease string
-    Bone_disease string
+    Has_a_bone_disease            string
+    Bone_disease                  string
     Relationship_bone_with_diabetes string
-    Comments_bone string
+    Comments_bone                 string
 
-    Has_a_urinary_disease string
-    Urinary_disease string
+    Has_a_urinary_disease         string
+    Urinary_disease               string
     Relationship_urinary_with_diabetes string
-    Comments_urinary string
+    Comments_urinary              string
 
+    TreatmentType  string 
+    TreatmentDrugs []TreatmentDrugExel
 }
-
 
 
 type MonthDown struct {
