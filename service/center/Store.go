@@ -621,15 +621,12 @@ func (s *Store) GetCenterUpdateCenterProfile(id int)(*types.GetCenterUpdateProfi
 
 
 func  (s *Store)  InsertReview(reviewdata types.Reviwe) (int, error) {
-	historyJSON, err := json.Marshal(reviewdata.HistoryOfFamilyDisease)
-	if err != nil {
-		log.Println("خطأ في تحويل historyOfFamilyDisease إلى JSON:", err)
-		return 0 , nil
-	}
+
+
     query := `
         INSERT INTO reviews (
-            patient_id, address_patient, wight, length_patient, sugarType,
-            otherDisease, historyOfFamilyDisease, diseaseDetection, gender,
+            patient_id, address_patient, wight, length_patient,
+            otherDisease,
             hemoglobin, grease, urineAcid, bloodPressure, cholesterol, ldl,
             hdl, creatine, normal_clucose, clucose_after_meal,
             triple_grease, hba1c, comments
@@ -637,23 +634,18 @@ func  (s *Store)  InsertReview(reviewdata types.Reviwe) (int, error) {
             $1, $2, $3, $4, $5,
             $6, $7, $8, $9,
             $10, $11, $12, $13, $14, $15,
-            $16, $17, $18, $19,
-            $20, $21, $22
+            $16, $17, $18
         )
 		  RETURNING id
     `
 
 	var reviewID int
-    err = s.db.QueryRow(query,
+    err := s.db.QueryRow(query,
         reviewdata.PatientID,
         reviewdata.Address,
         reviewdata.Weight,
         reviewdata.LengthPatient,
-        reviewdata.SugarType,
-        reviewdata.OtherDisease,
-        string(historyJSON),
-        reviewdata.HistoryOfDiseaseDetection,
-        reviewdata.Gender,
+        reviewdata.OtherDisease, 
         reviewdata.Hemoglobin,
         reviewdata.Grease,
         reviewdata.UrineAcid,
@@ -876,16 +868,16 @@ func (s *Store) GetReviewByID(reviewID int) (*types.ReviewResponse, error) {
 	// 1. استعلام جدول reviews
 	queryReview := `
 	SELECT 
-	    address_patient, wight, length_patient, sugarType, otherDisease,
-		historyOfFamilyDisease, diseaseDetection, gender, hemoglobin, grease,
+	    address_patient, wight, length_patient, otherDisease,
+		hemoglobin, grease,
 		urineAcid, bloodPressure, cholesterol, LDL, HDL, creatine, normal_clucose,
 		clucose_after_meal, triple_grease, hba1c, comments
 	FROM reviews WHERE id = $1
 	`
 	var historyJSON []byte
 	err := s.db.QueryRow(queryReview, reviewID).Scan(
-		&review.Address, &review.Weight, &review.LengthPatient, &review.SugarType, &review.OtherDisease,
-		&historyJSON, &review.HistoryOfDiseaseDetection, &review.Gender, &review.Hemoglobin, &review.Grease,
+		&review.Address, &review.Weight, &review.LengthPatient, &review.OtherDisease,
+		&historyJSON, &review.Hemoglobin, &review.Grease,
 		&review.UrineAcid, &review.BloodPressure, &review.Cholesterol, &review.LDL, &review.HDL,
 		&review.Creatine, &review.NormalGlocose, &review.GlocoseAfterMeal, &review.TripleGrease,
 		&review.Hba1c, &review.Coments,
@@ -893,7 +885,6 @@ func (s *Store) GetReviewByID(reviewID int) (*types.ReviewResponse, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get review: %w", err)
 	}
-	_ = json.Unmarshal(historyJSON, &review.HistoryOfFamilyDisease)
 
 	s.db.QueryRow(`
 		SELECT has_a_eye_disease, in_kind_disease, relationship_with_diabetes, comments 

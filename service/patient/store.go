@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
-
+    "log"
 	"github.com/AL-Hourani/care-center/service/auth"
 	"github.com/AL-Hourani/care-center/types"
 )
@@ -124,21 +124,48 @@ func (s *Store) GetLoginByID(id int) (*types.Login, error) {
 // 	return nil
 // }
 
-func (s *Store) GreatePatient(patient types.Patient)  error {
-	var id int
-	err := s.db.QueryRow(`
-		INSERT INTO patients 
-		(fullName, email, password, phone, date, id_number, center_id) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7)
-		RETURNING id
-	`, patient.FullName, patient.Email, patient.Password, patient.Phone, patient.Age, patient.IDNumber, patient.CenterID).Scan(&id)
+func (s *Store) CreatePatient(patient types.Patient) (int, error) {
+    var id int
+    err := s.db.QueryRow(`
+        INSERT INTO patients 
+        (fullName, email, password, phone, date, id_number, center_id) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        RETURNING id
+    `, patient.FullName, patient.Email, patient.Password, patient.Phone, patient.Age, patient.IDNumber, patient.CenterID).Scan(&id)
 
-	if err != nil {
-		return err
-	}
+    if err != nil {
+        return 0, err
+    }
 
-	return nil
+    return id, nil
 }
+
+func (s *Store) CreatePatientM(patientM types.PatientM) error {
+	historyJSON, errM := json.Marshal(patientM.HistoryOfFamilyDisease)
+	if errM != nil {
+		log.Println("خطأ في تحويل historyOfFamilyDisease إلى JSON:", errM)
+		return nil
+	}
+     _ ,err := s.db.Exec(`
+        INSERT INTO patient_m
+        (patient_id, gender, sugarType, historyOfFamilyDisease, diseaseDetection)
+        VALUES ($1, $2, $3, $4, $5)
+    `,
+        patientM.PatientID,
+        patientM.Gender,
+        patientM.SugarType,
+        string(historyJSON),
+        patientM.DiseaseDetection,
+    )
+
+    if err != nil {
+        return err
+    }
+
+    return nil
+}
+
+
 
 
 func (s *Store) SetFirstLoginTrue(patientID int) error {

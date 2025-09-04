@@ -20,7 +20,9 @@ type SuperisorStore interface {
      GetPatientCountByCity(cityName string) (int, error)
      GetPatientCountByCityLastMonth(cityName string) (int, error) 
      GetCenterWithMostPatients() (*CenterWithCount, error) 
-   
+     ParseMonthYear(input string) (month int, year int, err error) 
+     GetPatientReviewsByMonth(month, year int) ([]PatientReview, error) 
+
 }
 
 type ReturnCenters struct {
@@ -83,4 +85,62 @@ type CenterWithCount struct {
 	CenterName    string
 	CenterCity    string
 	PatientsCount int
+}
+
+
+
+
+type PatientReview struct {
+    PatientFullName string
+    PatientEmail    string
+    PatientPhone    string
+    AddressPatient  string
+    Wight           string
+    LengthPatient   string
+    OtherDisease    string
+    Hemoglobin      string
+    Grease          string
+    UrineAcid       string
+    BloodPressure   string
+    Cholesterol     string
+    LDL             string
+    HDL             string
+    Creatine        string
+    NormalClucose   string
+    ClucoseAfterMeal string
+    TripleGrease    string
+    Hba1c           string
+    DateReview      string
+    
+    Has_a_eye_disease string
+    In_kind_disease string
+    Relationship_with_diabetes string
+    Comments_eye        string
+
+    Has_a_heart_disease string
+    Heart_disease   string
+    Relationship_heart_with_diabetes string
+    Comments_heart string
+
+    Has_a_nerve_disease string
+    Nervous_disease string
+    Relationship_nervous_with_diabetes string
+    Comments_nervous  string
+
+    Has_a_bone_disease string
+    Bone_disease string
+    Relationship_bone_with_diabetes string
+    Comments_bone string
+
+    Has_a_urinary_disease string
+    Urinary_disease string
+    Relationship_urinary_with_diabetes string
+    Comments_urinary string
+
+}
+
+
+
+type MonthDown struct {
+    MonthDown   string    `json:"date"`
 }

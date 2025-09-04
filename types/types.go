@@ -13,7 +13,8 @@ type PatientStore interface {
 	GetPatientByEmail(email string) (*Patient , error)
 	GetPatientById(id int) (*Patient , error)
 	// GreatePatient(Patient) error
-	GreatePatient(patient Patient) ( error)
+	CreatePatient(patient Patient) (int, error)
+	CreatePatientM(patientM PatientM) error
 	// GetPatientDetailsByID(patientID int) (*PatientDetails, error)
 	GetUserByEmail(email string) (*UserLoginData, error)
 	// GetPatientProfile(id int)(*PatientProfile , error)
@@ -66,6 +67,18 @@ type RegisterPatientPayload struct {
 	Phone           string	     `json:"phone"    validate:"required"`
 	Password		string		 `json:"password" validate:"required"`
 	IDNumber		string       `json:"id_number" validate:"required"`
+    HistoryOfFamilyDisease  			[]string     `json:"historyOfFamilyDisease"`
+    HistoryOfDiseaseDetection           string       `json:"historyOfdiseaseDetection"`
+    Gender                              string       `json:"gender"`
+	SugarType         					string       `json:"sugarType"`
+}
+
+type PatientM struct {
+    PatientID              int    
+    Gender                 string 
+    SugarType              string 
+    HistoryOfFamilyDisease []string 
+    DiseaseDetection       string 
 }
 
 type ParientUpdatePayload struct {
@@ -472,11 +485,7 @@ type AddReviwePayload struct {
 	Address           					string       `json:"address"`
 	Weight            					string       `json:"weight"`
 	LengthPatient     					string       `json:"length_patient"`
-	SugarType         					string       `json:"sugarType"`
     OtherDisease      					string       `json:"otherDisease"`
-    HistoryOfFamilyDisease  			[]string     `json:"historyOfFamilyDisease"`
-    HistoryOfDiseaseDetection           string       `json:"historyOfdiseaseDetection"`
-    Gender                              string       `json:"gender"`
     Hemoglobin                          string       `json:"hemoglobin"`
     Grease                              string       `json:"grease"`
     UrineAcid                           string       `json:"urineAcid"`
@@ -541,12 +550,8 @@ type Reviwe struct {
 	PatientID		                    int		     
 	Address           					string       
 	Weight            					string       
-	LengthPatient     					string      
-	SugarType         					string       
-    OtherDisease      					string      
-    HistoryOfFamilyDisease  			[]string       
-    HistoryOfDiseaseDetection           string      
-    Gender                              string      
+	LengthPatient     					string         
+    OtherDisease      					string          
     Hemoglobin                          string     
     Grease                              string       
     UrineAcid                           string       
@@ -718,11 +723,7 @@ type ReviewResponse struct {
 	Address                        string   `json:"address"`
 	Weight                         string   `json:"weight"`
 	LengthPatient                  string   `json:"length_patient"`
-	SugarType                      string   `json:"sugarType"`
 	OtherDisease                   string   `json:"otherDisease"`
-	HistoryOfFamilyDisease         []string `json:"historyOfFamilyDisease"`
-	HistoryOfDiseaseDetection      string   `json:"historyOfdiseaseDetection"`
-	Gender                         string   `json:"gender"`
 	Hemoglobin                     string   `json:"hemoglobin"`
 	Grease                         string   `json:"grease"`
 	UrineAcid                      string   `json:"urineAcid"`

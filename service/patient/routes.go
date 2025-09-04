@@ -198,8 +198,9 @@ func (h *Handler) handlePatientRegister(w http.ResponseWriter , r *http.Request)
 			utils.WriteError(w , http.StatusInternalServerError , err)
 	}
 
-		//if it dosen't we create the new user
-	err = h.store.GreatePatient(types.Patient{
+
+
+	id , err := h.store.CreatePatient(types.Patient{
 		FullName: patientPayload.FullName,
 		Email: patientPayload.Email,
 		Password: hashedPassword,
@@ -207,11 +208,28 @@ func (h *Handler) handlePatientRegister(w http.ResponseWriter , r *http.Request)
 		Phone:patientPayload.Phone,
 	    IDNumber: patientPayload.IDNumber,
 		CenterID: centerID,
-		
-	})
+    })
+
+
+	
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return
+	}
+
+	newPatientM := types.PatientM {
+		PatientID: id,
+		Gender: patientPayload.Gender,
+		SugarType: patientPayload.SugarType,
+		HistoryOfFamilyDisease: patientPayload.HistoryOfFamilyDisease,
+		DiseaseDetection: patientPayload.HistoryOfDiseaseDetection,
+
+	}
+
+	err = h.store.CreatePatientM(newPatientM)
+	if err != nil {
+		utils.WriteError(w , http.StatusBadRequest ,err)
+		return 
 	}
 
 	newLoginFailed := types.InsertLogin {
@@ -227,7 +245,7 @@ func (h *Handler) handlePatientRegister(w http.ResponseWriter , r *http.Request)
 		return 
 	}
 
-
+   
 	
 
 

@@ -2,16 +2,10 @@ module github.com/AL-Hourani/care-center
 
 go 1.23.2
 
-
-
-
-
-
-
 require (
 	github.com/go-sql-driver/mysql v1.9.0
 	github.com/gorilla/mux v1.8.1
-	golang.org/x/crypto v0.36.0
+	golang.org/x/crypto v0.38.0
 )
 
 require (
@@ -47,12 +41,18 @@ require (
 	github.com/otiai10/gosseract/v2 v2.4.1 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/resend/resend-go/v2 v2.20.0 // indirect
+	github.com/richardlehane/mscfb v1.0.4 // indirect
+	github.com/richardlehane/msoleps v1.0.4 // indirect
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.16.0+incompatible // indirect
+	github.com/tiendc/go-deepcopy v1.6.0 // indirect
+	github.com/xuri/efp v0.0.1 // indirect
+	github.com/xuri/excelize/v2 v2.9.1 // indirect
+	github.com/xuri/nfp v0.0.1 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
-	golang.org/x/net v0.34.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
+	golang.org/x/net v0.40.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
+	golang.org/x/text v0.25.0 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
 )

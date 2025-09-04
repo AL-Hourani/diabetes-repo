@@ -13,6 +13,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
+
 )
 
 type Handler struct {
@@ -40,7 +41,9 @@ func (h *Handler) RegisterSuperVisorRoutes(router *mux.Router) {
 	router.HandleFunc("/getSuperInfo",auth.WithJWTAuth(h.handleGetSuperInfo)).Methods("GET")
 	router.HandleFunc("/rejectInquiries",auth.WithJWTAuth(h.handleRejectInquiries)).Methods("POST")
 	router.HandleFunc("/acceptedInquiries",auth.WithJWTAuth(h.handleAcceptedInquiries)).Methods("POST")
+	router.HandleFunc("/CreateDatePatientFile",auth.WithJWTAuth(h.handleGetSuperExcel)).Methods("POST")
 	router.HandleFunc("/superLogin",h.handleLoginSupervisor).Methods("POST")
+
 }
 
 
@@ -570,3 +573,58 @@ func (h *Handler) handleGetSuperInfo(w http.ResponseWriter, r *http.Request) {
 
 
 
+func (h *Handler) handleGetSuperExcel(w http.ResponseWriter, r *http.Request) {
+	var date types.MonthDown
+	
+	if err := utils.ParseJSON(r , &date); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+		return
+	}
+    token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+    if !ok {
+        http.Error(w, "Unauthorized", http.StatusUnauthorized)
+        return
+    }
+
+    idSup, err := auth.GetIDFromToken(token)
+    if err != nil {
+        http.Error(w, "Invalid token", http.StatusUnauthorized)
+        return
+    }
+
+    user, err := h.pStore.GetLoginByID(idSup)
+    if err != nil || user.Role != "supervisor" {
+        http.Error(w, "Unauthorized: not supervisor", http.StatusUnauthorized)
+        return
+    }
+
+    month, year, err := h.superStore.ParseMonthYear(date.MonthDown)
+	if err != nil {
+		fmt.Println("Error parsing date:", err)
+	} else {
+		fmt.Println("Month:", month, "Year:", year)
+	}
+	// المخرجات: Month: 3 Year: 2025
+
+
+    reviews, err := h.superStore.GetPatientReviewsByMonth(month, year)
+    if err != nil {
+        http.Error(w, "Error fetching reviews", http.StatusInternalServerError)
+        return
+    }
+
+    excelFile, err := CreateExcelFile(reviews)
+    if err != nil {
+        http.Error(w, "Error creating Excel file", http.StatusInternalServerError)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    w.Header().Set("Content-Disposition", "attachment; filename=patient_reviews.xlsx")
+    w.Header().Set("File-Name", "patient_reviews.xlsx")
+
+    if err := excelFile.Write(w); err != nil {
+        http.Error(w, "Error writing Excel file", http.StatusInternalServerError)
+        return
+    }
+}
