@@ -3,11 +3,11 @@ package center
 import (
 	"database/sql"
 	"encoding/json"
-	"errors"
+	// "errors"
 	"fmt"
 	"log"
 	"strconv"
-	"strings"
+	// "strings"
 	"time"
 
 	"github.com/AL-Hourani/care-center/types"
@@ -216,28 +216,20 @@ func (s *Store) GetReviewsByPatientID(patientID int) ([]types.Review, error) {
 }
 
 
+func (s *Store) GetSugarTypeByPatientID( patientID int) (string, error) {
+	query := `SELECT sugarType FROM patient_m WHERE patient_id = $1`
 
-//this is not completed
-func (s *Store) GetSugarTypeByReviewID(reviewID int) (string, error) {
-    var sugarType sql.NullString
+	var sugarType string
+	err := s.db.QueryRow(query, patientID).Scan(&sugarType)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// لا يوجد مريض بهذا المعرف
+			return "", nil
+		}
+		return "", err
+	}
 
-    query := `SELECT sugarType FROM reviews WHERE id = $1 ORDER BY date_review ASC, id ASC
-        LIMIT 1`
-    err := s.db.QueryRow(query, reviewID).Scan(&sugarType)
-    if err != nil {
-        if errors.Is(err, sql.ErrNoRows) {
-           
-            return "غير محدد بعد", nil
-        }
-        return "", fmt.Errorf("failed to get sugarType: %w", err)
-    }
-
-    if !sugarType.Valid || strings.TrimSpace(sugarType.String) == "" {
-       
-        return "غير محدد بعد", nil
-    }
-
-    return sugarType.String, nil
+	return sugarType, nil
 }
 
 func (s *Store) GetPatientsForCenter(CenterID int) ([]types.CardData , error) {
@@ -258,7 +250,7 @@ func (s *Store) GetPatientsForCenter(CenterID int) ([]types.CardData , error) {
 			return nil, fmt.Errorf("error getting reviews for patient %d: %w", cardd.ID, err)
 		}
 
-		sugerType , err := s.GetSugarTypeByReviewID(cardd.ID)
+		sugerType , err := s.GetSugarTypeByPatientID(cardd.ID)
 		if err != nil {
 			return nil, fmt.Errorf("error getting sugertypes for patient %d: %w", cardd.ID, err)
 		}
