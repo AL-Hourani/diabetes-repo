@@ -857,7 +857,6 @@ func (s *Store) DeleteReviewByID(reviewID int) error {
 func (s *Store) GetReviewByID(reviewID int) (*types.ReviewResponse, error) {
 	var review types.ReviewResponse
 
-	// 1. استعلام جدول reviews
 	queryReview := `
 	SELECT 
 	    address_patient, wight, length_patient, otherDisease,
@@ -866,10 +865,10 @@ func (s *Store) GetReviewByID(reviewID int) (*types.ReviewResponse, error) {
 		clucose_after_meal, triple_grease, hba1c, comments
 	FROM reviews WHERE id = $1
 	`
-	var historyJSON []byte
+	
 	err := s.db.QueryRow(queryReview, reviewID).Scan(
 		&review.Address, &review.Weight, &review.LengthPatient, &review.OtherDisease,
-		&historyJSON, &review.Hemoglobin, &review.Grease,
+		 &review.Hemoglobin, &review.Grease,
 		&review.UrineAcid, &review.BloodPressure, &review.Cholesterol, &review.LDL, &review.HDL,
 		&review.Creatine, &review.NormalGlocose, &review.GlocoseAfterMeal, &review.TripleGrease,
 		&review.Hba1c, &review.Coments,
