@@ -144,7 +144,7 @@ func (s *Store) CreatePatientM(patientM types.PatientM) error {
 	historyJSON, errM := json.Marshal(patientM.HistoryOfFamilyDisease)
 	if errM != nil {
 		log.Println("خطأ في تحويل historyOfFamilyDisease إلى JSON:", errM)
-		return nil
+		return errM
 	}
      _ ,err := s.db.Exec(`
         INSERT INTO patient_m
