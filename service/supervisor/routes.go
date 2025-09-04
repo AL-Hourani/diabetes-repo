@@ -398,7 +398,8 @@ func (h *Handler) handleAcceptedInquiries(w http.ResponseWriter, r *http.Request
 
 
 func (h *Handler) handleGetCentersByCity(w http.ResponseWriter, r *http.Request) {
-	var cityName types.City
+    cityName := r.URL.Query().Get("city")
+
 
 	if err := utils.ParseJSON(r , &cityName); err != nil {
 		utils.WriteError(w , http.StatusBadRequest , err)
@@ -429,19 +430,19 @@ func (h *Handler) handleGetCentersByCity(w http.ResponseWriter, r *http.Request)
 	}
 
 
-    centers_name_by_city , err := h.superStore.GetCentersByCity(cityName.City)
+    centers_name_by_city , err := h.superStore.GetCentersByCity(cityName)
     if err != nil {
 		utils.WriteError(w, http.StatusUnauthorized, err)
 		return
 	}
 
-	nopin , err := h.superStore.GetPatientCountByCity(cityName.City)
+	nopin , err := h.superStore.GetPatientCountByCity(cityName)
 	    if err != nil {
 		utils.WriteError(w, http.StatusUnauthorized, err)
 		return
 	}
 
-	nopin_lc , err := h.superStore.GetPatientCountByCityLastMonth(cityName.City)
+	nopin_lc , err := h.superStore.GetPatientCountByCityLastMonth(cityName)
 	    if err != nil {
 		utils.WriteError(w, http.StatusUnauthorized, err)
 		return
