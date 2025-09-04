@@ -299,7 +299,9 @@ type CenterStore interface {
 
 
 	InsertRecord(r InsertRecord) error
-	GetRecordsByCenter(centerID int) ([]Record, error)
+	// GetRecordsByCenter(centerID int) ([]Record, error)
+	 GetRecordsByCenter(centerID int, page int) ([]Record, error) 
+	 CountRecordsByCenter(centerID int) (int, error)
 	InsertInformation(r InsertInformation) error
 
 
@@ -1146,6 +1148,11 @@ type Record struct {
     CreatedAt        string
     ApprovalDate     string
     RecordStatus     string
+}
+
+type RecordResponse struct {
+	Nor      int                   `json:"nor"`
+	NumberOfRecordInPage  []Record `json:"norip"` 
 }
 
 

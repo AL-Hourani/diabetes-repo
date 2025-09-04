@@ -1555,16 +1555,24 @@ func (s *Store) InsertInformation(r types.InsertInformation) error {
 }
 
 
+func (s *Store) GetRecordsByCenter(centerID int, page int) ([]types.Record, error) {
+    const limit = 10 
+    offset := (page - 1) * limit
+    if offset < 0 {
+        offset = 0
+    }
 
-
-func (s *Store) GetRecordsByCenter(centerID int) ([]types.Record, error) {
-    rows, err := s.db.Query(`
+    query := `
         SELECT 
             id, name_arabic, dosage, medication_type, requested_quantity, 
             center_id, created_at, approval_date, record_status
         FROM records
         WHERE center_id = $1
-    `, centerID)
+        ORDER BY created_at DESC
+        LIMIT $2 OFFSET $3
+    `
+
+    rows, err := s.db.Query(query, centerID, limit, offset)
     if err != nil {
         return nil, err
     }
@@ -1595,6 +1603,21 @@ func (s *Store) GetRecordsByCenter(centerID int) ([]types.Record, error) {
     }
 
     return records, nil
+}
+
+
+func (s *Store) CountRecordsByCenter(centerID int) (int, error) {
+    var count int
+    query := `
+        SELECT COUNT(*)
+        FROM records
+        WHERE center_id = $1
+    `
+    err := s.db.QueryRow(query, centerID).Scan(&count)
+    if err != nil {
+        return 0, err
+    }
+    return count, nil
 }
 
 

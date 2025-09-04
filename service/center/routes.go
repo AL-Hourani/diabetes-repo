@@ -1762,6 +1762,12 @@ func (h *Handler) handleGetReviewMedicinesName(w http.ResponseWriter, r *http.Re
 
 
 func (h *Handler) handleGetRecords(w http.ResponseWriter, r *http.Request) {
+	pageStr := r.URL.Query().Get("page")
+	page, err := strconv.Atoi(pageStr)
+    if err != nil || page < 1 {
+        page = 1
+    }
+
 	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
 	if !ok {
 		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
@@ -1774,11 +1780,21 @@ func (h *Handler) handleGetRecords(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	records , err := h.store.GetRecordsByCenter(centerID)
+	records , err := h.store.GetRecordsByCenter(centerID , page)
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, records)
+	nor , err := h.store.CountRecordsByCenter(centerID)
+    if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	newPageRecord := types.RecordResponse {
+		Nor: nor,
+		NumberOfRecordInPage: records,
+	}
+	utils.WriteJSON(w, http.StatusOK, newPageRecord)
 }
