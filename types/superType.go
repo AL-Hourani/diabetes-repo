@@ -91,6 +91,8 @@ type CenterWithCount struct {
 
 
 type PatientReview struct {
+    ReviewID        int
+    PatientID       int
     PatientFullName string
     PatientEmail    string
     PatientPhone    string
@@ -110,6 +112,7 @@ type PatientReview struct {
     ClucoseAfterMeal string
     TripleGrease    string
     Hba1c           string
+    Comments           string
     DateReview      string
     
     Has_a_eye_disease string
