@@ -38,6 +38,7 @@ func (h *Handler) RegisterSuperVisorRoutes(router *mux.Router) {
 	router.HandleFunc("/getInquiries",auth.WithJWTAuth(h.handleGetInquiries)).Methods("GET")
 	router.HandleFunc("/getInquiriesDetails/{id}",auth.WithJWTAuth(h.handleGetInquiriesDetails)).Methods("GET")
 	router.HandleFunc("/getCityInfo",auth.WithJWTAuth(h.handleGetCentersByCity)).Methods("GET")
+	// router.HandleFunc("/getCenterInfo",auth.WithJWTAuth(h.handleGetInforAboutCenter)).Methods("GET")
 	router.HandleFunc("/getSuperInfo",auth.WithJWTAuth(h.handleGetSuperInfo)).Methods("GET")
 	router.HandleFunc("/rejectInquiries",auth.WithJWTAuth(h.handleRejectInquiries)).Methods("POST")
 	router.HandleFunc("/acceptedInquiries",auth.WithJWTAuth(h.handleAcceptedInquiries)).Methods("POST")
@@ -401,11 +402,6 @@ func (h *Handler) handleGetCentersByCity(w http.ResponseWriter, r *http.Request)
     cityName := r.URL.Query().Get("city")
 
 
-	if err := utils.ParseJSON(r , &cityName); err != nil {
-		utils.WriteError(w , http.StatusBadRequest , err)
-		return
-	}
-
 	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
 	if !ok {
 		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
@@ -457,6 +453,69 @@ func (h *Handler) handleGetCentersByCity(w http.ResponseWriter, r *http.Request)
 	
 	utils.WriteJSON(w , http.StatusOK ,newCityInfo )
 }
+
+
+
+
+
+
+// func (h *Handler) handleGetInforAboutCenter(w http.ResponseWriter, r *http.Request) {
+//     centerName := r.URL.Query().Get("center")
+
+
+
+
+// 	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+// 	if !ok {
+// 		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+// 		return
+// 	}
+
+// 	idSup, err := auth.GetIDFromToken(token)
+// 	if err != nil {
+// 		http.Error(w, "Invalid token", http.StatusUnauthorized)
+// 		return
+// 	}
+
+// 	user , err := h.pStore.GetLoginByID(idSup)
+// 	if err != nil {
+// 		utils.WriteError(w, http.StatusUnauthorized, err)
+// 		return
+// 	}
+
+// 	if user.Role != "supervisor" {
+// 		http.Error(w, "Unauthorized: You are not supervisor", http.StatusUnauthorized)
+// 		return
+// 	}
+
+
+//     centers_name_by_city , err := h.superStore.GetCentersByCity(cityName)
+//     if err != nil {
+// 		utils.WriteError(w, http.StatusUnauthorized, err)
+// 		return
+// 	}
+
+// 	nopin , err := h.superStore.GetPatientCountByCity(cityName)
+// 	    if err != nil {
+// 		utils.WriteError(w, http.StatusUnauthorized, err)
+// 		return
+// 	}
+
+// 	nopin_lc , err := h.superStore.GetPatientCountByCityLastMonth(cityName)
+// 	    if err != nil {
+// 		utils.WriteError(w, http.StatusUnauthorized, err)
+// 		return
+// 	}
+
+// 	newCityInfo := types.AllCityInfo {
+// 		NumberOfPatientInCity:nopin,
+// 		NumberOfPatientInCityLastMonth:nopin_lc ,
+// 		ActiveCenter:centers_name_by_city ,
+// 	}
+
+	
+// 	utils.WriteJSON(w , http.StatusOK ,newCityInfo )
+// }
 
 
 
