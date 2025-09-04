@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS reviews (
     address_patient VARCHAR(255) DEFAULT '',
     wight VARCHAR(255) DEFAULT '',
     length_patient  VARCHAR(255)  DEFAULT '',
+    otherdisease  VARCHAR(255)  DEFAULT '',
     hemoglobin VARCHAR(255)  DEFAULT '',
     grease VARCHAR(255) DEFAULT '',
     urineAcid VARCHAR(255) DEFAULT '',

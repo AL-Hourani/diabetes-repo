@@ -490,7 +490,7 @@ func (s *Store) GetPatientReviewsByMonth(month, year int) ([]types.PatientReview
             r.clucose_after_meal,
             r.triple_grease,
             r.hba1c,
-            COALESCE(NULLIF(e.comments, ''), 'لا يوجد') AS comments_eye,
+            COALESCE(NULLIF(e.comments, ''), 'لا يوجد') AS comments,
             r.date_review,
 
             -- بيانات العيون
@@ -507,13 +507,13 @@ func (s *Store) GetPatientReviewsByMonth(month, year int) ([]types.PatientReview
             COALESCE(
                 CASE WHEN h.has_a_heart_disease THEN 'يوجد مرض' ELSE 'لا يوجد مرض' END, 'لا يوجد'
             ) AS has_a_heart_disease,
-            COALESCE(NULLIF(e.heart_disease, ''), 'لا يوجد') AS heart_disease,
+            COALESCE(NULLIF(h.heart_disease, ''), 'لا يوجد') AS heart_disease,
 
             COALESCE(
                 CASE WHEN h.relationship_with_diabetes THEN 'نعم' ELSE 'لا' END, 'لا يوجد'
             ) AS relationship_heart_with_diabetes,
 
-            COALESCE(NULLIF(e.comments, ''), 'لا يوجد') AS comments_heart,
+            COALESCE(NULLIF(h.comments, ''), 'لا يوجد') AS comments_heart,
 
             -- بيانات الأعصاب
             COALESCE(
