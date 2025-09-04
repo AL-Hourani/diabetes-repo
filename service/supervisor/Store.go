@@ -593,6 +593,7 @@ func (s *Store) GetPatientReviewsByMonth(month, year int) ([]types.PatientReview
 
 
 
+
 func CreateExcelFile(reviews []types.PatientReview) (*excelize.File, error) {
     f := excelize.NewFile()
     sheet := "Patients"
@@ -600,7 +601,7 @@ func CreateExcelFile(reviews []types.PatientReview) (*excelize.File, error) {
 
     // رؤوس الأعمدة بالعربية
     headers := []string{
-       "اسم المريض", "البريد الإلكتروني", "الهاتف",
+        "اسم المريض", "البريد الإلكتروني", "الهاتف",
         "العنوان", "الوزن", "الطول", "أمراض أخرى", "الهيموغلوبين",
         "الدهون", "حمض اليوريك", "ضغط الدم", "الكوليسترول", "LDL", "HDL",
         "الكرياتين", "سكر طبيعي", "سكر بعد الوجبة", "الدهون الثلاثية", "HBA1c", "ملاحظات", "تاريخ المراجعة",
@@ -611,67 +612,55 @@ func CreateExcelFile(reviews []types.PatientReview) (*excelize.File, error) {
         "أمراض الجهاز البولي", "نوع المرض بالجهاز البولي", "علاقة الجهاز البولي بالسكري", "ملاحظات الجهاز البولي",
     }
 
-  
+    // تنسيق الهيدر
+    headerStyle, _ := f.NewStyle(&excelize.Style{
+        Font: &excelize.Font{Bold: true, Family: "Arial Unicode MS", Size: 12},
+        Fill: excelize.Fill{Type: "pattern", Color: []string{"#D9E1F2"}, Pattern: 1},
+        Alignment: &excelize.Alignment{Horizontal: "center", Vertical: "center"},
+    })
+
     for i, h := range headers {
-        col := string(rune('A' + i))
-        f.SetCellValue(sheet, col+"1", h)
+        col, _ := excelize.ColumnNumberToName(i + 1)
+        cell := col + "1"
+        f.SetCellValue(sheet, cell, h)
+        f.SetCellStyle(sheet, cell, cell, headerStyle)
     }
 
     // تعبئة البيانات
     for i, r := range reviews {
         row := i + 2
 
-    f.SetCellValue(sheet, "A"+strconv.Itoa(row), r.PatientFullName)
-    f.SetCellValue(sheet, "B"+strconv.Itoa(row), r.PatientEmail)
-    f.SetCellValue(sheet, "C"+strconv.Itoa(row), r.PatientPhone)
-    f.SetCellValue(sheet, "D"+strconv.Itoa(row), r.AddressPatient)
-    f.SetCellValue(sheet, "E"+strconv.Itoa(row), r.Wight)
-    f.SetCellValue(sheet, "F"+strconv.Itoa(row), r.LengthPatient)
-    f.SetCellValue(sheet, "G"+strconv.Itoa(row), r.OtherDisease)
-    f.SetCellValue(sheet, "H"+strconv.Itoa(row), r.Hemoglobin)
-    f.SetCellValue(sheet, "I"+strconv.Itoa(row), r.Grease)
-    f.SetCellValue(sheet, "J"+strconv.Itoa(row), r.UrineAcid)
-    f.SetCellValue(sheet, "K"+strconv.Itoa(row), r.BloodPressure)
-    f.SetCellValue(sheet, "L"+strconv.Itoa(row), r.Cholesterol)
-    f.SetCellValue(sheet, "M"+strconv.Itoa(row), r.LDL)
-    f.SetCellValue(sheet, "N"+strconv.Itoa(row), r.HDL)
-    f.SetCellValue(sheet, "O"+strconv.Itoa(row), r.Creatine)
-    f.SetCellValue(sheet, "P"+strconv.Itoa(row), r.NormalClucose)
-    f.SetCellValue(sheet, "Q"+strconv.Itoa(row), r.ClucoseAfterMeal)
-    f.SetCellValue(sheet, "R"+strconv.Itoa(row), r.TripleGrease)
-    f.SetCellValue(sheet, "S"+strconv.Itoa(row), r.Hba1c)
-    f.SetCellValue(sheet, "T"+strconv.Itoa(row), r.Comments)
-    f.SetCellValue(sheet, "U"+strconv.Itoa(row), r.DateReview)
+        values := []interface{}{
+            r.PatientFullName, r.PatientEmail, r.PatientPhone, r.AddressPatient,
+            r.Wight, r.LengthPatient, r.OtherDisease, r.Hemoglobin, r.Grease,
+            r.UrineAcid, r.BloodPressure, r.Cholesterol, r.LDL, r.HDL,
+            r.Creatine, r.NormalClucose, r.ClucoseAfterMeal, r.TripleGrease,
+            r.Hba1c, r.Comments, r.DateReview,
 
-    f.SetCellValue(sheet, "V"+strconv.Itoa(row), r.Has_a_eye_disease)
-    f.SetCellValue(sheet, "W"+strconv.Itoa(row), r.In_kind_disease)
-    f.SetCellValue(sheet, "X"+strconv.Itoa(row), r.Relationship_with_diabetes)
-    f.SetCellValue(sheet, "Y"+strconv.Itoa(row), r.Comments_eye)
+            r.Has_a_eye_disease, r.In_kind_disease, r.Relationship_with_diabetes, r.Comments_eye,
+            r.Has_a_heart_disease, r.Heart_disease, r.Relationship_heart_with_diabetes, r.Comments_heart,
+            r.Has_a_nerve_disease, r.Nervous_disease, r.Relationship_nervous_with_diabetes, r.Comments_nervous,
+            r.Has_a_bone_disease, r.Bone_disease, r.Relationship_bone_with_diabetes, r.Comments_bone,
+            r.Has_a_urinary_disease, r.Urinary_disease, r.Relationship_urinary_with_diabetes, r.Comments_urinary,
+        }
 
-    f.SetCellValue(sheet, "Z"+strconv.Itoa(row), r.Has_a_heart_disease)
-    f.SetCellValue(sheet, "AA"+strconv.Itoa(row), r.Heart_disease)
-    f.SetCellValue(sheet, "AB"+strconv.Itoa(row), r.Relationship_heart_with_diabetes)
-    f.SetCellValue(sheet, "AC"+strconv.Itoa(row), r.Comments_heart)
+        for j, v := range values {
+            col, _ := excelize.ColumnNumberToName(j + 1)
+            f.SetCellValue(sheet, col+strconv.Itoa(row), v)
+        }
+    }
 
-    f.SetCellValue(sheet, "AD"+strconv.Itoa(row), r.Has_a_nerve_disease)
-    f.SetCellValue(sheet, "AE"+strconv.Itoa(row), r.Nervous_disease)
-    f.SetCellValue(sheet, "AF"+strconv.Itoa(row), r.Relationship_nervous_with_diabetes)
-    f.SetCellValue(sheet, "AG"+strconv.Itoa(row), r.Comments_nervous)
-
-    f.SetCellValue(sheet, "AH"+strconv.Itoa(row), r.Has_a_bone_disease)
-    f.SetCellValue(sheet, "AI"+strconv.Itoa(row), r.Bone_disease)
-    f.SetCellValue(sheet, "AJ"+strconv.Itoa(row), r.Relationship_bone_with_diabetes)
-    f.SetCellValue(sheet, "AK"+strconv.Itoa(row), r.Comments_bone)
-
-    f.SetCellValue(sheet, "AL"+strconv.Itoa(row), r.Has_a_urinary_disease)
-    f.SetCellValue(sheet, "AM"+strconv.Itoa(row), r.Urinary_disease)
-    f.SetCellValue(sheet, "AN"+strconv.Itoa(row), r.Relationship_urinary_with_diabetes)
-    f.SetCellValue(sheet, "AO"+strconv.Itoa(row), r.Comments_urinary)
-}
-
+    // ضبط عرض الأعمدة تلقائياً
+    f.SetColWidth(sheet, "A", "AO", 20)
 
     return f, nil
 }
+
+
+
+
+
+
 
 
 
