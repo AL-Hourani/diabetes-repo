@@ -1178,7 +1178,7 @@ func (s *Store) UpdatePatientCenterInfo(id int, centerName string) (types.Update
 	_, err = s.db.Exec(`
 		UPDATE patients
 		SET  center_id = $1
-		WHERE id = $1
+		WHERE id = $2
 	`,  centerID, id)
 	if err != nil {
 		return types.UpdatePatientCenterInfo{}, err
