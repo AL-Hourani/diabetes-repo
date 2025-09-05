@@ -43,7 +43,7 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	// router.HandleFunc("/getAllPatientInfo/{id}" , h.handleGetAllPatientInfo).Methods("GET")
 	router.HandleFunc("/verify-token", h.VerifyTokenHandler).Methods("POST")
 	// router.HandleFunc("/verifyOtp", h.VerifyOTPHandler).Methods("POST")
-	router.HandleFunc("/updatePatientProfile", h.handleUpdatePatientProfile).Methods(http.MethodPatch)
+	router.HandleFunc("/updatePatientProfile", auth.WithJWTAuth(h.handleUpdatePatientProfile)).Methods(http.MethodPatch)
 	router.HandleFunc("/CenterStatistics/{id}",h.handleStatisticsSugerType).Methods("GET")
 	router.HandleFunc("/sendEmail",h.handleVerifyEmail).Methods("POST")
 	router.HandleFunc("/verfiyOTPResetPassword",h.handleVerifyOTP).Methods("POST")
