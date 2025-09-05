@@ -492,7 +492,7 @@ func (s *Store) GetPatientReviewsByMonth(month, year int) ([]types.PatientReview
             r.clucose_after_meal,
             r.triple_grease,
             r.hba1c,
-            COALESCE(NULLIF(e.comments, ''), 'لا يوجد') AS comments,
+            COALESCE(NULLIF(r.comments, ''), 'لا يوجد') AS comments,
             r.date_review,
 
             -- بيانات العيون
