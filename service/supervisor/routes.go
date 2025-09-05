@@ -667,10 +667,12 @@ func (h *Handler) handleGetSuperExcel(w http.ResponseWriter, r *http.Request) {
 
 
     reviews, err := h.superStore.GetPatientReviewsByMonth(month, year)
-    if err != nil {
-        http.Error(w, "Error fetching reviews", http.StatusInternalServerError)
+	  if err != nil {
+      	   utils.WriteError(w , http.StatusBadRequest , err)
         return
     }
+    	
+		
 
     excelFile, err := CreateExcelFile(reviews)
     if err != nil {
