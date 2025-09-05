@@ -463,11 +463,8 @@ func (s *Store) GetCenterWithMostPatients() (*types.CenterWithCount, error) {
 
 
 
-
-
-
 func (s *Store) GetPatientReviewsByMonth(month, year int) ([]types.PatientReview, error) {
-    query := `
+	query := `
         SELECT 
             r.id AS review_id,
             r.patient_id,
@@ -479,7 +476,7 @@ func (s *Store) GetPatientReviewsByMonth(month, year int) ([]types.PatientReview
             r.address_patient,
             r.wight,
             r.length_patient,
-            r.otherDisease,
+            r.otherdisease,
             r.hemoglobin,
             r.grease,
             r.urineAcid,
@@ -510,18 +507,16 @@ func (s *Store) GetPatientReviewsByMonth(month, year int) ([]types.PatientReview
                 CASE WHEN h.has_a_heart_disease THEN 'يوجد مرض' ELSE 'لا يوجد مرض' END, 'لا يوجد'
             ) AS has_a_heart_disease,
             COALESCE(NULLIF(h.heart_disease, ''), 'لا يوجد') AS heart_disease,
-
             COALESCE(
                 CASE WHEN h.relationship_with_diabetes THEN 'نعم' ELSE 'لا' END, 'لا يوجد'
             ) AS relationship_heart_with_diabetes,
-
             COALESCE(NULLIF(h.comments, ''), 'لا يوجد') AS comments_heart,
 
             -- بيانات الأعصاب
             COALESCE(
                 CASE WHEN n.has_a_nerve_disease THEN 'يوجد مرض' ELSE 'لا يوجد مرض' END, 'لا يوجد'
             ) AS has_a_nerve_disease,
-            COALESCE(NULLIF(n.nervous_disease,'') ,'لا يوجد') AS nervous_disease,
+            COALESCE(NULLIF(n.nervous_disease,''), 'لا يوجد') AS nervous_disease,
             COALESCE(
                 CASE WHEN n.relationship_with_diabetes THEN 'نعم' ELSE 'لا' END, 'لا يوجد'
             ) AS relationship_nervous_with_diabetes,
@@ -558,52 +553,42 @@ func (s *Store) GetPatientReviewsByMonth(month, year int) ([]types.PatientReview
         LEFT JOIN bone_clinic b ON b.review_id = r.id
         LEFT JOIN urinary_clinic u ON u.review_id = r.id
         LEFT JOIN treatments t ON t.review_id = r.id
-        LEFT JOIN treatment_drugs td ON td.treatment_id = t.id
         WHERE EXTRACT(MONTH FROM r.date_review) = $1
           AND EXTRACT(YEAR FROM r.date_review) = $2
-          GROUP BY 
-        r.id, r.patient_id, p.fullName, p.email, p.phone, pm.gender, pm.sugarType,
-        r.address_patient, r.wight, r.length_patient, r.otherDisease, r.hemoglobin,
-        r.grease, r.urineAcid, r.bloodPressure, r.cholesterol, r.LDL, r.HDL, r.creatine,
-        r.normal_clucose, r.clucose_after_meal, r.triple_grease, r.hba1c, r.comments, r.date_review,
-        e.has_a_eye_disease, e.in_kind_disease, e.relationship_with_diabetes, e.comments,
-        h.has_a_heart_disease, h.heart_disease, h.relationship_with_diabetes, h.comments,
-        n.has_a_nerve_disease, n.nervous_disease, n.relationship_with_diabetes, n.comments,
-        b.has_a_bone_disease, b.bone_disease, b.relationship_with_diabetes, b.comments,
-        u.has_a_urinary_disease, u.urinary_disease, u.relationship_with_diabetes, u.comments,
-        t.treatment_type
         ORDER BY r.date_review;
     `
 
-    rows, err := s.db.Query(query, month, year)
-    if err != nil {
-        return nil, err
-    }
-    defer rows.Close()
+	rows, err := s.db.Query(query, month, year)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
 
-    var reviews []types.PatientReview
-    for rows.Next() {
-        var r types.PatientReview
-        err := rows.Scan(
-            &r.ReviewID , &r.PatientID,
-            &r.PatientFullName, &r.PatientEmail, &r.PatientPhone,
-            &r.AddressPatient, &r.Wight, &r.LengthPatient,
-            &r.OtherDisease, &r.Hemoglobin, &r.Grease, &r.UrineAcid, &r.BloodPressure,
-            &r.Cholesterol, &r.LDL, &r.HDL, &r.Creatine, &r.NormalClucose,
-            &r.ClucoseAfterMeal, &r.TripleGrease, &r.Hba1c,&r.Comments, &r.DateReview,
+	var reviews []types.PatientReview
+	for rows.Next() {
+		var r types.PatientReview
+		err := rows.Scan(
+			&r.ReviewID, &r.PatientID,
+			&r.PatientFullName, &r.PatientEmail, &r.PatientPhone,
+			&r.Gender, &r.SugarType,
+			&r.AddressPatient, &r.Wight, &r.LengthPatient,
+			&r.OtherDisease, &r.Hemoglobin, &r.Grease, &r.UrineAcid, &r.BloodPressure,
+			&r.Cholesterol, &r.LDL, &r.HDL, &r.Creatine, &r.NormalClucose,
+			&r.ClucoseAfterMeal, &r.TripleGrease, &r.Hba1c, &r.Comments, &r.DateReview,
 
-            &r.Has_a_eye_disease, &r.In_kind_disease, &r.Relationship_with_diabetes, &r.Comments_eye,
-            &r.Has_a_heart_disease, &r.Heart_disease, &r.Relationship_heart_with_diabetes, &r.Comments_heart,
-            &r.Has_a_nerve_disease, &r.Nervous_disease, &r.Relationship_nervous_with_diabetes, &r.Comments_nervous,
-            &r.Has_a_bone_disease, &r.Bone_disease, &r.Relationship_bone_with_diabetes, &r.Comments_bone,
-            &r.Has_a_urinary_disease, &r.Urinary_disease, &r.Relationship_urinary_with_diabetes, &r.Comments_urinary,
-        )
-        if err != nil {
-            return nil, err
-        }
-        var treatmentDrugs []types.TreatmentDrugExel
+			&r.Has_a_eye_disease, &r.In_kind_disease, &r.Relationship_with_diabetes, &r.Comments_eye,
+			&r.Has_a_heart_disease, &r.Heart_disease, &r.Relationship_heart_with_diabetes, &r.Comments_heart,
+			&r.Has_a_nerve_disease, &r.Nervous_disease, &r.Relationship_nervous_with_diabetes, &r.Comments_nervous,
+			&r.Has_a_bone_disease, &r.Bone_disease, &r.Relationship_bone_with_diabetes, &r.Comments_bone,
+			&r.Has_a_urinary_disease, &r.Urinary_disease, &r.Relationship_urinary_with_diabetes, &r.Comments_urinary,
+			&r.TreatmentType,
+		)
+		if err != nil {
+			return nil, err
+		}
 
-        drugRows, err := s.db.Query(`
+		// استعلام أدوية العلاج لكل مراجعة
+		drugRows, err := s.db.Query(`
             SELECT m.name_arabic, td.dosage_per_day, td.quantity
             FROM treatment_drugs td
             JOIN medications m ON m.id = td.drug_id
@@ -611,25 +596,26 @@ func (s *Store) GetPatientReviewsByMonth(month, year int) ([]types.PatientReview
                 SELECT id FROM treatments WHERE review_id = $1
             )
         `, r.ReviewID)
-        if err != nil {
-            return nil, err
-        }
+		if err != nil {
+			return nil, err
+		}
 
+		var treatmentDrugs []types.TreatmentDrugExel
+		for drugRows.Next() {
+			var d types.TreatmentDrugExel
+			if err := drugRows.Scan(&d.DrugName, &d.DosagePerDay, &d.Quantity); err != nil {
+				drugRows.Close()
+				return nil, err
+			}
+			treatmentDrugs = append(treatmentDrugs, d)
+		}
+		drugRows.Close() // أغلق بعد الانتهاء
+		r.TreatmentDrugs = treatmentDrugs
 
-        for drugRows.Next() {
-            var d types.TreatmentDrugExel
-            if err := drugRows.Scan(&d.DrugName, &d.DosagePerDay, &d.Quantity); err != nil {
-                return nil, err
-            }
-            treatmentDrugs = append(treatmentDrugs, d)
-        }
-        defer drugRows.Close()
-        r.TreatmentDrugs = treatmentDrugs
-        reviews = append(reviews, r)
-    }
+		reviews = append(reviews, r)
+	}
 
-           
-    return reviews, nil
+	return reviews, nil
 }
 
 
