@@ -602,10 +602,11 @@ func (s *Store) GetPatientReviewsByMonth(month, year int) ([]types.PatientReview
             return nil, err
         }
         var treatmentDrugs []types.TreatmentDrugExel
+
         drugRows, err := s.db.Query(`
-            SELECT d.name_arabic, td.dosage_per_day, td.quantity
+            SELECT m.name_arabic, td.dosage_per_day, td.quantity
             FROM treatment_drugs td
-            JOIN drugs d ON d.id = td.drug_id
+            JOIN medications m ON m.id = td.drug_id
             WHERE td.treatment_id = (
                 SELECT id FROM treatments WHERE review_id = $1
             )
@@ -613,7 +614,7 @@ func (s *Store) GetPatientReviewsByMonth(month, year int) ([]types.PatientReview
         if err != nil {
             return nil, err
         }
- 
+
 
         for drugRows.Next() {
             var d types.TreatmentDrugExel
@@ -653,7 +654,7 @@ func CreateExcelFile(reviews []types.PatientReview) (*excelize.File, error) {
 
     // تنسيق الهيدر
     headerStyle, _ := f.NewStyle(&excelize.Style{
-        Font: &excelize.Font{Bold: true, Family: "Tajawal", Size: 12},
+        Font: &excelize.Font{Bold: true, Family: "Tahoma", Size: 12},
         Fill: excelize.Fill{Type: "pattern", Color: []string{"#D9E1F2"}, Pattern: 1},
         Alignment: &excelize.Alignment{Horizontal: "center", Vertical: "center"},
     })
