@@ -39,6 +39,7 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/patientRegister", auth.WithJWTAuth(h.handlePatientRegister)).Methods("POST")
 	router.HandleFunc("/getPatient/{id}" , h.handleGetPatient).Methods("GET")
 	router.HandleFunc("/getPatientProfile" ,auth.WithJWTAuth( h.handleGetPatientProfile)).Methods("GET")
+	// router.HandleFunc("/getLocationPatientProfile" ,auth.WithJWTAuth( h.getLocationPatientProfile)).Methods("GET")
 	// router.HandleFunc("/getAllPatientInfo/{id}" , h.handleGetAllPatientInfo).Methods("GET")
 	router.HandleFunc("/verify-token", h.VerifyTokenHandler).Methods("POST")
 	// router.HandleFunc("/verifyOtp", h.VerifyOTPHandler).Methods("POST")
@@ -53,7 +54,7 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/notifications/mark-all-read" ,  auth.WithJWTAuth(h.MarkAllNotificationsAsRead)).Methods("PUT")
    
 	router.HandleFunc("/UpdatePatientProfile" ,  auth.WithJWTAuth(h.handleUpdatePatient)).Methods("POST")
-	router.HandleFunc("/UpdatePatientProfileLocation" ,  auth.WithJWTAuth(h.UpdatePatientProfileLocation)).Methods("POST")
+	// router.HandleFunc("/UpdatePatientProfileLocation" ,  auth.WithJWTAuth(h.UpdatePatientProfileLocation)).Methods("POST")
 	router.HandleFunc("/UpdatePatientPassword" ,  auth.WithJWTAuth(h.UpdatePatientPassword)).Methods("POST")
 
 	
@@ -263,7 +264,7 @@ func (h *Handler) handlePatientRegister(w http.ResponseWriter , r *http.Request)
 
 
 func (h *Handler) handleGetPatientProfile(w http.ResponseWriter , r *http.Request) {
-
+    
 	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
 	if !ok {
 		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
@@ -283,12 +284,42 @@ func (h *Handler) handleGetPatientProfile(w http.ResponseWriter , r *http.Reques
 		return
 	}
 
+	
+	Center , err := h.storeCenter.GetCenterByID(patient.CenterID)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		 return
+	}
+
+	sugerType , err := h.storeCenter.GetSugarTypeByPatientID(patientID)
+		if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		 return
+	}
+
+
+    review , err := h.store. GetLastReviewByPatientID(patientID)
+    if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		 return
+	}
+
+	treatment_type , err := h.store.GetTreatmentTypeByReviewID(review.ID)
+    if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		 return
+	}
+
 	newPatientProfile := types.ReturnPatientProfile {
 		FullName: patient.FullName,
 		Date: patient.Age,
 		IDNumber: patient.IDNumber,
 		Email: patient.Email,
 		Phone: patient.Phone,
+		City:Center.CenterCity ,
+		CenterName: Center.CenterName,
+		SugerType: sugerType,
+		Treatment: treatment_type,
 	}
 
 	utils.WriteJSON(w , http.StatusOK ,newPatientProfile )
@@ -957,36 +988,78 @@ func (h *Handler) handleUpdatePatient(w http.ResponseWriter, r *http.Request) {
 
 
 
-func (h *Handler) UpdatePatientProfileLocation(w http.ResponseWriter, r *http.Request) {
-	var updateData types.UpdatePatientCenterInfo
-	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
-	if !ok {
-		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
-		return
-	}
+// func (h *Handler) UpdatePatientProfileLocation(w http.ResponseWriter, r *http.Request) {
+// 	var updateData types.UpdatePatientCenterInfo
+// 	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+// 	if !ok {
+// 		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+// 		return
+// 	}
 
-	patientID, err := auth.GetIDFromToken(token)
-	if err != nil {
-		http.Error(w, "Invalid token", http.StatusUnauthorized)
-		return
-	}
+// 	patientID, err := auth.GetIDFromToken(token)
+// 	if err != nil {
+// 		http.Error(w, "Invalid token", http.StatusUnauthorized)
+// 		return
+// 	}
 
 	
-	if err := utils.ParseJSON(r , &updateData); err != nil {
-		utils.WriteError(w , http.StatusBadRequest , err)
-		return
-	}
+// 	if err := utils.ParseJSON(r , &updateData); err != nil {
+// 		utils.WriteError(w , http.StatusBadRequest , err)
+// 		return
+// 	}
 
-	updatedPatient, err := h.store.UpdatePatientCenterInfo(patientID , updateData)
-	if err != nil {
-		utils.WriteError(w, http.StatusInternalServerError, err)
-		return
-	}
+// 	updatedPatient, err := h.store.UpdatePatientCenterInfo(patientID , updateData)
+// 	if err != nil {
+// 		utils.WriteError(w, http.StatusInternalServerError, err)
+// 		return
+// 	}
 
-	utils.WriteJSON(w, http.StatusOK, updatedPatient)
+// 	utils.WriteJSON(w, http.StatusOK, updatedPatient)
 
 
-}
+// }
+
+
+
+
+
+// func (h *Handler) getLocationPatientProfile(w http.ResponseWriter, r *http.Request) {
+	
+// 	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+// 	if !ok {
+// 		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+// 		return
+// 	}
+
+// 	patientID, err := auth.GetIDFromToken(token)
+// 	if err != nil {
+// 		http.Error(w, "Invalid token", http.StatusUnauthorized)
+// 		return
+// 	}
+
+// 	patient , err  := h.store.GetPatientById(patientID)
+// 	if err != nil {
+// 		utils.WriteError(w, http.StatusInternalServerError, err)
+// 		 return
+// 	}
+    
+
+// 	Center , err := h.storeCenter.GetCenterByID(patient.CenterID)
+// 	if err != nil {
+// 		utils.WriteError(w, http.StatusInternalServerError, err)
+// 		 return
+// 	}
+
+// 	newPatientProfileLocation := types.ReturnPatientProfileLoation {
+// 		City: Center.CenterCity,
+// 		CenterName: Center.CenterName,
+// 	}
+
+//    utils.WriteJSON(w, http.StatusOK, newPatientProfileLocation)
+
+// }
+
+
 
 
 

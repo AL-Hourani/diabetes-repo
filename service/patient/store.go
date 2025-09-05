@@ -847,7 +847,7 @@ func (s *Store) GetReviewsByPatientID(patientID int) ([]types.ReviewResponseForP
 
 	rows, err := s.db.Query(`
 		SELECT 
-			id, address_patient, wight, length_patient otherDisease,
+			id, address_patient, wight, length_patient, otherDisease,
 			hemoglobin, grease,
 			urineAcid, bloodPressure, cholesterol, LDL, HDL, creatine, normal_clucose,
 			clucose_after_meal, triple_grease, hba1c ,date_review 
@@ -880,6 +880,60 @@ func (s *Store) GetReviewsByPatientID(patientID int) ([]types.ReviewResponseForP
 	return reviews, nil
 }
 
+
+
+
+
+func (s *Store) GetLastReviewByPatientID(patientID int) (*types.ReviewResponseForPatient, error) {
+	var review types.ReviewResponseForPatient
+
+	err := s.db.QueryRow(`
+		SELECT 
+			id, address_patient, wight, length_patient, otherDisease,
+			hemoglobin, grease,
+			urineAcid, bloodPressure, cholesterol, LDL, HDL, creatine, normal_clucose,
+			clucose_after_meal, triple_grease, hba1c, date_review 
+		FROM reviews 
+		WHERE patient_id = $1
+		ORDER BY date_review DESC
+		LIMIT 1
+	`, patientID).Scan(
+		&review.ID, &review.Address, &review.Weight, &review.LengthPatient, &review.OtherDisease,
+		&review.Hemoglobin, &review.Grease,
+		&review.UrineAcid, &review.BloodPressure, &review.Cholesterol, &review.LDL, &review.HDL,
+		&review.Creatine, &review.NormalGlocose, &review.GlocoseAfterMeal, &review.TripleGrease,
+		&review.Hba1c, &review.DateReview,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil // لا توجد مراجعات
+		}
+		return nil, fmt.Errorf("query last review failed: %w", err)
+	}
+
+	return &review, nil
+}
+
+
+func (s *Store) GetTreatmentTypeByReviewID(reviewID int) (json.RawMessage, error) {
+    var treatmentType json.RawMessage
+
+    err := s.db.QueryRow(`
+        SELECT treatment_type
+        FROM treatments
+        WHERE review_id = $1
+        LIMIT 1
+    `, reviewID).Scan(&treatmentType)
+
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return nil, nil // لا توجد بيانات للعلاج
+        }
+        return nil, fmt.Errorf("query treatment_type failed: %w", err)
+    }
+
+    return treatmentType, nil
+}
 
 
 
@@ -1068,35 +1122,35 @@ func (s *Store) GetCenterIDByName(name string) (int, error) {
 
 
 
-func (s *Store) UpdatePatientCenterInfo(id int, update types.UpdatePatientCenterInfo) (types.UpdatePatientCenterInfo, error) {
-	centerID, err := s.GetCenterIDByName(update.CenterName)
-	if err != nil {
-		return types.UpdatePatientCenterInfo{}, fmt.Errorf("center not found: %w", err)
-	}
+// func (s *Store) UpdatePatientCenterInfo(id int, update types.UpdatePatientCenterInfo) (types.UpdatePatientCenterInfo, error) {
+// 	centerID, err := s.GetCenterIDByName(update.CenterName)
+// 	if err != nil {
+// 		return types.UpdatePatientCenterInfo{}, fmt.Errorf("center not found: %w", err)
+// 	}
 
-	_, err = s.db.Exec(`
-		UPDATE patients
-		SET city = $1, center_id = $2
-		WHERE id = $3
-	`, update.City, centerID, id)
-	if err != nil {
-		return types.UpdatePatientCenterInfo{}, err
-	}
+// 	_, err = s.db.Exec(`
+// 		UPDATE patients
+// 		SET city = $1, center_id = $2
+// 		WHERE id = $3
+// 	`, update.City, centerID, id)
+// 	if err != nil {
+// 		return types.UpdatePatientCenterInfo{}, err
+// 	}
 
-	var centerName string
-	err = s.db.QueryRow(`SELECT centerName FROM centers WHERE id = $1`, centerID).Scan(&centerName)
-	if err != nil {
-		return types.UpdatePatientCenterInfo{}, err
-	}
+// 	var centerName string
+// 	err = s.db.QueryRow(`SELECT centerName FROM centers WHERE id = $1`, centerID).Scan(&centerName)
+// 	if err != nil {
+// 		return types.UpdatePatientCenterInfo{}, err
+// 	}
 
-	result := types.UpdatePatientCenterInfo{
-		City:       update.City,
-		CenterName: centerName,
-	}
+// 	result := types.UpdatePatientCenterInfo{
+// 		City:       update.City,
+// 		CenterName: centerName,
+// 	}
 
-	return result, nil
+// 	return result, nil
 	
-}
+// }
 
 
 

@@ -1,7 +1,7 @@
 package types
 
 import (
-
+	"encoding/json"
 	"time"
 )
 
@@ -35,7 +35,7 @@ type PatientStore interface {
 	GetNotificationsByUserID(userID int) ([]NotificationTwo, error)
 	UpdateIsReadNotifications(userID int) error
 	UpdatePatientBasicInfo(p UpdatePatientInfo , id int) (*UpdatePatientInfo, error)
-	UpdatePatientCenterInfo(id int, update UpdatePatientCenterInfo)  (UpdatePatientCenterInfo, error) 
+	// UpdatePatientCenterInfo(id int, update UpdatePatientCenterInfo)  (UpdatePatientCenterInfo, error) 
     ChangePatientPassword(patientID int, payload ChangePassword) error 
 
 
@@ -44,6 +44,8 @@ type PatientStore interface {
    SetFirstLoginTrue(patientID int) error
 
    GetPatientsLastMonth() (int, error)
+    GetLastReviewByPatientID(patientID int) (*ReviewResponseForPatient, error)
+	GetTreatmentTypeByReviewID(reviewID int) (json.RawMessage, error)
 }
 
 type Patient struct {
@@ -87,6 +89,15 @@ type ReturnPatientProfile struct {
 	Date			string       `json:"date"    validate:"required"`
 	Phone           string	     `json:"phone"    validate:"required"`
 	IDNumber		string       `json:"id_number" validate:"required"`
+	City            string       `json:"city"`
+	CenterName       string      `json:"centerName"`
+	Treatment       json.RawMessage       `json:"treatment_type"`
+	SugerType       string       `json:"suger_type"`
+} 
+
+type ReturnPatientProfileLoation struct {
+	City       string  `json:"city"`
+	CenterName string    `json:"centerName"`
 }
 
 type ParientUpdatePayload struct {
@@ -315,6 +326,7 @@ type CenterStore interface {
 
 
 	InsertMedicationRequest(m InsertRequestMedicine)  error
+	GetSugarTypeByPatientID( patientID int) (string, error)
 }
 
 
@@ -1081,7 +1093,6 @@ type UpdatePatientInfo struct {
 
 type UpdatePatientCenterInfo struct {
 
-	City       string  `json:"city"`
 	CenterName string    `json:"centerName"`
 }
 
