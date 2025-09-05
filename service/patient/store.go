@@ -1122,35 +1122,81 @@ func (s *Store) GetCenterIDByName(name string) (int, error) {
 
 
 
-// func (s *Store) UpdatePatientCenterInfo(id int, update types.UpdatePatientCenterInfo) (types.UpdatePatientCenterInfo, error) {
-// 	centerID, err := s.GetCenterIDByName(update.CenterName)
-// 	if err != nil {
-// 		return types.UpdatePatientCenterInfo{}, fmt.Errorf("center not found: %w", err)
-// 	}
 
-// 	_, err = s.db.Exec(`
-// 		UPDATE patients
-// 		SET city = $1, center_id = $2
-// 		WHERE id = $3
-// 	`, update.City, centerID, id)
-// 	if err != nil {
-// 		return types.UpdatePatientCenterInfo{}, err
-// 	}
 
-// 	var centerName string
-// 	err = s.db.QueryRow(`SELECT centerName FROM centers WHERE id = $1`, centerID).Scan(&centerName)
-// 	if err != nil {
-// 		return types.UpdatePatientCenterInfo{}, err
-// 	}
 
-// 	result := types.UpdatePatientCenterInfo{
-// 		City:       update.City,
-// 		CenterName: centerName,
-// 	}
+func (s *Store) GetCenterByID(id int) (*types.Center , error) {
+	rows , err := s.db.Query("SELECT * FROM centers WHERE id=$1",id)
+	if err != nil {
+		return nil , err
+	}
+    
+defer rows.Close()
 
-// 	return result, nil
+	c := new(types.Center)
+	for rows.Next() {
+		c , err = scanRowIntoCenter(rows)
+		if err != nil {
+			return nil , err
+		}
+	}
+
+	if c.ID == 0 {
+		return nil , fmt.Errorf("center not found")
+	}
+
+	return c , nil
+}
+
+
+func scanRowIntoCenter(rows *sql.Rows) (*types.Center , error ){
+	center := new(types.Center)
+
+	err := rows.Scan(
+		&center.ID,
+		&center.CenterName,
+		&center.CenterPassword,
+		&center.CenterEmail,
+		&center.CenterCity,
+		&center.CreateAt,
+	)
 	
-// }
+	if err  != nil {
+		return nil , err
+	}
+
+	return center , nil
+}
+
+
+func (s *Store) UpdatePatientCenterInfo(id int, centerName string) (types.UpdatePatientCenterInfo, error) {
+	centerID, err := s.GetCenterIDByName(centerName)
+	if err != nil {
+		return types.UpdatePatientCenterInfo{}, fmt.Errorf("center not found: %w", err)
+	}
+
+	_, err = s.db.Exec(`
+		UPDATE patients
+		SET  center_id = $1
+		WHERE id = $1
+	`,  centerID, id)
+	if err != nil {
+		return types.UpdatePatientCenterInfo{}, err
+	}
+
+    center , err := s.GetCenterByID(centerID)
+	if err != nil {
+		return types.UpdatePatientCenterInfo{} , err
+	}
+
+	result := types.UpdatePatientCenterInfo{
+		City:       center.CenterCity,
+		CenterName: center.CenterName,
+	}
+
+	return result, nil
+	
+}
 
 
 

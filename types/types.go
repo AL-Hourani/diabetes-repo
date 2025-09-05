@@ -46,6 +46,7 @@ type PatientStore interface {
    GetPatientsLastMonth() (int, error)
     GetLastReviewByPatientID(patientID int) (*ReviewResponseForPatient, error)
 	GetTreatmentTypeByReviewID(reviewID int) (json.RawMessage, error)
+	 UpdatePatientCenterInfo(id int, centerName string) (UpdatePatientCenterInfo, error)
 }
 
 type Patient struct {
@@ -1102,7 +1103,15 @@ type UpdatePatientInfo struct {
 
 
 type UpdatePatientCenterInfo struct {
-
+    City            string       `json:"city"`
+	CenterName string    `json:"centerName"`
+}
+type UpdatePatientCenterInfoPayload struct {
+ 
+	CenterName string    `json:"centerName"`
+}
+type UpdatePatientCenterInfoReturn struct {
+    
 	CenterName string    `json:"centerName"`
 }
 
