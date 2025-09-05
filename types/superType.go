@@ -153,3 +153,10 @@ type PatientReview struct {
 type MonthDown struct {
     MonthDown   string    `json:"date"`
 }
+
+
+
+
+type CenterAboutInfor struct {
+    
+}

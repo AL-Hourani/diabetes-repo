@@ -828,11 +828,7 @@ type ReviewResponseForPatient struct {
 	Address                        string   `json:"address"`
 	Weight                         string   `json:"weight"`
 	LengthPatient                  string   `json:"length_patient"`
-	SugarType                      string   `json:"sugarType"`
 	OtherDisease                   string   `json:"otherDisease"`
-	HistoryOfFamilyDisease         []string `json:"historyOfFamilyDisease"`
-	HistoryOfDiseaseDetection      string   `json:"historyOfdiseaseDetection"`
-	Gender                         string   `json:"gender"`
 	Hemoglobin                     string   `json:"hemoglobin"`
 	Grease                         string   `json:"grease"`
 	UrineAcid                      string   `json:"urineAcid"`

@@ -464,7 +464,6 @@ func (h *Handler) handleGetCentersByCity(w http.ResponseWriter, r *http.Request)
 
 
 
-
 // 	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
 // 	if !ok {
 // 		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)

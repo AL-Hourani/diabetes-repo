@@ -758,7 +758,7 @@ func (h *Handler) handleGethomePatient(w http.ResponseWriter , r *http.Request) 
 	for _, r := range reviews {
 	// 1. تعبئة ChartData
 	chartData = append(chartData, types.ChartData{
-		Date:          r.DateReview.Format("02-01-2006"),
+		Date:          r.DateReview.Format("2006-01-02"),
 		LDL:           r.LDL,
 		HDL:           r.HDL,
 		NormalGlocose: r.NormalGlocose,
@@ -767,7 +767,7 @@ func (h *Handler) handleGethomePatient(w http.ResponseWriter , r *http.Request) 
 	// 2. تعبئة MyReviews
 	myReviews = append(myReviews, types.Review{
 		Id:   r.ID,
-		Date: r.DateReview.Format("02-01-2006"),
+		Date: r.DateReview.Format("2006-01-02"),
 	})
 }
 
@@ -776,13 +776,13 @@ func (h *Handler) handleGethomePatient(w http.ResponseWriter , r *http.Request) 
     var next_Reviwe string
     var first_Reviwe string
 	if len(reviews) > 0 {
-		// نأخذ أول مراجعة (يفترض أنها مرتبة تنازليًا)
+	
 		first_Reviwe =  reviews[0].DateReview.Format("02-01-2006")
 		latest := reviews[0].DateReview
 		next_Reviwe = latest.AddDate(0, 1, 0).Format("02-01-2006")
 		
 	} else {
-    // لا توجد مراجعات، نستخدم تاريخ اليوم
+
     first_Reviwe = "لا يوجد اي مراجعة يرجى زيازة المركز  لاكمال الحساب"
     next_Reviwe = time.Now().Format("02-01-2006")
   
@@ -807,7 +807,6 @@ func (h *Handler) handleGethomePatient(w http.ResponseWriter , r *http.Request) 
 		MyReviews:myReviews,
 
 	}
-
 
 
 		utils.WriteJSON(w, http.StatusOK, newGetPatientHomeData)

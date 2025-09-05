@@ -845,11 +845,10 @@ func (s *Store) UpdatePasswordByEmail(email, newPassword string) error {
 func (s *Store) GetReviewsByPatientID(patientID int) ([]types.ReviewResponseForPatient, error) {
 	var reviews []types.ReviewResponseForPatient
 
-	// 1. استعلام كل مراجعات هذا المريض من جدول reviews
 	rows, err := s.db.Query(`
 		SELECT 
-			id, address_patient, wight, length_patient, sugarType, otherDisease,
-			historyOfFamilyDisease, diseaseDetection, gender, hemoglobin, grease,
+			id, address_patient, wight, length_patient otherDisease,
+			hemoglobin, grease,
 			urineAcid, bloodPressure, cholesterol, LDL, HDL, creatine, normal_clucose,
 			clucose_after_meal, triple_grease, hba1c ,date_review 
 		FROM reviews 
@@ -863,10 +862,10 @@ func (s *Store) GetReviewsByPatientID(patientID int) ([]types.ReviewResponseForP
 
 	for rows.Next() {
 		var review types.ReviewResponseForPatient
-		var historyJSON []byte
+		
 		err := rows.Scan(
-			&review.ID, &review.Address, &review.Weight, &review.LengthPatient, &review.SugarType, &review.OtherDisease,
-			&historyJSON, &review.HistoryOfDiseaseDetection, &review.Gender, &review.Hemoglobin, &review.Grease,
+			&review.ID, &review.Address, &review.Weight, &review.LengthPatient, &review.OtherDisease,
+			&review.Hemoglobin, &review.Grease,
 			&review.UrineAcid, &review.BloodPressure, &review.Cholesterol, &review.LDL, &review.HDL,
 			&review.Creatine, &review.NormalGlocose, &review.GlocoseAfterMeal, &review.TripleGrease,
 			&review.Hba1c,&review.DateReview,
@@ -874,10 +873,6 @@ func (s *Store) GetReviewsByPatientID(patientID int) ([]types.ReviewResponseForP
 		if err != nil {
 			continue // يمكن تسجيل الخطأ
 		}
-		_ = json.Unmarshal(historyJSON, &review.HistoryOfFamilyDisease)
-
-		// (اختياري) استدعِ باقي العيادات أو العلاجات باستخدام review.ID
-		// ويمكنك هنا إما تجاهلها أو بناء استعلامات أخرى لجلب تفاصيل كل مراجعة.
 
 		reviews = append(reviews, review)
 	}
