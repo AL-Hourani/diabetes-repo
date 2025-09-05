@@ -592,7 +592,7 @@ func (s *Store) GetPatientReviewsByMonth(month, year int) ([]types.PatientReview
             SELECT m.name_arabic, td.dosage_per_day, td.quantity
             FROM treatment_drugs td
             JOIN medications m ON m.id = td.drug_id
-            WHERE td.treatment_id = (
+            WHERE td.treatment_id IN (
                 SELECT id FROM treatments WHERE review_id = $1
             )
         `, r.ReviewID)
