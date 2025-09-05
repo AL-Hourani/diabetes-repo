@@ -18,7 +18,7 @@ type PatientStore interface {
 	// GetPatientDetailsByID(patientID int) (*PatientDetails, error)
 	GetUserByEmail(email string) (*UserLoginData, error)
 	// GetPatientProfile(id int)(*PatientProfile , error)
-	UpdatePatientProfile(patientPayload ParientUpdatePayload) error
+	UpdatePatientProfile(patientPayload ParientUpdatePayload , id int) error
 	GetSugarTypeStats(centerID int) ([]*Statistics, error)
 	GetUpdatePatientProfile(id int) (*GetPatientUpdateProfile , error) 
 	GetGenderCounts(centerID int) (int, int, error)
@@ -95,13 +95,21 @@ type ReturnPatientProfile struct {
 	SugerType       string       `json:"suger_type"`
 } 
 
+type ReturnPatientProfileGet struct {
+	FullName		string		 `json:"fullname" validate:"required"`
+	Email			string		 `json:"email"    validate:"required,email"`
+	Date			string       `json:"date"    validate:"required"`
+	Phone           string	     `json:"phone"    validate:"required"`
+	IDNumber		string       `json:"id_number" validate:"required"`
+
+} 
+
 type ReturnPatientProfileLoation struct {
 	City       string  `json:"city"`
 	CenterName string    `json:"centerName"`
 }
 
 type ParientUpdatePayload struct {
-	ID				int			 `json:"id"`
 	FullName		string		 `json:"fullname" validate:"required"`
 	Email			string		 `json:"email"    validate:"required,email"`
 	Age 			string       `json:"age"    validate:"required"`

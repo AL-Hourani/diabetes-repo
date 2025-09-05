@@ -440,7 +440,7 @@ func (s *Store) GetUserByID(id int) (*types.UserLoginData, error) {
 
 
 
-func (s *Store) UpdatePatientProfile(patientPayload types.ParientUpdatePayload)error {
+func (s *Store) UpdatePatientProfile(patientPayload types.ParientUpdatePayload , id int)error {
 	query := `UPDATE Patients
 	SET 
 	fullName = $1, 
@@ -449,7 +449,7 @@ func (s *Store) UpdatePatientProfile(patientPayload types.ParientUpdatePayload)e
 	date = $4,
 	id_number = $5,
 	WHERE id = $7`
-	_, err := s.db.Exec(query,patientPayload.FullName,patientPayload.Email,patientPayload.Phone,patientPayload.Age,patientPayload.IDNumber,patientPayload.ID)
+	_, err := s.db.Exec(query,patientPayload.FullName,patientPayload.Email,patientPayload.Phone,patientPayload.Age,patientPayload.IDNumber,id)
 
 	if err != nil {
         return fmt.Errorf("error updating patient: %v", err)

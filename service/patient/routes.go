@@ -43,7 +43,7 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	// router.HandleFunc("/getAllPatientInfo/{id}" , h.handleGetAllPatientInfo).Methods("GET")
 	router.HandleFunc("/verify-token", h.VerifyTokenHandler).Methods("POST")
 	// router.HandleFunc("/verifyOtp", h.VerifyOTPHandler).Methods("POST")
-	// router.HandleFunc("/updatePatientProfile", h.handleUpdatePatientProfile).Methods(http.MethodPatch)
+	router.HandleFunc("/updatePatientProfile", h.handleUpdatePatientProfile).Methods(http.MethodPatch)
 	router.HandleFunc("/CenterStatistics/{id}",h.handleStatisticsSugerType).Methods("GET")
 	router.HandleFunc("/sendEmail",h.handleVerifyEmail).Methods("POST")
 	router.HandleFunc("/verfiyOTPResetPassword",h.handleVerifyOTP).Methods("POST")
@@ -537,30 +537,53 @@ func (h *Handler)  VerifyTokenHandler(w http.ResponseWriter , r *http.Request) {
 }
 
 
-// // update patient profile
-// func (h *Handler) handleUpdatePatientProfile(w http.ResponseWriter , r *http.Request) {
-// 	var updatePatietPayload types.ParientUpdatePayload
-// 	if err := utils.ParseJSON(r , &updatePatietPayload); err != nil {
-// 		utils.WriteError(w , http.StatusBadRequest , err)
-// 		return
-// 	}
+// update patient profile
+func (h *Handler) handleUpdatePatientProfile(w http.ResponseWriter , r *http.Request) {
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
 
-// 	err := h.store.UpdatePatientProfile(updatePatietPayload)
-// 	if err != nil {
-// 		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error update patient profile"))
-// 		return
-// 	}
+	
+	patientID, errp := auth.GetIDFromToken(token)
+	if errp != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	var updatePatietPayload types.ParientUpdatePayload
+
+	if err := utils.ParseJSON(r , &updatePatietPayload); err != nil {
+		utils.WriteError(w , http.StatusBadRequest , err)
+		return
+	}
+
+	err := h.store.UpdatePatientProfile(updatePatietPayload , patientID)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error update patient profile"))
+		return
+	}
     
 	
-// 	updateProfileInfo , err := h.store.GetPatientProfile(updatePatietPayload.ID)
-// 	if err != nil {
-// 		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error get patient profile"))
-// 		return
-// 	}
+	updateProfileInfo , err := h.store.GetPatientById(patientID)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest ,  fmt.Errorf("error get patient profile"))
+		return
+	}
+
+	newPatientProfile := types.ReturnPatientProfileGet {
+		FullName: updateProfileInfo.FullName,
+		Email: updateProfileInfo.Email,
+		Date: updateProfileInfo.Age,
+		Phone: updateProfileInfo.Phone,
+		IDNumber: updateProfileInfo.IDNumber,
+
+	}
 
 	
-// 	utils.WriteJSON(w , http.StatusOK , updateProfileInfo)
-// }
+	utils.WriteJSON(w , http.StatusOK , newPatientProfile)
+}
 
 
 
