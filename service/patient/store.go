@@ -823,23 +823,25 @@ func (s *Store) UpdatePasswordByEmail(email, newPassword string) error {
 	   return err
 	}
 
-    // تحديث كلمة المرور في قاعدة البيانات
+ 
     _, err = s.db.Exec(`
         UPDATE login_serach  
         SET password = $1 
         WHERE email = $2
     `, string(hashedPassword), email)
 
-
+    if err != nil {
+        return fmt.Errorf("failed to update login_serach: %w", err)
+    }
 
 	_, err = s.db.Exec(`
 		UPDATE patients
 		SET password = $1
 		WHERE email = $2
 	`,  string(hashedPassword), email)
-	if err != nil {
-		return  err
-	}
+   if err != nil {
+        return fmt.Errorf("failed to update patients: %w", err)
+    }
 	
     return err
 }
