@@ -51,6 +51,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
 	router.HandleFunc("/confirmAccount", h.handleConfirmPatientAccount).Methods("POST")
 	router.HandleFunc("/getCenters/{city}",h.handleGetCenters).Methods("GET")
 	router.HandleFunc("/getCities",h.handleGetCities).Methods("GET")
+	router.HandleFunc("/getCenterByCityName",h.handleGetCenterByCityName).Methods("GET")
 	router.HandleFunc("/getCenterProfile/{id}",h.handleGetCenetrProfile).Methods("GET")
 	router.HandleFunc("/updateCenterProfile", h.handleUpdateCenterProfile).Methods(http.MethodPatch)
 	router.HandleFunc("/getPatients", auth.WithJWTAuth(h.handleGetPatients)).Methods(http.MethodGet)
@@ -1798,3 +1799,29 @@ func (h *Handler) handleGetRecords(w http.ResponseWriter, r *http.Request) {
 	}
 	utils.WriteJSON(w, http.StatusOK, newPageRecord)
 }
+
+
+   
+
+
+
+
+
+
+func (h *Handler) handleGetCenterByCityName(w http.ResponseWriter, r *http.Request) {
+	cityName := r.URL.Query().Get("city")
+
+
+	centers , err := h.store.GetCentersByCityWothID(cityName)
+		if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, centers)
+
+}
+
+
+
+

@@ -327,6 +327,8 @@ type CenterStore interface {
 
 	InsertMedicationRequest(m InsertRequestMedicine)  error
 	GetSugarTypeByPatientID( patientID int) (string, error)
+
+	GetCentersByCityWothID(city string) ([]CenterInfo, error)
 }
 
 
@@ -1203,4 +1205,21 @@ type InquirieDetails struct {
 	Nop             int       `json:"nop"`
 	Request_date    string    `json:"request_date"`
 	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+type CenterInfo struct {
+    ID   int    `json:"id"`
+    Name string `json:"centerName"`
 }

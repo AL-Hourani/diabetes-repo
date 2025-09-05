@@ -1858,3 +1858,35 @@ func (s *Store) UpdateMedicationQuantity(id int, decreaseQuantity string) error 
 
     return err
 }
+
+
+
+
+
+func (s *Store) GetCentersByCityWothID(city string) ([]types.CenterInfo, error) {
+    rows, err := s.db.Query(`
+        SELECT id, centerName
+        FROM centers
+        WHERE centerCity = $1
+        ORDER BY centerName ASC
+    `, city)
+    if err != nil {
+        return nil, fmt.Errorf("query centers failed: %w", err)
+    }
+    defer rows.Close()
+
+    var centers []types.CenterInfo
+    for rows.Next() {
+        var c types.CenterInfo
+        if err := rows.Scan(&c.ID, &c.Name); err != nil {
+            return nil, fmt.Errorf("scan center failed: %w", err)
+        }
+        centers = append(centers, c)
+    }
+
+    if err := rows.Err(); err != nil {
+        return nil, fmt.Errorf("rows iteration failed: %w", err)
+    }
+
+    return centers, nil
+}
