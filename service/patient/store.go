@@ -447,7 +447,7 @@ func (s *Store) UpdatePatientProfile(patientPayload types.ParientUpdatePayload ,
 	email = $2,
 	phone = $3,
 	date = $4,
-	id_number = $5,
+	id_number = $5
 	WHERE id = $6`
 	_, err := s.db.Exec(query,patientPayload.FullName,patientPayload.Email,patientPayload.Phone,patientPayload.Age,patientPayload.IDNumber,id)
 
