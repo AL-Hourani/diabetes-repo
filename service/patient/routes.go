@@ -212,7 +212,6 @@ func (h *Handler) handlePatientRegister(w http.ResponseWriter , r *http.Request)
     })
 
 
-	
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return
@@ -240,7 +239,6 @@ func (h *Handler) handlePatientRegister(w http.ResponseWriter , r *http.Request)
 	
 	err = h.storeCenter.GreateLoginFailed(newLoginFailed)
 	
-
 	if err != nil {
 		utils.WriteError(w , http.StatusBadRequest ,err)
 		return 
@@ -252,8 +250,6 @@ func (h *Handler) handlePatientRegister(w http.ResponseWriter , r *http.Request)
 
 	utils.WriteJSON(w , http.StatusCreated , map[string]string{"message":"successfully Created"})
 
-
-	
 
 
 
@@ -1086,12 +1082,16 @@ func (h *Handler) UpdatePatientProfileLocation(w http.ResponseWriter, r *http.Re
 
 
 
-
+// f5t6a32n
 
 func (h *Handler) UpdatePatientPassword(w http.ResponseWriter, r *http.Request) {
 	var payload types.ChangePassword
 
-	
+	if err := utils.ParseJSON(r, &payload); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
 	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
 	if !ok {
 		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
@@ -1105,14 +1105,10 @@ func (h *Handler) UpdatePatientPassword(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if err := utils.ParseJSON(r, &payload); err != nil {
-		utils.WriteError(w, http.StatusBadRequest, err)
-		return
-	}
 
 	err = h.store.ChangePatientPassword(patientID, payload)
 	if err != nil {
-		utils.WriteError(w, http.StatusBadRequest, err) //القديمة مثلا خطأ كلمة المرور 
+		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 

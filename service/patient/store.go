@@ -817,7 +817,7 @@ func scanRowIntoUsertabele(rows *sql.Rows) (*types.Email , error ){
 
 
 func (s *Store) UpdatePasswordByEmail(email, newPassword string) error {
-    // تشفير كلمة المرور الجديدة
+  
  	hashedPassword , err := auth.HashPassword(newPassword)
 	if err != nil {
 	   return err
@@ -830,6 +830,17 @@ func (s *Store) UpdatePasswordByEmail(email, newPassword string) error {
         WHERE email = $2
     `, string(hashedPassword), email)
 
+
+
+	_, err = s.db.Exec(`
+		UPDATE patients
+		SET password = $1
+		WHERE email = $2
+	`,  string(hashedPassword), email)
+	if err != nil {
+		return  err
+	}
+	
     return err
 }
 
@@ -1214,7 +1225,7 @@ func (s *Store) ChangePatientPassword(patientID int, payload types.ChangePasswor
 	}
 
 	
-	if !auth.ComparePasswords(storedHashedPassword, []byte(payload.OldPassword)) {
+	if !auth.ComparePasswords(storedHashedPassword,[]byte(payload.OldPassword)) {
 		return fmt.Errorf("old password is incorrect")
 	}
 
