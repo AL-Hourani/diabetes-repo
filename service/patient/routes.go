@@ -38,7 +38,7 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/Login", h.handleLogin).Methods("POST")
 	router.HandleFunc("/patientRegister", auth.WithJWTAuth(h.handlePatientRegister)).Methods("POST")
 	router.HandleFunc("/getPatient/{id}" , h.handleGetPatient).Methods("GET")
-	// router.HandleFunc("/getPatientProfile/{id}" , h.handleGetPatientProfile).Methods("GET")
+	router.HandleFunc("/getPatientProfile" ,auth.WithJWTAuth( h.handleGetPatientProfile)).Methods("GET")
 	// router.HandleFunc("/getAllPatientInfo/{id}" , h.handleGetAllPatientInfo).Methods("GET")
 	router.HandleFunc("/verify-token", h.VerifyTokenHandler).Methods("POST")
 	// router.HandleFunc("/verifyOtp", h.VerifyOTPHandler).Methods("POST")
@@ -261,6 +261,40 @@ func (h *Handler) handlePatientRegister(w http.ResponseWriter , r *http.Request)
 
 
 
+
+func (h *Handler) handleGetPatientProfile(w http.ResponseWriter , r *http.Request) {
+
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	patientID, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+
+	patient , err := h.store.GetPatientById(patientID)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	newPatientProfile := types.ReturnPatientProfile {
+		FullName: patient.FullName,
+		Date: patient.Age,
+		IDNumber: patient.IDNumber,
+		Email: patient.Email,
+		Phone: patient.Phone,
+	}
+
+	utils.WriteJSON(w , http.StatusOK ,newPatientProfile )
+
+
+}
 // ----------------------------------------------------
 
 

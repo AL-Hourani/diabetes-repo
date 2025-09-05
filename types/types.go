@@ -81,6 +81,14 @@ type PatientM struct {
     DiseaseDetection       string 
 }
 
+type ReturnPatientProfile struct {
+	FullName		string		 `json:"fullname" validate:"required"`
+	Email			string		 `json:"email"    validate:"required,email"`
+	Date			string       `json:"date"    validate:"required"`
+	Phone           string	     `json:"phone"    validate:"required"`
+	IDNumber		string       `json:"id_number" validate:"required"`
+}
+
 type ParientUpdatePayload struct {
 	ID				int			 `json:"id"`
 	FullName		string		 `json:"fullname" validate:"required"`
