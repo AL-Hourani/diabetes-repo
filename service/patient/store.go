@@ -448,7 +448,7 @@ func (s *Store) UpdatePatientProfile(patientPayload types.ParientUpdatePayload ,
 	phone = $3,
 	date = $4,
 	id_number = $5,
-	WHERE id = $7`
+	WHERE id = $6`
 	_, err := s.db.Exec(query,patientPayload.FullName,patientPayload.Email,patientPayload.Phone,patientPayload.Age,patientPayload.IDNumber,id)
 
 	if err != nil {

@@ -113,7 +113,7 @@ type ReturnPatientProfileLoation struct {
 type ParientUpdatePayload struct {
 	FullName		string		 `json:"fullname" validate:"required"`
 	Email			string		 `json:"email"    validate:"required,email"`
-	Age 			string       `json:"age"    validate:"required"`
+	Age 			string       `json:"date"    validate:"required"`
 	Phone           string	     `json:"phone"    validate:"required"`
 	IDNumber		string       `json:"id_number" validate:"required"`
 
