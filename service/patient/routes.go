@@ -1,6 +1,7 @@
 package patient
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -38,7 +39,7 @@ func (h *Handler) RegisterPatientRoutes(router *mux.Router) {
 	router.HandleFunc("/Login", h.handleLogin).Methods("POST")
 	router.HandleFunc("/patientRegister", auth.WithJWTAuth(h.handlePatientRegister)).Methods("POST")
 	router.HandleFunc("/getPatient/{id}" , h.handleGetPatient).Methods("GET")
-	router.HandleFunc("/getPatientProfile" ,auth.WithJWTAuth( h.handleGetPatientProfile)).Methods("GET")
+	router.HandleFunc("/getPatientProfile" ,auth.WithJWTAuth(h.handleGetPatientProfile)).Methods("GET")
 	// router.HandleFunc("/getLocationPatientProfile" ,auth.WithJWTAuth( h.getLocationPatientProfile)).Methods("GET")
 	// router.HandleFunc("/getAllPatientInfo/{id}" , h.handleGetAllPatientInfo).Methods("GET")
 	router.HandleFunc("/verify-token", h.VerifyTokenHandler).Methods("POST")
@@ -296,15 +297,28 @@ func (h *Handler) handleGetPatientProfile(w http.ResponseWriter , r *http.Reques
 
     review , err := h.store. GetLastReviewByPatientID(patientID)
     if err != nil {
-		utils.WriteError(w, http.StatusInternalServerError, err)
+        utils.WriteError(w, http.StatusBadGateway, err)
 		 return
+		
+	}
+	
+	var treatment json.RawMessage
+
+	if review != nil {
+		treatmentStr, err := h.store.GetTreatmentTypeByReviewID(review.ID)
+		if err != nil {
+			utils.WriteError(w, http.StatusBadGateway, err)
+			return
+		}
+		treatment = json.RawMessage(treatmentStr)
+	} else {
+		
+		treatment = nil
 	}
 
-	treatment_type , err := h.store.GetTreatmentTypeByReviewID(review.ID)
-    if err != nil {
-		utils.WriteError(w, http.StatusInternalServerError, err)
-		 return
-	}
+
+
+	
 
 	newPatientProfile := types.ReturnPatientProfile {
 		FullName: patient.FullName,
@@ -315,7 +329,7 @@ func (h *Handler) handleGetPatientProfile(w http.ResponseWriter , r *http.Reques
 		City:Center.CenterCity ,
 		CenterName: Center.CenterName,
 		SugerType: sugerType,
-		Treatment: treatment_type,
+		Treatment: treatment,
 	}
 
 	utils.WriteJSON(w , http.StatusOK ,newPatientProfile )
