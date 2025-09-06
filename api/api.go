@@ -63,7 +63,7 @@ func (s *APIServer) Run() error {
    
 		// إعدادات CORS
 		cors := handlers.CORS(
-			handlers.AllowedOrigins([]string{"https://mustafa-ki-o.github.io"}),
+			handlers.AllowedOrigins([]string{"*"}),
 			handlers.AllowedMethods([]string{"GET", "POST","PATCH", "PUT", "DELETE", "OPTIONS"}),
 			handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
 		)
