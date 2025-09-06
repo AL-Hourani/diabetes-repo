@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/AL-Hourani/care-center/config"
@@ -13,7 +14,6 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
-
 )
 
 type Handler struct {
@@ -473,7 +473,8 @@ func (h *Handler) handleGetCentersByCity(w http.ResponseWriter, r *http.Request)
 
 
 func (h *Handler) handleGetInfoAboutCenter(w http.ResponseWriter, r *http.Request) {
-    centerName := r.URL.Query().Get("center")
+   centerN := r.URL.Query().Get("center")
+   centerName := strings.TrimSpace(centerN)
 
 
 	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
@@ -499,7 +500,7 @@ func (h *Handler) handleGetInfoAboutCenter(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	nop , err := h.superStore.GetPatientCountByCity(centerName) 
+	nop , err := h.superStore.GetPatientCountByCenterName(centerName)
 	if err != nil {
 		utils.WriteError(w, http.StatusUnauthorized, err)
 		return

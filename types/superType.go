@@ -27,6 +27,7 @@ type SuperisorStore interface {
       GetMaleCountByCenter(centerName string) (int, error)
 
       GetFemaleCountByCenter(centerName string) (int, error)
+      GetPatientCountByCenterName(centerName string) (int, error)
 
 }
 
