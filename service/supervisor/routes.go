@@ -5,7 +5,8 @@ import (
 	"net/http"
 	"strconv"
 	"sync"
-
+	"path/filepath"
+    "os"
 	"github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/service/auth"
 	"github.com/AL-Hourani/care-center/types"
@@ -13,6 +14,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 )
 
 type Handler struct {
@@ -44,6 +46,18 @@ func (h *Handler) RegisterSuperVisorRoutes(router *mux.Router) {
 	router.HandleFunc("/acceptedInquiries",auth.WithJWTAuth(h.handleAcceptedInquiries)).Methods("POST")
 	router.HandleFunc("/CreateDatePatientFile",auth.WithJWTAuth(h.handleGetSuperExcel)).Methods("POST")
 	router.HandleFunc("/superLogin",h.handleLoginSupervisor).Methods("POST")
+    // ربط دالة ServeFile مع URL يحتوي على اسم الملف
+    router.HandleFunc("/download/{fileName}", h.handleServeFile).Methods("GET")
+
+}
+
+
+
+
+func (h *Handler) handleServeFile(w http.ResponseWriter, r *http.Request) {
+    fileName := chi.URLParam(r, "fileName") 
+    filePath := "./tmp/" + fileName
+    http.ServeFile(w, r, filePath)
 
 }
 
@@ -768,12 +782,22 @@ func (h *Handler) handleGetSuperExcel(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    w.Header().Set("Content-Disposition", "attachment; filename=patient_reviews.xlsx")
-    w.Header().Set("File-Name", "patient_reviews.xlsx")
-
-    if err := excelFile.Write(w); err != nil {
-        http.Error(w, "Error writing Excel file", http.StatusInternalServerError)
+	if _, err := os.Stat("./tmp"); os.IsNotExist(err) {
+    err := os.Mkdir("./tmp", 0755)
+    if err != nil {
+        http.Error(w, "Error creating tmp folder", http.StatusInternalServerError)
         return
     }
+   }
+
+    tempFile := fmt.Sprintf("./tmp/patient_reviews_%d_%d.xlsx", month, year)
+    if err := excelFile.SaveAs(tempFile); err != nil {
+        http.Error(w, "Error saving file", http.StatusInternalServerError)
+        return
+    }
+
+    
+    downloadURL := fmt.Sprintf("https://diabetes-care-center-api.onrender.com/download/%s", filepath.Base(tempFile))
+    w.Header().Set("Content-Type", "application/json")
+    w.Write([]byte(fmt.Sprintf(`{"url":"%s"}`, downloadURL)))
 }
