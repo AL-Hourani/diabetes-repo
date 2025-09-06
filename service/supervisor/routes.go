@@ -14,7 +14,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
-	"github.com/go-chi/chi/v5"
+	
 )
 
 type Handler struct {
@@ -55,7 +55,7 @@ func (h *Handler) RegisterSuperVisorRoutes(router *mux.Router) {
 
 
 func (h *Handler) handleServeFile(w http.ResponseWriter, r *http.Request) {
-    fileName := chi.URLParam(r, "fileName") 
+    fileName := r.URL.Query().Get("fileName") 
     filePath := "./tmp/" + fileName
     http.ServeFile(w, r, filePath)
 
