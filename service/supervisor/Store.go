@@ -355,9 +355,9 @@ func (s *Store) UpdateMedicationQuantity(id int, newQuantity int) error {
 
 
 
-func (s *Store) GetCentersByCity(cityName string) ([]string, error) {
+func (s *Store) GetCentersByCity(cityName string) ([]types.CenterWithID, error) {
     rows, err := s.db.Query(`
-        SELECT centerName 
+        SELECT id, centerName 
         FROM centers
         WHERE centerCity ILIKE $1
     `, cityName)
@@ -366,13 +366,13 @@ func (s *Store) GetCentersByCity(cityName string) ([]string, error) {
     }
     defer rows.Close()
 
-    var centers []string
+    var centers []types.CenterWithID
     for rows.Next() {
-        var name string
-        if err := rows.Scan(&name); err != nil {
+        var centerWid types.CenterWithID
+        if err := rows.Scan(&centerWid.ID , &centerWid.CenterName); err != nil {
             return nil, err
         }
-        centers = append(centers, name)
+        centers = append(centers, centerWid)
     }
 
     if err := rows.Err(); err != nil {

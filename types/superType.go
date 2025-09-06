@@ -16,7 +16,7 @@ type SuperisorStore interface {
      UpdateInformationStatus(id int, newStatus string) error
      UpdateRecordStatusAndApprovalDate(id int, newStatus string) error
      UpdateMedicationQuantity(id int, newQuantity int) error
-     GetCentersByCity(cityName string) ([]string, error)
+     GetCentersByCity(cityName string) ([]CenterWithID, error)
      GetPatientCountByCity(cityName string) (int, error)
      GetPatientCountByCityLastMonth(cityName string) (int, error) 
      GetCenterWithMostPatients() (*CenterWithCount, error) 
@@ -74,10 +74,16 @@ type City struct {
 }
 
 
+
+type CenterWithID struct {
+    ID       int      `json:"id"`
+    CenterName string  `json:"centerName"`
+}
+
 type AllCityInfo struct {
     NumberOfPatientInCity          int `json:"nopic"`
     NumberOfPatientInCityLastMonth int `json:"nopic_lm"`
-    ActiveCenter                   []string `json:"active_center"`
+    ActiveCenter                   []CenterWithID `json:"active_center"`
 }
 type GenericSuperInfo struct {
     NumberOfPatientInSystem          int `json:"nopis"`

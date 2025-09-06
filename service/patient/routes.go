@@ -301,7 +301,7 @@ func (h *Handler) handleGetPatientProfile(w http.ResponseWriter , r *http.Reques
 		 return
 		
 	}
-	
+
 	var treatment json.RawMessage
 
 	if review != nil {
@@ -328,7 +328,7 @@ func (h *Handler) handleGetPatientProfile(w http.ResponseWriter , r *http.Reques
 		Phone: patient.Phone,
 		City:Center.CenterCity ,
 		CenterName: Center.CenterName,
-		SugerType: sugerType,
+		SugerType:sugerType,
 		Treatment: treatment,
 	}
 
