@@ -889,6 +889,7 @@ func (h *Handler) handleGethomePatient(w http.ResponseWriter , r *http.Request) 
 		MyCenter: center.CenterName ,
 		NextReview: next_Reviwe ,
 		MyReviews:myReviews,
+		CenterEmail: center.CenterEmail,
 
 	}
 

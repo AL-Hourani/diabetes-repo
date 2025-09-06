@@ -852,6 +852,8 @@ type GetPatientHomeData struct {
 
 	MyReviews       []Review     `json:"myReviews"`
 
+	CenterEmail    string        `json:"centerEmail"`
+
 }
 
 type ReviewResponseForPatient struct {
