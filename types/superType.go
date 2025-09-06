@@ -23,11 +23,11 @@ type SuperisorStore interface {
      ParseMonthYear(input string) (month int, year int, err error) 
      GetPatientReviewsByMonth(month, year int) ([]PatientReview, error) 
 
-      GetPatientCountByCenterLastMonth(centerName string) (int, error) 
-      GetMaleCountByCenter(centerName string) (int, error)
+      GetPatientCountByCenterLastMonth(id int) (int, error) 
+      GetMaleCountByCenter(id int) (int, error)
 
-      GetFemaleCountByCenter(centerName string) (int, error)
-      GetPatientCountByCenterName(centerName string) (int, error)
+      GetFemaleCountByCenter(id int) (int, error)
+      GetPatientCountByCenterName(id int) (int, error)
 
 }
 

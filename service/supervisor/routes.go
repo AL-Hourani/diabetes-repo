@@ -472,7 +472,7 @@ func (h *Handler) handleGetCentersByCity(w http.ResponseWriter, r *http.Request)
 
 
 func (h *Handler) handleGetInfoAboutCenter(w http.ResponseWriter, r *http.Request) {
-   centerName := r.URL.Query().Get("center")
+   centerName := r.URL.Query().Get("centerName")
    
 
 
@@ -499,24 +499,30 @@ func (h *Handler) handleGetInfoAboutCenter(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	nop , err := h.superStore.GetPatientCountByCenterName(centerName)
+	center , err := h.store.GetCenterByName(centerName)
 	if err != nil {
 		utils.WriteError(w, http.StatusUnauthorized, err)
 		return
 	}
 
-	nop_in_center_lm , err := h.superStore.GetPatientCountByCenterLastMonth(centerName)
+	nop , err := h.superStore.GetPatientCountByCenterName(center.ID)
 	if err != nil {
 		utils.WriteError(w, http.StatusUnauthorized, err)
 		return
 	}
 
-	number_of_male , err := h.superStore.GetMaleCountByCenter(centerName)
+	nop_in_center_lm , err := h.superStore.GetPatientCountByCenterLastMonth(center.ID)
 	if err != nil {
 		utils.WriteError(w, http.StatusUnauthorized, err)
 		return
 	}
-	number_of_female , err := h.superStore.GetFemaleCountByCenter(centerName)
+
+	number_of_male , err := h.superStore.GetMaleCountByCenter(center.ID)
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
+	number_of_female , err := h.superStore.GetFemaleCountByCenter(center.ID)
 	if err != nil {
 		utils.WriteError(w, http.StatusUnauthorized, err)
 		return

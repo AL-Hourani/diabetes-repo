@@ -401,14 +401,14 @@ func (s *Store) GetPatientCountByCity(cityName string) (int, error) {
 
 
 
-func (s *Store) GetPatientCountByCenterName(centerName string) (int, error) {
+func (s *Store) GetPatientCountByCenterName(id int) (int, error) {
     var count int
     err := s.db.QueryRow(`
         SELECT COUNT(p.id)
         FROM patients p
         INNER JOIN centers c ON p.center_id = c.id
-        WHERE c.centerName ILIKE $1
-    `, centerName).Scan(&count)
+        WHERE c.id = $1
+    `, id).Scan(&count)
 
     if err != nil {
         return 0, err
@@ -435,7 +435,7 @@ func (s *Store) GetPatientCountByCityLastMonth(cityName string) (int, error) {
 
 
 
-func (s *Store) GetMaleCountByCenter(centerName string) (int, error) {
+func (s *Store) GetMaleCountByCenter(id int) (int, error) {
     var count int
     err := s.db.QueryRow(`
         SELECT COUNT(pm.id)
@@ -443,8 +443,8 @@ func (s *Store) GetMaleCountByCenter(centerName string) (int, error) {
         INNER JOIN patients p ON pm.patient_id = p.id
         INNER JOIN centers c ON p.center_id = c.id
         WHERE pm.gender = 'male'
-          AND c.centerName = $1
-    `, centerName).Scan(&count)
+          AND c.id =  $1
+    `, id).Scan(&count)
 
     if err != nil {
         return 0, err
@@ -453,7 +453,7 @@ func (s *Store) GetMaleCountByCenter(centerName string) (int, error) {
 }
 
 
-func (s *Store) GetFemaleCountByCenter(centerName string) (int, error) {
+func (s *Store) GetFemaleCountByCenter(id int) (int, error) {
     var count int
     err := s.db.QueryRow(`
         SELECT COUNT(pm.id)
@@ -461,8 +461,8 @@ func (s *Store) GetFemaleCountByCenter(centerName string) (int, error) {
          INNER JOIN patients p ON pm.patient_id = p.id
         INNER JOIN centers c ON p.center_id = c.id
         WHERE pm.gender = 'female'
-          AND c.centerName = $1
-    `, centerName).Scan(&count)
+          AND c.id = $1
+    `, id).Scan(&count)
 
     if err != nil {
         return 0, err
@@ -473,15 +473,15 @@ func (s *Store) GetFemaleCountByCenter(centerName string) (int, error) {
 
 
 
-func (s *Store) GetPatientCountByCenterLastMonth(centerName string) (int, error) {
+func (s *Store) GetPatientCountByCenterLastMonth(id int) (int, error) {
     var count int
     err := s.db.QueryRow(`
         SELECT COUNT(p.id)
         FROM patients p
         INNER JOIN centers c ON p.center_id = c.id
-        WHERE c.centerName ILIKE $1
+        WHERE c.id = $1
           AND p.createAt >= NOW() - INTERVAL '1 month'
-    `, centerName).Scan(&count)
+    `, id).Scan(&count)
 
     if err != nil {
         return 0, err
