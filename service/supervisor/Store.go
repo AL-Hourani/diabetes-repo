@@ -423,7 +423,7 @@ func (s *Store) GetMaleCountByCenter(centerName string) (int, error) {
     err := s.db.QueryRow(`
         SELECT COUNT(p.id)
         FROM patient_m pm
-        INNER JOIN patient p ON pm.patient_id = p.id
+        INNER JOIN patients p ON pm.patient_id = p.id
         INNER JOIN centers c ON p.center_id = c.id
         WHERE pm.gender = 'male'
           AND c.centerName = $1
@@ -440,8 +440,8 @@ func (s *Store) GetFemaleCountByCenter(centerName string) (int, error) {
     var count int
     err := s.db.QueryRow(`
         SELECT COUNT(p.id)
-        FROM patients pm
-         INNER JOIN patient p ON pm.patient_id = p.id
+        FROM patient_m pm
+         INNER JOIN patients p ON pm.patient_id = p.id
         INNER JOIN centers c ON p.center_id = c.id
         WHERE pm.gender = 'female'
           AND c.centerName = $1
