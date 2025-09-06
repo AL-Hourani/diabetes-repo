@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 	"sync"
 
 	"github.com/AL-Hourani/care-center/config"
@@ -473,8 +472,8 @@ func (h *Handler) handleGetCentersByCity(w http.ResponseWriter, r *http.Request)
 
 
 func (h *Handler) handleGetInfoAboutCenter(w http.ResponseWriter, r *http.Request) {
-   centerN := r.URL.Query().Get("center")
-   centerName := strings.TrimSpace(centerN)
+   centerName := r.URL.Query().Get("center")
+   
 
 
 	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
