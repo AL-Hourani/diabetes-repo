@@ -55,10 +55,11 @@ func (h *Handler) RegisterSuperVisorRoutes(router *mux.Router) {
 
 
 func (h *Handler) handleServeFile(w http.ResponseWriter, r *http.Request) {
-    fileName := r.URL.Query().Get("fileName") 
+    vars := mux.Vars(r)                  // استخرج المتغيرات من الـ path
+    fileName := vars["fileName"]         // هذا هو {fileName}
     filePath := "./tmp/" + fileName
-    http.ServeFile(w, r, filePath)
 
+    http.ServeFile(w, r, filePath)  
 }
 
 
