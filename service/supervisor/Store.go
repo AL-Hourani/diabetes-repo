@@ -418,6 +418,60 @@ func (s *Store) GetPatientCountByCityLastMonth(cityName string) (int, error) {
 
 
 
+func (s *Store) GetMaleCountByCenter(centerName string) (int, error) {
+    var count int
+    err := s.db.QueryRow(`
+        SELECT COUNT(p.id)
+        FROM patients p
+        INNER JOIN centers c ON p.center_id = c.id
+        WHERE p.gender = 'male'
+          AND c.centerName = $1
+    `, centerName).Scan(&count)
+
+    if err != nil {
+        return 0, err
+    }
+    return count, nil
+}
+
+
+func (s *Store) GetFemaleCountByCenter(centerName string) (int, error) {
+    var count int
+    err := s.db.QueryRow(`
+        SELECT COUNT(p.id)
+        FROM patients p
+        INNER JOIN centers c ON p.center_id = c.id
+        WHERE p.gender = 'female'
+          AND c.centerName = $1
+    `, centerName).Scan(&count)
+
+    if err != nil {
+        return 0, err
+    }
+    return count, nil
+}
+
+
+
+
+func (s *Store) GetPatientCountByCenterLastMonth(centerName string) (int, error) {
+    var count int
+    err := s.db.QueryRow(`
+        SELECT COUNT(p.id)
+        FROM patients p
+        INNER JOIN centers c ON p.center_id = c.id
+        WHERE c.centerName ILIKE $1
+          AND p.createAt >= NOW() - INTERVAL '1 month'
+    `, centerName).Scan(&count)
+
+    if err != nil {
+        return 0, err
+    }
+    return count, nil
+}
+
+
+
 func (s *Store) GetCenterWithMostPatients() (*types.CenterWithCount, error) {
 	query := `
 		SELECT c.id, c.centerName, c.centerCity, COUNT(p.id) AS patients_count

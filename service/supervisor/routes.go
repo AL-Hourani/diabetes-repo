@@ -40,6 +40,7 @@ func (h *Handler) RegisterSuperVisorRoutes(router *mux.Router) {
 	router.HandleFunc("/getCityInfo",auth.WithJWTAuth(h.handleGetCentersByCity)).Methods("GET")
 	// router.HandleFunc("/getCenterInfo",auth.WithJWTAuth(h.handleGetInforAboutCenter)).Methods("GET")
 	router.HandleFunc("/getSuperInfo",auth.WithJWTAuth(h.handleGetSuperInfo)).Methods("GET")
+	router.HandleFunc("/aboutCenter",auth.WithJWTAuth(h.handleGetInfoAboutCenter)).Methods("GET")
 	router.HandleFunc("/rejectInquiries",auth.WithJWTAuth(h.handleRejectInquiries)).Methods("POST")
 	router.HandleFunc("/acceptedInquiries",auth.WithJWTAuth(h.handleAcceptedInquiries)).Methods("POST")
 	router.HandleFunc("/CreateDatePatientFile",auth.WithJWTAuth(h.handleGetSuperExcel)).Methods("POST")
@@ -455,6 +456,83 @@ func (h *Handler) handleGetCentersByCity(w http.ResponseWriter, r *http.Request)
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+func (h *Handler) handleGetInfoAboutCenter(w http.ResponseWriter, r *http.Request) {
+    centerName := r.URL.Query().Get("center")
+
+
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	idSup, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	user , err := h.pStore.GetLoginByID(idSup)
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	if user.Role != "supervisor" {
+		http.Error(w, "Unauthorized: You are not supervisor", http.StatusUnauthorized)
+		return
+	}
+
+	nop , err := h.superStore.GetPatientCountByCity(centerName) 
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	nop_in_center_lm , err := h.superStore.GetPatientCountByCenterLastMonth(centerName)
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	number_of_male , err := h.superStore.GetMaleCountByCenter(centerName)
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
+	number_of_female , err := h.superStore.GetFemaleCountByCenter(centerName)
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	aboutCenterInfo := types.AboutCenterInfo {
+		NumberOfPatientInCenter: nop,
+		RegisterPatientLastMonth:nop_in_center_lm ,
+		NumberOfMale:number_of_male ,
+		NumberOfFemale: number_of_female,
+
+	}
+
+	
+	utils.WriteJSON(w , http.StatusOK ,aboutCenterInfo )
+}
 
 
 

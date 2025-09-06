@@ -5,5 +5,5 @@ CREATE TABLE IF NOT EXISTS patient_m (
     sugarType VARCHAR(255) ,
     historyOfFamilyDisease JSONB DEFAULT '[]',
     diseaseDetection  VARCHAR(255) DEFAULT '',
-    CONSTRAINT fk_patient FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE SET NULL
+    CONSTRAINT fk_patient FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE
 );
