@@ -797,7 +797,7 @@ func (h *Handler) handleGetSuperExcel(w http.ResponseWriter, r *http.Request) {
     }
 
     
-    downloadURL := fmt.Sprintf("https://diabetes-care-center-api.onrender.com/download/%s", filepath.Base(tempFile))
+    downloadURL := fmt.Sprintf("https://diabetes-care-center-api.onrender.com/api/v1/download/%s", filepath.Base(tempFile))
     w.Header().Set("Content-Type", "application/json")
     w.Write([]byte(fmt.Sprintf(`{"url":"%s"}`, downloadURL)))
 }
