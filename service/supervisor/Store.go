@@ -124,7 +124,9 @@ func (s *Store) GetAllInformation() ([]types.GetAllInformation, error) {
             name_english,
             requested_quantity,
             center_id,
-            information_status
+            information_status,
+            createAt,
+            due_date
         FROM information
     `)
     if err != nil {
@@ -143,6 +145,8 @@ func (s *Store) GetAllInformation() ([]types.GetAllInformation, error) {
             &info.Quantity,
             &centerID,
             &info.Status,
+            &info.RequestDate,
+            &info.DueDate,
         )
         if err != nil {
             return nil, err
@@ -164,6 +168,23 @@ func (s *Store) GetAllInformation() ([]types.GetAllInformation, error) {
     }
 
     return infos, nil
+}
+
+
+
+func (s *Store) UpdateDueDateToNow(infoID int) error {
+    query := `
+        UPDATE information
+        SET due_date = CURRENT_TIMESTAMP
+        WHERE id = $1;
+    `
+
+    _, err := s.db.Exec(query, infoID)
+    if err != nil {
+        return err
+    }
+
+    return nil
 }
 
 

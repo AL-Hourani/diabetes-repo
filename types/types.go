@@ -1214,7 +1214,20 @@ type GetAllInformation struct {
 	CenterName       string   `json:"center_name"`
 	CenterCity     string     `json:"center_city"`
 	Status         string     `json:"status"`
+	RequestDate    string     `json:"request_date"`
+	DueDate        string     `json:"due_date"`
 }
+	
+// type GetAllInformationInquires struct {
+// 	ID             int        `json:"id"`
+//     NameArabic     string     `json:"name_arabic"`
+//     NameEnglish    string     `json:"name_english"`
+//     Quantity       int        `json:"quantity"`
+// 	CenterName       string   `json:"center_name"`
+// 	CenterCity     string     `json:"center_city"`
+// 	Status         string     `json:"status"`
+
+// }
 	
 
 type InquirieDetails struct {

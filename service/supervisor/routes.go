@@ -3,10 +3,12 @@ package supervisor
 import (
 	"fmt"
 	"net/http"
-	"strconv"
-	"sync"
+	"os"
 	"path/filepath"
-    "os"
+	"strconv"
+	"strings"
+	"sync"
+
 	"github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/service/auth"
 	"github.com/AL-Hourani/care-center/types"
@@ -14,7 +16,6 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
-	
 )
 
 type Handler struct {
@@ -330,6 +331,11 @@ func (h *Handler) handleRejectInquiries(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	err = h.superStore.UpdateDueDateToNow(queryId.Query_ID)
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
 
 	err = h.superStore.UpdateInformationStatus(queryId.Query_ID , string(types.InfoStatusCancel))
     if err != nil {
@@ -383,6 +389,12 @@ func (h *Handler) handleAcceptedInquiries(w http.ResponseWriter, r *http.Request
 
 	if user.Role != "supervisor" {
 		http.Error(w, "Unauthorized: You are not supervisor", http.StatusUnauthorized)
+		return
+	}
+
+	err = h.superStore.UpdateDueDateToNow(queryAccept.Query_ID)
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
 		return
 	}
 
@@ -808,8 +820,11 @@ func (h *Handler) handleGetSuperExcel(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+	fileName := filepath.Base(tempFile)
+    fileName = strings.Trim(fileName, "/")  
+
     
-    downloadURL := fmt.Sprintf("https://diabetes-care-center-api.onrender.com/api/v1/download/%s", filepath.Base(tempFile))
+    downloadURL := fmt.Sprintf("https://diabetes-care-center-api.onrender.com/api/v1/download/%s", fileName)
     w.Header().Set("Content-Type", "application/json")
     w.Write([]byte(fmt.Sprintf(`{"url":"%s"}`, downloadURL)))
 }

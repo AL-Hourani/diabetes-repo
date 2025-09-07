@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS information (
     center_id INT NOT NULL,
     information_status  TEXT NOT NULL,
     createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    due_date TIMESTAMP DEFAULT NULL,
     request_id INT NOT NULL
 );

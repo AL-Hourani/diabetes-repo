@@ -28,6 +28,7 @@ type SuperisorStore interface {
 
       GetFemaleCountByCenter(id int) (int, error)
       GetPatientCountByCenterName(id int) (int, error)
+      UpdateDueDateToNow(infoID int) error
 
 }
 
