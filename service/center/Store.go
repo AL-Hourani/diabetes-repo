@@ -1935,3 +1935,34 @@ func (s *Store) GetLastFivePatientsByCenter(centerID int) ([]*types.PatientInfo,
 
     return patients, nil
 }
+
+
+func (s *Store) CountPatientsAfterFirstLoginByCenter(centerID int) (int, error) {
+    query := `SELECT COUNT(*) FROM patients WHERE first_login = false AND center_id = $1;`
+
+    var count int
+    err := s.db.QueryRow(query, centerID).Scan(&count)
+    if err != nil {
+        return 0, err
+    }
+
+    return count, nil
+}
+
+func (s *Store) CountPatientsThisMonth(centerID int) (int, error) {
+    query := `
+        SELECT COUNT(*)
+        FROM patients
+        WHERE center_id = $1
+          AND createAt >= date_trunc('month', CURRENT_DATE);
+    `
+
+    var count int
+    err := s.db.QueryRow(query, centerID).Scan(&count)
+    if err != nil {
+        return 0, err
+    }
+
+    return count, nil
+}
+

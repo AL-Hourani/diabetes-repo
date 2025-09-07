@@ -187,3 +187,10 @@ type PatientInfo struct {
     Email     string
     SugarType string
 }
+
+
+type HomeCenter struct {
+    ActiveAccount   int  `json:"count_active_account"`
+    LastFivePatient []*PatientInfo `json:"last_five_patient"`
+    NumberRegisterAccounthisMoth int `json:"account_this_month"`
+}

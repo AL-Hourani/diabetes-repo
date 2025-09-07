@@ -54,9 +54,10 @@ func (h *Handler) RegisterSuperVisorRoutes(router *mux.Router) {
 
 
 
+
 func (h *Handler) handleServeFile(w http.ResponseWriter, r *http.Request) {
-    vars := mux.Vars(r)                  // استخرج المتغيرات من الـ path
-    fileName := vars["fileName"]         // هذا هو {fileName}
+    vars := mux.Vars(r)                  
+    fileName := vars["fileName"]        
     filePath := "./tmp/" + fileName
 
     http.ServeFile(w, r, filePath)  
@@ -766,7 +767,6 @@ func (h *Handler) handleGetSuperExcel(w http.ResponseWriter, r *http.Request) {
 	} else {
 		fmt.Println("Month:", month, "Year:", year)
 	}
-	// المخرجات: Month: 3 Year: 2025
 
 
     reviews, err := h.superStore.GetPatientReviewsByMonth(month, year)
@@ -782,6 +782,8 @@ func (h *Handler) handleGetSuperExcel(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "Error creating Excel file", http.StatusInternalServerError)
         return
     }
+
+
 
 	if _, err := os.Stat("./tmp"); os.IsNotExist(err) {
     err := os.Mkdir("./tmp", 0755)

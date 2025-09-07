@@ -339,6 +339,8 @@ type CenterStore interface {
 
 	GetCentersByCityWothID(city string) ([]CenterInfo, error)
 	GetLastFivePatientsByCenter(centerID int) ([]*PatientInfo, error) 
+	CountPatientsAfterFirstLoginByCenter(centerID int) (int, error) 
+	CountPatientsThisMonth(centerID int) (int, error)
 }
 
 

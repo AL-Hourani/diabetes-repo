@@ -1853,7 +1853,26 @@ func (h *Handler) handleGetLastFivePatients(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-    utils.WriteJSON(w, http.StatusOK, lastFive)
+	activeAccout , err := h.store.CountPatientsAfterFirstLoginByCenter(centerID)
+		if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	accountThismoth , err := h.store.CountPatientsThisMonth(centerID)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	homeCenter := types.HomeCenter {
+		LastFivePatient: lastFive,
+		ActiveAccount:activeAccout ,
+		NumberRegisterAccounthisMoth: accountThismoth,
+		
+	}
+
+    utils.WriteJSON(w, http.StatusOK, homeCenter)
 
 }
 
