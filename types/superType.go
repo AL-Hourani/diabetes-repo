@@ -180,3 +180,10 @@ type MonthDown struct {
 type CenterAboutInfor struct {
     
 }
+
+
+type PatientInfo struct {
+    FullName  string
+    Email     string
+    SugarType string
+}

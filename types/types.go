@@ -338,6 +338,7 @@ type CenterStore interface {
 	GetSugarTypeByPatientID( patientID int) (string, error)
 
 	GetCentersByCityWothID(city string) ([]CenterInfo, error)
+	GetLastFivePatientsByCenter(centerID int) ([]*PatientInfo, error) 
 }
 
 

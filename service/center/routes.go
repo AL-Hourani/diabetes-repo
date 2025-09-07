@@ -97,6 +97,7 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
    	router.HandleFunc("/getMedicineLogs",auth.WithJWTAuth(h.handleGetMedicationLogs)).Methods("GET")
     router.HandleFunc("/getReviewMedicinesName",auth.WithJWTAuth(h.handleGetReviewMedicinesName)).Methods("GET")
     router.HandleFunc("/getRecords",auth.WithJWTAuth(h.handleGetRecords)).Methods("GET")
+    router.HandleFunc("/getLastFivePatients",auth.WithJWTAuth(h.handleGetLastFivePatients)).Methods("GET")
 
 }
 
@@ -1823,5 +1824,37 @@ func (h *Handler) handleGetCenterByCityName(w http.ResponseWriter, r *http.Reque
 }
 
 
+
+
+
+
+
+
+//get last five patients
+
+
+func (h *Handler) handleGetLastFivePatients(w http.ResponseWriter, r *http.Request) {
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	centerID, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+
+	lastFive , err := h.store.GetLastFivePatientsByCenter(centerID)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+    utils.WriteJSON(w, http.StatusOK, lastFive)
+
+}
 
 

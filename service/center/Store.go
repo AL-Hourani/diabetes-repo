@@ -1890,3 +1890,48 @@ func (s *Store) GetCentersByCityWothID(city string) ([]types.CenterInfo, error) 
 
     return centers, nil
 }
+
+
+
+
+
+
+
+
+
+
+
+
+func (s *Store) GetLastFivePatientsByCenter(centerID int) ([]*types.PatientInfo, error) {
+    
+    query := `
+        SELECT p.fullName, p.email, pm.sugarType
+        FROM patients p
+        LEFT JOIN patient_m pm ON p.id = pm.patient_id
+        WHERE p.center_id = $1
+        ORDER BY p.createAt DESC
+        LIMIT 5;
+    `
+
+    rows, err := s.db.Query(query, centerID)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var patients []*types.PatientInfo
+
+    for rows.Next() {
+        var pi types.PatientInfo
+        if err := rows.Scan(&pi.FullName, &pi.Email, &pi.SugarType); err != nil {
+            return nil, err
+        }
+        patients = append(patients, &pi)
+    }
+
+    if err = rows.Err(); err != nil {
+        return nil, err
+    }
+
+    return patients, nil
+}
