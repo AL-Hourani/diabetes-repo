@@ -117,6 +117,9 @@ func (h *Handler) handleGetAllCentersData(w http.ResponseWriter, r *http.Request
 
 
 
+
+// commit fiiiiii
+
 func (h *Handler) handleGetInquiries(w http.ResponseWriter, r *http.Request) {
 	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
 	if !ok {
