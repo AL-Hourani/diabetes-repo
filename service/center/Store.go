@@ -263,7 +263,7 @@ func (s *Store) GetPatientsForCenter(CenterID int) ([]types.CardData , error) {
 
 		cardd.Reviews = reviews
 		cardd.SugarType = sugerType
-		cardd.CenterName = center.CenterName
+		cardd.CenterName = center.CenterCity
 		cardData = append(cardData, *cardd)
 	}
 
