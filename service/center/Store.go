@@ -239,6 +239,11 @@ func (s *Store) GetPatientsForCenter(CenterID int) ([]types.CardData , error) {
 	}
 	defer rows.Close()
 
+	center , err := s.GetCenterByID(CenterID)
+	if err != nil {
+			return nil, fmt.Errorf("error getting center name for patient: %w", err)
+	}
+
 	cardData := make([]types.CardData,0)
 	for rows.Next() {
 		cardd , err := scanRowIntoPatientsCard(rows)
@@ -258,6 +263,7 @@ func (s *Store) GetPatientsForCenter(CenterID int) ([]types.CardData , error) {
 
 		cardd.Reviews = reviews
 		cardd.SugarType = sugerType
+		cardd.CenterName = center.CenterName
 		cardData = append(cardData, *cardd)
 	}
 

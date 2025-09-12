@@ -248,6 +248,7 @@ type CardData struct {
 	IDNumber		string       `json:"id_number"`
 	SugarType		string      `json:"sugarType"`
 	CreateAt         string      `json:"create_At"`
+	CenterName       string      `json:"centerName"`
 	Reviews         []Review     `json:"reviews"`          
 }
 
