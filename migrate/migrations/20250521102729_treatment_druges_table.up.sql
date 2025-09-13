@@ -4,6 +4,6 @@ CREATE TABLE IF NOT EXISTS  treatment_drugs (
     drug_id INT NOT NULL,
     dosage_per_day VARCHAR(255),
     quantity INT DEFAULT 0,
-    FOREIGN KEY (treatment_id) REFERENCES treatments(id) ON DELETE CASCADE,
+    FOREIGN KEY (treatment_id) REFERENCES treatments(id) ON DELETE CASCADE
     
 );

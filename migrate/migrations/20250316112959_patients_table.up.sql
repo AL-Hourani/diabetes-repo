@@ -8,6 +8,6 @@ CREATE TABLE IF NOT EXISTS patients (
     id_number VARCHAR(255) NOT NULL,
     center_id INT NOT NULL,
     createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    first_login BOOL  NOT NULL DEFAULT true
+    first_login BOOL  NOT NULL DEFAULT true,
     CONSTRAINT fk_center FOREIGN KEY (center_id) REFERENCES centers(id) ON DELETE CASCADE
 );

@@ -1669,7 +1669,11 @@ func (s *Store) GetAllMedications(centerID int) ([]types.GeTMedication, error) {
         if err != nil {
             return nil, err
         }
-        medications = append(medications, m)
+
+		if m.Quantity > 0 {
+
+			medications = append(medications, m)
+		}
     }
 
     if err := rows.Err(); err != nil {
