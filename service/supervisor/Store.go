@@ -4,9 +4,12 @@ import (
 	"database/sql"
 	"fmt"
 	"strconv"
-    "time"
-    "github.com/xuri/excelize/v2"
+	"time"
+
+	"github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/types"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/xuri/excelize/v2"
 )
 
 type Store struct {
@@ -797,4 +800,87 @@ func (s *Store) ParseMonthYear(input string) (month int, year int, err error) {
     month = int(t.Month())
     year = t.Year()
     return month, year, nil
+}
+
+
+
+
+
+
+
+
+func  (s *Store)  CreateToken(superVisorID int) (string, error) {
+    SECRET_KEY := []byte(config.Envs.JWTSecret)
+	expiration := time.Now().Add(30 * time.Minute)
+
+	claims := jwt.MapClaims{
+		"user_id": superVisorID,
+		"exp":     expiration.Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(SECRET_KEY)
+	if err != nil {
+		return "", err
+	}
+
+
+    _, err = s.db.Exec(`
+		INSERT INTO one_time_tokens (token, user_id)
+		VALUES ($1, $2)
+	`, tokenString,superVisorID)
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
+
+}
+
+
+
+
+
+func (s *Store) IsOneTimeTokenValid(tokenString string) (bool, error) {
+
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(config.Envs.JWTSecret), nil
+	})
+	if err != nil {
+		return false, fmt.Errorf("invalid token: %v", err)
+	}
+
+	if !token.Valid {
+		return false, fmt.Errorf("token is invalid or expired")
+	}
+
+	
+	var used bool
+	err = s.db.QueryRow(`
+		SELECT used
+		FROM one_time_tokens
+		WHERE token = $1
+	`, tokenString).Scan(&used)
+	if err != nil {
+		return false, fmt.Errorf("token not found")
+	}
+
+	if used {
+		return false, fmt.Errorf("token already used")
+	}
+
+
+	_, err = s.db.Exec(`
+		UPDATE one_time_tokens
+		SET used = TRUE
+		WHERE token = $1
+	`, tokenString)
+	if err != nil {
+		return false, fmt.Errorf("failed to mark token as used")
+	}
+
+	return true, nil
 }

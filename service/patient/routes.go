@@ -512,9 +512,6 @@ func (h *Handler) handleGetPatient (w http.ResponseWriter , r *http.Request) {
 
 // }
 
-
-
-
 func (h *Handler)  VerifyTokenHandler(w http.ResponseWriter , r *http.Request) {
 	tokenString := auth.GetTokenFromRequest(r)
 	if tokenString == "" {
@@ -540,8 +537,6 @@ func (h *Handler)  VerifyTokenHandler(w http.ResponseWriter , r *http.Request) {
 		http.Error(w, "Invalid token", http.StatusUnauthorized)
 		return
 	}
-
-
 
 	utils.WriteJSON(w , http.StatusOK , "Token is Vaild")
 }

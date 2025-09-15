@@ -47,8 +47,9 @@ func (h *Handler) RegisterSuperVisorRoutes(router *mux.Router) {
 	router.HandleFunc("/acceptedInquiries",auth.WithJWTAuth(h.handleAcceptedInquiries)).Methods("POST")
 	router.HandleFunc("/CreateDatePatientFile",auth.WithJWTAuth(h.handleGetSuperExcel)).Methods("POST")
 	router.HandleFunc("/superLogin",h.handleLoginSupervisor).Methods("POST")
-    // ربط دالة ServeFile مع URL يحتوي على اسم الملف
+
     router.HandleFunc("/download/{fileName}", h.handleServeFile).Methods("GET")
+    router.HandleFunc("/generateToken", auth.WithJWTAuth(h.handleGenerateToken)).Methods("GET")
 
 }
 
@@ -831,3 +832,53 @@ func (h *Handler) handleGetSuperExcel(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
     w.Write([]byte(fmt.Sprintf(`{"url":"%s"}`, downloadURL)))
 }
+
+
+
+
+
+
+
+
+
+func (h *Handler) handleGenerateToken (w http.ResponseWriter, r *http.Request) {
+
+	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
+	if !ok {
+		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
+		return
+	}
+
+	idSup, err := auth.GetIDFromToken(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	user , err := h.pStore.GetLoginByID(idSup)
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	if user.Role != "supervisor" {
+		http.Error(w, "Unauthorized: You are not supervisor", http.StatusUnauthorized)
+		return
+	}
+
+	tokenCenter , err := h.superStore.CreateToken(idSup)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+
+	newTokenGenterated := types.GenerateCenterToken {
+		Token: tokenCenter,
+	}
+
+	utils.WriteJSON(w , http.StatusOK ,newTokenGenterated )
+
+}
+
+

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/AL-Hourani/care-center/config"
+	// "github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/service/auth"
 	"github.com/AL-Hourani/care-center/service/notifications"
 
@@ -81,8 +81,6 @@ func (h *Handler) RegisterCenterRoutes(router *mux.Router) {
     router.HandleFunc("/getAllVideos",h.handleGetAllVideos).Methods("GET")
     router.HandleFunc("/videoDelete/{id}", auth.WithJWTAuth(h.handleDeleteVideo)).Methods("DELETE")
     router.HandleFunc("/sse/notifications", h.NotifHub.HandleSSE)
-
-
 
 	router.HandleFunc("/sendNotification", auth.WithJWTAuth(h.handleSendNotification)).Methods("POST")
 
@@ -232,14 +230,16 @@ func (h *Handler) handleCheckIsCenter(w http.ResponseWriter , r *http.Request) {
 
 	if err := utils.ParseJSON(r , &SecretKey); err != nil {
 		utils.WriteError(w , http.StatusBadRequest , err)
-	}
-
-	if SecretKey.SecretKey != config.Envs.CENTERKEY {
-	    utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("secret key is in correct"))
 		return
 	}
 
-	utils.WriteJSON(w , http.StatusOK ,"")
+    valid, err := h.superStore.IsOneTimeTokenValid(SecretKey.SecretKey)
+	if !valid {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	utils.WriteJSON(w , http.StatusOK ,"Valid Token")
 }
 
 func (h *Handler) handleGetCenters(w http.ResponseWriter , r *http.Request) {

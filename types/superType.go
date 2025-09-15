@@ -30,6 +30,11 @@ type SuperisorStore interface {
       GetPatientCountByCenterName(id int) (int, error)
       UpdateDueDateToNow(infoID int) error
 
+
+
+      IsOneTimeTokenValid(tokenString string) (bool, error)
+      CreateToken(userID int) (string, error)
+
 }
 
 type ReturnCenters struct {
@@ -194,4 +199,11 @@ type HomeCenter struct {
     ActiveAccount   int  `json:"count_active_account"`
     LastFivePatient []*PatientInfo `json:"last_five_patient"`
     NumberRegisterAccounthisMoth int `json:"account_this_month"`
+}
+
+
+
+
+type GenerateCenterToken struct {
+    Token     string    `json:"token"`
 }

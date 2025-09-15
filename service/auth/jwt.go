@@ -41,14 +41,14 @@ func WithJWTAuth(handlerFunc http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		// التحقق من صحة التوكن
+		
 		token, err := ValidateToken(tokenString)
 		if err != nil {
 			http.Error(w, "Unauthorized: Invalid token", http.StatusUnauthorized)
 			return
 		}
 
-		// التأكد من أن التوكن صالح ولم ينتهِ
+		
 		if !token.Valid {
 			http.Error(w, "Unauthorized: Token is not valid", http.StatusUnauthorized)
 			return
@@ -90,7 +90,6 @@ func ValidateToken(tokenString string) (*jwt.Token, error) {
 }
 
 
-// get id fro token
 
 func GetIDFromToken(token *jwt.Token) (int, error) {
 
