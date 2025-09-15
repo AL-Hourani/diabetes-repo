@@ -720,7 +720,7 @@ func (s *Store) GetPatientReviewsByMonth(month, year , id int) ([]types.PatientR
 func CreateExcelFile(reviews []types.PatientReview) (*excelize.File, error) {
     f := excelize.NewFile()
     sheet := "Sheet1"
-    f.NewSheet(sheet)
+    f.SetSheetName(f.GetSheetName(0), sheet)
 
     headers := []string{
         "اسم المريض", "البريد الإلكتروني", "الهاتف",

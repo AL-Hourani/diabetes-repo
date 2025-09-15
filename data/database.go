@@ -6,6 +6,7 @@ import (
     "fmt"
 	
 	_ "github.com/lib/pq"
+	//  "github.com/jackc/pgx/v5/pgxpool"
 )
 
 type PostgresConfig struct {
@@ -32,8 +33,8 @@ func NewMQLStorage(cfg PostgresConfig) (*sql.DB , error) {
 	}
 
 
-	db.SetMaxOpenConns(50)    // الحد الأقصى للاتصالات المفتوحة في نفس الوقت
-    db.SetMaxIdleConns(20)     // الحد الأقصى للاتصالات الفارغة التي يمكن أن تبقى مفتوحة
+	db.SetMaxOpenConns(50)   
+    db.SetMaxIdleConns(20)  
     db.SetConnMaxLifetime(0)  
 
 	return db , nil
@@ -49,3 +50,25 @@ func InitStorage(db *sql.DB) {
 
 	log.Println("DB : Successfuly connected !")
 }
+
+
+
+
+
+// type dbLogger struct{}
+
+
+// func (d dbLogger) BeforeQuery(ctx context.Context, evt pgxpool.QueryEvent) context.Context {
+//     f, _ := os.OpenFile("queries.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+// fmt.Fprintln(f, "Executing query:", evt.SQL)
+// f.Close()
+
+// }
+
+
+// func (d dbLogger) AfterQuery(ctx context.Context, evt pgxpool.QueryEvent) {
+//     f, _ := os.OpenFile("queries.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+// fmt.Fprintln(f, "Executing query:", evt.SQL)
+// f.Close()
+
+// }
