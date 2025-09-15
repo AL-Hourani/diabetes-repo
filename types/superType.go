@@ -21,7 +21,7 @@ type SuperisorStore interface {
      GetPatientCountByCityLastMonth(cityName string) (int, error) 
      GetCenterWithMostPatients() (*CenterWithCount, error) 
      ParseMonthYear(input string) (month int, year int, err error) 
-     GetPatientReviewsByMonth(month, year int) ([]PatientReview, error) 
+     GetPatientReviewsByMonth(month, year , id int) ([]PatientReview, error) 
 
       GetPatientCountByCenterLastMonth(id int) (int, error) 
       GetMaleCountByCenter(id int) (int, error)
@@ -101,6 +101,7 @@ type GenericSuperInfo struct {
 
 
 type AboutCenterInfo struct {
+    CenterName                       string `json:"centerName"`
     NumberOfPatientInCenter          int `json:"nop_in_center"`
     RegisterPatientLastMonth         int  `json:"nop_in_center_lm"`
     NumberOfMale                     int `json:"number_of_male"`
@@ -177,6 +178,7 @@ type PatientReview struct {
 
 
 type MonthDown struct {
+    CenterID    int       `json:"id"`
     MonthDown   string    `json:"date"`
 }
 

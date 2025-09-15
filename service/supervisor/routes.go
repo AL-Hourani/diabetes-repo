@@ -550,6 +550,12 @@ func (h *Handler) handleGetInfoAboutCenter(w http.ResponseWriter, r *http.Reques
 	// 	return
 	// }
 
+	center , err := h.store.GetCenterByID(id)
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, err)
+		return
+	}
+
 	nop , err := h.superStore.GetPatientCountByCenterName(id)
 	if err != nil {
 		utils.WriteError(w, http.StatusUnauthorized, err)
@@ -574,6 +580,7 @@ func (h *Handler) handleGetInfoAboutCenter(w http.ResponseWriter, r *http.Reques
 	}
 
 	aboutCenterInfo := types.AboutCenterInfo {
+		CenterName: center.CenterName,
 		NumberOfPatientInCenter: nop,
 		RegisterPatientLastMonth:nop_in_center_lm ,
 		NumberOfMale:number_of_male ,
@@ -794,7 +801,7 @@ func (h *Handler) handleGetSuperExcel(w http.ResponseWriter, r *http.Request) {
 	}
 
 
-    reviews, err := h.superStore.GetPatientReviewsByMonth(month, year)
+    reviews, err := h.superStore.GetPatientReviewsByMonth(month, year , date.CenterID)
 	  if err != nil {
       	   utils.WriteError(w , http.StatusBadRequest , err)
         return

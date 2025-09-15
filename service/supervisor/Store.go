@@ -560,7 +560,7 @@ func (s *Store) GetCenterWithMostPatients() (*types.CenterWithCount, error) {
 
 
 
-func (s *Store) GetPatientReviewsByMonth(month, year int) ([]types.PatientReview, error) {
+func (s *Store) GetPatientReviewsByMonth(month, year , id int) ([]types.PatientReview, error) {
 	query := `
         SELECT 
             r.id AS review_id,
@@ -652,10 +652,11 @@ func (s *Store) GetPatientReviewsByMonth(month, year int) ([]types.PatientReview
         LEFT JOIN treatments t ON t.review_id = r.id
         WHERE EXTRACT(MONTH FROM r.date_review) = $1
           AND EXTRACT(YEAR FROM r.date_review) = $2
+          AND p.center_id = $3
         ORDER BY r.date_review;
     `
 
-	rows, err := s.db.Query(query, month, year)
+	rows, err := s.db.Query(query, month, year , id)
 	if err != nil {
 		return nil, err
 	}
@@ -706,7 +707,7 @@ func (s *Store) GetPatientReviewsByMonth(month, year int) ([]types.PatientReview
 			}
 			treatmentDrugs = append(treatmentDrugs, d)
 		}
-		drugRows.Close() // أغلق بعد الانتهاء
+		drugRows.Close() 
 		r.TreatmentDrugs = treatmentDrugs
 
 		reviews = append(reviews, r)
@@ -718,7 +719,7 @@ func (s *Store) GetPatientReviewsByMonth(month, year int) ([]types.PatientReview
 
 func CreateExcelFile(reviews []types.PatientReview) (*excelize.File, error) {
     f := excelize.NewFile()
-    sheet := "Patients"
+    sheet := "Sheet1"
     f.NewSheet(sheet)
 
     headers := []string{
@@ -781,7 +782,7 @@ func CreateExcelFile(reviews []types.PatientReview) (*excelize.File, error) {
         }
     }
 
-    // ضبط عرض الأعمدة تلقائياً
+ 
     f.SetColWidth(sheet, "A", "AQ", 25)
 
     return f, nil
