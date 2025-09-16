@@ -93,7 +93,7 @@ func scanRowIntoPatient(rows *sql.Rows) (*types.Patient , error ){
 
 
 func (s *Store) GetLoginByID(id int) (*types.Login, error) {
-    // استعلام لاستخراج بيانات المستخدم من جدول login_serach
+ 
     row := s.db.QueryRow(`
         SELECT id, email, password , role
         FROM login_serach
