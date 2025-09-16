@@ -130,8 +130,16 @@ func (h *Handler) handleLogin(w http.ResponseWriter , r *http.Request) {
 			   utils.WriteError(w, http.StatusInternalServerError, err)
 			   return
 		   }
+
 		   
-				// إنشاء JWT Token
+
+				err =   h.store.SetFirstLoginTrue(patient.ID)
+				if err != nil {
+					utils.WriteError(w, http.StatusInternalServerError, err)
+					return
+				}
+		   
+			
 				secret := []byte(config.Envs.JWTSecret)
 				token, err := auth.CreateJWT(secret, patient.ID)
 				if err != nil {
@@ -791,17 +799,6 @@ func (h *Handler) handleResetPassword(w http.ResponseWriter , r *http.Request) {
     }
 
 
-	patient , err := h.store.GetPatientByEmail(resetPasswordPayload.Email)
-    if err != nil {
-        utils.WriteError(w, http.StatusInternalServerError, err)
-        return
-    }
-
-	err =   h.store.SetFirstLoginTrue(patient.ID)
-    if err != nil {
-        utils.WriteError(w, http.StatusInternalServerError, err)
-        return
-    }
 	
    
     utils.WriteJSON(w, http.StatusOK, map[string]string{

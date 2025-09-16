@@ -1120,7 +1120,7 @@ func (s *Store) UpdatePatientBasicInfo(p types.UpdatePatientInfo , id int) (*typ
         return &types.UpdatePatientInfo{}, err
     }
 
-    // تحديث البريد في جدول login_serach باستخدام البريد القديم
+
     _, err = tx.Exec(`
         UPDATE login_serach
         SET email = $1

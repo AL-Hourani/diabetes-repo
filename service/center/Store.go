@@ -1948,7 +1948,7 @@ func (s *Store) GetLastFivePatientsByCenter(centerID int) ([]*types.PatientInfo,
 
 
 func (s *Store) CountPatientsAfterFirstLoginByCenter(centerID int) (int, error) {
-    query := `SELECT COUNT(*) FROM patients WHERE first_login = true AND center_id = $1;`
+    query := `SELECT COUNT(*) FROM patients WHERE first_login = false AND center_id = $1;`
 
     var count int
     err := s.db.QueryRow(query, centerID).Scan(&count)
