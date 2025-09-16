@@ -268,6 +268,10 @@ func (h *Handler) handlePatientRegister(w http.ResponseWriter , r *http.Request)
 
 
 
+// this func to get all patient info for patient apppp
+
+
+
 func (h *Handler) handleGetPatientProfile(w http.ResponseWriter , r *http.Request) {
     
 	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
