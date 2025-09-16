@@ -18,27 +18,27 @@ type Store struct {
 func NewStore(db *sql.DB) *Store {
 	return &Store{db: db}
 }
-func  (s *Store) GetPatientByEmail(email string) (*types.Patient , error) {
-	rows , err := s.db.Query("SELECT id,fullName,email,password,phone,date,id_number,center_id,createAt,first_login FROM patients WHERE email=$1",email)
-	if err != nil {
-		return nil , err
-	}
-	defer rows.Close()
+// func  (s *Store) GetPatientByEmail(email string) (*types.Patient , error) {
+// 	rows , err := s.db.Query("SELECT id,fullName,email,password,phone,date,id_number,center_id,createAt,first_login FROM patients WHERE email=$1",email)
+// 	if err != nil {
+// 		return nil , err
+// 	}
+// 	defer rows.Close()
 
-	p := new(types.Patient)
-	for rows.Next() {
-		p , err = scanRowIntoPatient(rows)
-		if err != nil {
-			return nil , err
-		}
-	}
+// 	p := new(types.Patient)
+// 	for rows.Next() {
+// 		p , err = scanRowIntoPatient(rows)
+// 		if err != nil {
+// 			return nil , err
+// 		}
+// 	}
 
-	if p.ID == 0 {
-		return nil , fmt.Errorf("patient not found")
-	}
+// 	if p.ID == 0 {
+// 		return nil , fmt.Errorf("patient not found")
+// 	}
 
-	return p , nil
-}
+// 	return p , nil
+// }
 
 
 
@@ -64,6 +64,24 @@ func  (s *Store) GetPatientById(id int) (*types.Patient , error) {
 	return p , nil
 }
 
+
+func (s *Store) GetPatientByEmail(email string) (*types.Patient, error) {
+    query := `SELECT id, fullName, email, password, phone, date, id_number, center_id, createAt, first_login 
+              FROM patients WHERE email = $1`
+
+    row := s.db.QueryRow(query, email)
+
+    p := new(types.Patient)
+    err := row.Scan(&p.ID, &p.FullName, &p.Email, &p.Password, &p.Phone, &p.Age, &p.IDNumber, &p.CenterID, &p.CreateAt, &p.FirstLogin)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return nil, fmt.Errorf("patient not found")
+        }
+        return nil, err
+    }
+
+    return p, nil
+}
 
 
 
@@ -1083,7 +1101,7 @@ func (s *Store) UpdatePatientBasicInfo(p types.UpdatePatientInfo , id int) (*typ
         return &types.UpdatePatientInfo{}, err
     }
 
-    // جلب البريد الحالي من جدول المرضى
+   
     var oldEmail string
     err = tx.QueryRow(`SELECT email FROM patients WHERE id = $1`, id).Scan(&oldEmail)
     if err != nil {
