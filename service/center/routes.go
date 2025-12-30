@@ -10,6 +10,7 @@ import (
 	"time"
 
 	// "github.com/AL-Hourani/care-center/config"
+	"github.com/AL-Hourani/care-center/config"
 	"github.com/AL-Hourani/care-center/service/auth"
 	"github.com/AL-Hourani/care-center/service/notifications"
 
@@ -233,11 +234,14 @@ func (h *Handler) handleCheckIsCenter(w http.ResponseWriter , r *http.Request) {
 		return
 	}
 
-    valid, err := h.superStore.IsOneTimeTokenValid(SecretKey.SecretKey)
-	if !valid {
-		utils.WriteError(w, http.StatusBadRequest, err)
+	if SecretKey.SecretKey != config.Envs.CENTERKEY {
+		utils.WriteError(w, http.StatusBadRequest,fmt.Errorf("invalid key"))
 		return
 	}
+    // valid, err := h.superStore.IsOneTimeTokenValid(SecretKey.SecretKey)
+	// if !valid {
+
+	// }
 
 	utils.WriteJSON(w , http.StatusOK ,"Valid Token")
 }

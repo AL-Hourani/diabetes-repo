@@ -258,7 +258,7 @@ func (h *Handler) handleLoginSupervisor(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-		// find patient .............................................................
+		// find supervisor .............................................................
 	user, err := h.pStore.GetUserByEmail(LoginPayload.Email)
 	if err != nil {
 		utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("invalid email or password"))
