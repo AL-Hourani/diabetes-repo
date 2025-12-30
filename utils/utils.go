@@ -46,7 +46,6 @@ func VerifyOTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// التحقق من الرمز
 	if auth.VerifyOTP(req.Email, req.OTPCode) {
 		w.Write([]byte("OTP verified successfully"))
 	} else {

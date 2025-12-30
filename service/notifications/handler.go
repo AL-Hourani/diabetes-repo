@@ -55,7 +55,7 @@ func (h *Hub) Run() {
 				for _, ch := range chans {
 					select {
 					case ch <- notif:
-					case <-time.After(1 * time.Second): // لا تنتظر كثيرًا
+					case <-time.After(1 * time.Second): 
 					}
 				}
 			}
@@ -78,16 +78,16 @@ func (h *Hub) HandleSSE(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 
-	// قناة لهذا العميل
+
 	notifChan := make(chan types.Notification)
 
-	// سجل العميل
+	
 	h.register <- clientConn{ID: id, Chan: notifChan}
 	defer func() {
 		h.unregister <- clientConn{ID: id, Chan: notifChan}
 	}()
 
-	// بث الإشعارات
+
 	for notif := range notifChan {
 		data, _ := json.Marshal(notif)
 		fmt.Fprintf(w, "data: %s\n\n", data)

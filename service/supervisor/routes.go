@@ -34,7 +34,6 @@ func NewHandler(store types.CenterStore , patientStore types.PatientStore , supe
 
 
 
-
 func (h *Handler) RegisterSuperVisorRoutes(router *mux.Router) {
 	router.HandleFunc("/getSupervisorCenters",auth.WithJWTAuth(h.handleGetAllCentersData)).Methods("GET")
 	router.HandleFunc("/getInquiries",auth.WithJWTAuth(h.handleGetInquiries)).Methods("GET")
@@ -760,9 +759,6 @@ func (h *Handler) handleGetSuperInfo(w http.ResponseWriter, r *http.Request) {
 	
 	utils.WriteJSON(w , http.StatusOK ,newSystemInfo )
 }
-
-
-
 
 
 

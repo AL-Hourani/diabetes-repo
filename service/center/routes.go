@@ -836,7 +836,6 @@ func (h *Handler) handleAddReviewe(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-	// العمليات الثانوية: إدخال بيانات العيون / القلب / الأعصاب / العظام / البول
 	go func() {
 		if payload.Has_a_eye_disease {
 			_ = h.store.InsertClinicEye(types.Clinic_Eye{
@@ -1769,7 +1768,9 @@ func (h *Handler) handleGetRecords(w http.ResponseWriter, r *http.Request) {
     if err != nil || page < 1 {
         page = 1
     }
+ 
 
+	
 	token, ok := r.Context().Value(auth.UserContextKey).(*jwt.Token)
 	if !ok {
 		http.Error(w, "Unauthorized: No token found", http.StatusUnauthorized)
